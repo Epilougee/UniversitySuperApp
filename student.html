@@ -1,0 +1,3710 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uni | Student Portal</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap"
+    rel="stylesheet">
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    :root {
+      --bg-dark: #020408;
+      --chalk-white: #ffffff;
+      --glass: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --glass-hover: rgba(255, 255, 255, 0.1);
+      --accent: #6366f1;
+      --aura-purple: #4c1d95;
+      --muted: rgba(255, 255, 255, 0.45);
+      --muted2: rgba(255, 255, 255, 0.25);
+      --gold: #e8a020;
+      --gold2: #f5c842;
+      --teal: #0d9488;
+      --rose: #e11d48;
+      --green: #10b981;
+      --violet: #7c3aed;
+      --admin: #6366f1;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body,
+    html {
+      width: 100%;
+      height: 100%;
+      background: #020408;
+      background: radial-gradient(circle at 30% 20%, #0d1117 0%, #020408 100%);
+      font-family: 'Inter', -apple-system, sans-serif;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    /* â”€â”€ CHALK BG â”€â”€ */
+    #chalkboard {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .chalk-icon {
+      position: absolute;
+      color: rgba(255, 255, 255, 0.35);
+      pointer-events: none;
+      filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.1));
+      will-change: transform, color, opacity;
+      transition: color 0.3s ease, opacity 0.3s ease;
+    }
+
+    /* â”€â”€ MOUSE GLOW â”€â”€ */
+    #mouse-glow {
+      position: fixed;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: screen;
+      transition: left 0.05s, top 0.05s;
+    }
+
+    /* â”€â”€ LAYOUT â”€â”€ */
+    .app {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      height: 100vh;
+      width: 100%;
+    }
+
+    /* â”€â”€ SIDEBAR â”€â”€ */
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      background: var(--glass);
+      border-right: 1px solid var(--glass-border);
+      backdrop-filter: blur(30px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .sb-nav {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .sb-nav::-webkit-scrollbar {
+      width: 2px;
+    }
+
+    .sb-nav::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+    }
+
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 200px;
+      background: radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.05), transparent);
+      pointer-events: none;
+    }
+
+    .sb-head {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .sb-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+
+    .sb-logo span {
+      color: #a5b4fc;
+    }
+
+    .sb-uni {
+      font-size: .58rem;
+      color: var(--muted2);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .sb-profile {
+      margin: 14px 12px;
+      padding: 10px 12px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sb-av {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .8rem;
+      font-weight: 800;
+      color: #111;
+    }
+
+    .sb-name {
+      font-size: .78rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .sb-role {
+      font-size: .62rem;
+      color: var(--muted);
+    }
+
+    .sb-section {
+      font-size: .56rem;
+      color: var(--muted2);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 12px 20px 4px;
+    }
+
+    .sb-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 20px;
+      cursor: pointer;
+      transition: all .15s;
+      border-left: 2px solid transparent;
+      font-size: .78rem;
+      font-weight: 500;
+      color: var(--muted);
+      position: relative;
+    }
+
+    .sb-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .sb-item.active {
+      background: rgba(99, 102, 241, 0.1);
+      color: #a5b4fc;
+      border-left-color: #6366f1;
+    }
+
+    .sb-ico {
+      font-size: .85rem;
+      width: 16px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .sb-bdg {
+      margin-left: auto;
+      background: var(--rose);
+      color: #fff;
+      font-size: .55rem;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 99px;
+      min-width: 15px;
+      text-align: center;
+    }
+
+    .sb-foot {
+      margin-top: auto;
+      padding: 14px 20px;
+      border-top: 1px solid var(--glass-border);
+    }
+
+    /* â”€â”€ MAIN â”€â”€ */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .main::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .main::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 99px;
+    }
+
+    .main::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.08));
+      border-radius: 99px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .main::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.18));
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(2, 4, 8, 0.8);
+      backdrop-filter: blur(30px);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .tb-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      flex: 1;
+    }
+
+    .tb-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 99px;
+      padding: 7px 14px;
+    }
+
+    .tb-search input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      font-size: .78rem;
+      color: #fff;
+      width: 140px;
+    }
+
+    .tb-search input::placeholder {
+      color: var(--muted2);
+    }
+
+    .nb {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: var(--glass);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: .85rem;
+      position: relative;
+      transition: .2s;
+    }
+
+    .nb:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+      background: var(--glass-hover);
+    }
+
+    .ndot {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      min-width: 16px;
+      height: 16px;
+      background: var(--rose);
+      border-radius: 99px;
+      border: 1.5px solid var(--bg-dark);
+      font-size: .58rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 3px;
+      color: #fff;
+      transition: transform .2s;
+    }
+
+    /* â”€â”€ NOTIFICATION DROPDOWN â”€â”€ */
+    .notif-panel {
+      position: fixed;
+      top: 58px;
+      right: 16px;
+      width: 320px;
+      max-height: 480px;
+      background: rgba(10, 12, 24, 0.96);
+      backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      z-index: 999;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      animation: panelIn .2s ease both;
+      display: none;
+    }
+
+    .notif-panel.open {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .notif-hdr {
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .notif-title {
+      font-size: .82rem;
+      font-weight: 700;
+    }
+
+    .notif-list {
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .notif-list::-webkit-scrollbar {
+      width: 2px;
+    }
+
+    .notif-item {
+      padding: 11px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      cursor: pointer;
+      transition: background .15s;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .notif-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .notif-item.unread {
+      background: rgba(99, 102, 241, 0.06);
+    }
+
+    .notif-ico {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .8rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .notif-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .notif-body-t {
+      font-size: .76rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+      line-height: 1.35;
+    }
+
+    .notif-body-s {
+      font-size: .66rem;
+      color: var(--muted);
+    }
+
+    .notif-unread-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+      margin-top: 6px;
+    }
+
+    .notif-empty {
+      padding: 30px 16px;
+      text-align: center;
+      color: var(--muted);
+      font-size: .78rem;
+    }
+
+    .notif-foot {
+      padding: 10px 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      text-align: center;
+    }
+
+    .page {
+      padding: 20px 24px 40px;
+    }
+
+    /* â”€â”€ GLASS CARD â”€â”€ */
+    .gcard {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      backdrop-filter: blur(30px);
+      padding: 18px 20px;
+      transition: border-color .2s, transform .2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gcard:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    /* â”€â”€ GRID â”€â”€ */
+    .g2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .g3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .g4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    /* â”€â”€ STAT CARD â”€â”€ */
+    .stat {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      backdrop-filter: blur(30px);
+      transition: .2s;
+    }
+
+    .stat:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .stat-ico {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .stat-n {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .stat-l {
+      font-size: .68rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* â”€â”€ HERO BANNER â”€â”€ */
+    .hero {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 22px 24px;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+      margin-bottom: 14px;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(232, 160, 32, 0.12), transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: 'Uni';
+      position: absolute;
+      bottom: -24px;
+      right: 16px;
+      font-family: 'Playfair Display', serif;
+      font-size: 5rem;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.03);
+      pointer-events: none;
+    }
+
+    .hero-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.55rem;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .hero-sub {
+      font-size: .75rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .hero-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .htag {
+      font-size: .65rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .htag.gold {
+      background: rgba(232, 160, 32, 0.12);
+      border-color: rgba(232, 160, 32, 0.25);
+      color: var(--gold);
+    }
+
+    /* â”€â”€ BUTTONS â”€â”€ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      font-size: .75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .btn-white {
+      background: #fff;
+      color: #000;
+    }
+
+    .btn-white:hover {
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-glass {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      color: #fff;
+    }
+
+    .btn-glass:hover {
+      background: var(--glass-hover);
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: #000;
+    }
+
+    .btn-gold:hover {
+      background: var(--gold2);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: .7rem;
+    }
+
+    .btn-xs {
+      padding: 3px 8px;
+      font-size: .65rem;
+    }
+
+    /* â”€â”€ INPUTS â”€â”€ */
+    .inp {
+      width: 100%;
+      padding: 10px 13px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: .82rem;
+      outline: none;
+      transition: .2s;
+    }
+
+    .inp:focus {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .inp::placeholder {
+      color: var(--muted2);
+    }
+
+    textarea.inp {
+      resize: vertical;
+      min-height: 72px;
+    }
+
+    /* â”€â”€ TAGS â”€â”€ */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 7px;
+      border-radius: 99px;
+      font-size: .62rem;
+      font-weight: 600;
+    }
+
+    .t-gold {
+      background: rgba(232, 160, 32, 0.15);
+      color: var(--gold);
+      border: 1px solid rgba(232, 160, 32, 0.25);
+    }
+
+    .t-teal {
+      background: rgba(13, 148, 136, 0.15);
+      color: #2dd4bf;
+      border: 1px solid rgba(13, 148, 136, 0.25);
+    }
+
+    .t-rose {
+      background: rgba(225, 29, 72, 0.15);
+      color: #fb7185;
+      border: 1px solid rgba(225, 29, 72, 0.25);
+    }
+
+    .t-green {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .t-violet {
+      background: rgba(124, 58, 237, 0.15);
+      color: #a78bfa;
+      border: 1px solid rgba(124, 58, 237, 0.25);
+    }
+
+    .t-white {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    /* â”€â”€ SECTION HEADER â”€â”€ */
+    .sh {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .sh-t {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    /* â”€â”€ DIVIDER â”€â”€ */
+    .div {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.07);
+      margin: .8rem 0;
+    }
+
+    /* â”€â”€ PROGRESS BAR â”€â”€ */
+    .pb {
+      height: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .pf {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 1s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    /* â”€â”€ LIST ITEM â”€â”€ */
+    .li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 8px;
+      border-radius: 10px;
+      transition: .15s;
+      cursor: pointer;
+    }
+
+    .li:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    /* â”€â”€ ATTENDANCE â”€â”€ */
+    .att-wrap {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      flex-shrink: 0;
+    }
+
+    .att-svg {
+      width: 80px;
+      height: 80px;
+      transform: rotate(-90deg);
+    }
+
+    .att-ring-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.08);
+      stroke-width: 5;
+    }
+
+    .att-ring-fill {
+      fill: none;
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-dasharray: 219.9;
+      transition: stroke-dashoffset 1.2s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .att-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .att-pct {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .att-lbl {
+      font-size: .5rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    /* â”€â”€ CHAT â”€â”€ */
+    .chat-layout {
+      display: flex;
+      height: calc(100vh - 130px);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      overflow: hidden;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+    }
+
+    .chat-left {
+      width: 220px;
+      flex-shrink: 0;
+      border-right: 1px solid var(--glass-border);
+      overflow-y: auto;
+    }
+
+    .chat-left::-webkit-scrollbar {
+      width: 2px;
+    }
+
+    .chat-si {
+      padding: 10px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      transition: .15s;
+    }
+
+    .chat-si:hover,
+    .chat-si.active {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .chat-si.active {
+      border-left: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .chat-sn {
+      font-size: .78rem;
+      font-weight: 600;
+    }
+
+    .chat-sp {
+      font-size: .68rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 2px;
+    }
+
+    .chat-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-hdr {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chat-msgs {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .chat-msgs::-webkit-scrollbar {
+      width: 2px;
+    }
+
+    .cmsg {
+      max-width: 68%;
+      padding: 9px 13px;
+      border-radius: 12px;
+      font-size: .8rem;
+      line-height: 1.55;
+    }
+
+    .cm-me {
+      align-self: flex-end;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 12px 12px 2px 12px;
+    }
+
+    .cm-them {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px 12px 12px 2px;
+    }
+
+    .chat-inp {
+      padding: 10px 12px;
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      gap: 8px;
+    }
+
+    /* â”€â”€ TIMETABLE â”€â”€ */
+    .tt {
+      display: grid;
+      grid-template-columns: 52px repeat(6, 1fr);
+      gap: 2px;
+      font-size: .68rem;
+    }
+
+    .tt-h {
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.7);
+      padding: 6px 4px;
+      text-align: center;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: .62rem;
+    }
+
+    .tt-t {
+      color: var(--muted);
+      padding: 4px 4px;
+      text-align: right;
+      font-size: .6rem;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .tt-c {
+      padding: 3px 3px;
+      border-radius: 5px;
+      min-height: 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .tt-e {
+      border: 1px dashed rgba(255, 255, 255, 0.06);
+    }
+
+    .tt-s {
+      color: #fff;
+      font-weight: 600;
+      font-size: .62rem;
+      padding: 4px 5px;
+    }
+
+    /* â”€â”€ MARKET CARD â”€â”€ */
+    .mkt-c {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: .2s;
+      cursor: pointer;
+      backdrop-filter: blur(20px);
+    }
+
+    .mkt-c:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .mkt-img {
+      height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    /* â”€â”€ TOAST â”€â”€ */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 999;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: .8rem;
+      font-weight: 500;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: fadeUp .3s ease;
+    }
+
+    /* â”€â”€ MODAL â”€â”€ */
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      backdrop-filter: blur(30px);
+      animation: fadeIn .2s ease;
+    }
+
+    .modal {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      backdrop-filter: blur(30px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      max-width: 90vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalSlide .3s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    @keyframes modalSlide {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-t {
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: .95rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-c {
+      padding: 20px 24px;
+      max-height: calc(90vh - 120px);
+      overflow-y: auto;
+    }
+
+    .modal-b {
+      padding: 16px 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    @keyframes panelIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    /* â”€â”€ GLOBAL LOADER â”€â”€ */
+    .global-loader {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      backdrop-filter: blur(30px);
+      animation: fadeIn .2s ease;
+    }
+
+    .global-loader.hidden {
+      display: none;
+    }
+
+    .loader-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255, 255, 255, 0.2);
+      border-top: 4px solid #a5b4fc;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* â”€â”€ FORM VALIDATION â”€â”€ */
+    .form-error {
+      color: #fb7185;
+      font-size: .7rem;
+      margin-top: 3px;
+      min-height: 16px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .inp.error {
+      border-color: #fb7185 !important;
+      background: rgba(251, 113, 133, 0.05) !important;
+    }
+
+    .inp.success {
+      border-color: #10b981 !important;
+      background: rgba(16, 185, 129, 0.05) !important;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .btn.loading {
+      position: relative;
+      color: transparent;
+    }
+
+    .btn.loading::after {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      top: 50%;
+      left: 50%;
+      margin-left: -7px;
+      margin-top: -7px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    .panel {
+      animation: panelIn .3s ease both;
+    }
+
+    /* â”€â”€ PANELS â”€â”€ */
+    #panel-ai {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh-115px);
+    }
+
+    .ai-msgs {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-bottom: 10px;
+    }
+
+    .ai-msgs::-webkit-scrollbar {
+      width: 2px;
+    }
+
+    /* â”€â”€ SUBJECT EXPAND â”€â”€ */
+    .subj-c {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: .2s;
+      margin-bottom: 8px;
+      backdrop-filter: blur(20px);
+    }
+
+    .subj-c:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .subj-head {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .subj-arrow {
+      color: var(--muted);
+      font-size: .9rem;
+      margin-left: auto;
+      transition: .3s;
+    }
+
+    .subj-c.open .subj-arrow {
+      transform: rotate(180deg);
+    }
+
+    .subj-detail {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .4s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .subj-c.open .subj-detail {
+      max-height: 320px;
+    }
+
+    .detail-inner {
+      padding: 16px 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    /* â”€â”€ CAL GRID â”€â”€ */
+    .cal-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+      margin-top: 8px;
+    }
+
+    .cal-d {
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .55rem;
+      font-weight: 600;
+    }
+
+    .cal-p {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+    }
+
+    .cal-a {
+      background: rgba(225, 29, 72, 0.2);
+      color: #fb7185;
+    }
+
+    /* â”€â”€ POSTS â”€â”€ */
+    .post {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 16px 18px;
+      margin-bottom: 10px;
+      backdrop-filter: blur(20px);
+    }
+
+    .post:hover {
+      border-color: rgba(255, 255, 255, 0.16);
+    }
+
+    /* â”€â”€ EVENT CARD â”€â”€ */
+    .ev-c {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: .2s;
+      backdrop-filter: blur(20px);
+    }
+
+    .ev-c:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    /* â”€â”€ BOOK CARD â”€â”€ */
+    .bk-c {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: .2s;
+      backdrop-filter: blur(20px);
+    }
+
+    .bk-c:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    /* â”€â”€ SCROLLBAR GLOBAL â”€â”€ */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 99px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.08));
+      border-radius: 99px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: background .2s;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.18));
+    }
+
+    @media(max-width:768px) {
+      .sidebar {
+        display: none
+      }
+
+      .g4 {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .g3 {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .chat-left {
+        display: none
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="mouse-glow"></div>
+  <div id="chalkboard"></div>
+
+  <div class="app">
+
+    <!-- â”€â”€â”€ SIDEBAR â”€â”€â”€ -->
+    <aside class="sidebar">
+      <div class="sb-head">
+        <div class="sb-logo">Un<span>i</span></div>
+        <div class="sb-uni">Student Portal Â· 2025â€“26</div>
+      </div>
+      <div class="sb-profile">
+        <div class="sb-av" id="sb-av">SW</div>
+        <div>
+          <div class="sb-name" id="sb-name">John</div>
+          <div class="sb-role">Student</div>
+        </div>
+      </div>
+
+      <div class="sb-nav">
+        <div class="sb-section"><i class="fa-solid fa-star" style="margin-right:6px"></i>Main</div>
+        <div class="sb-item active" onclick="nav(this,'dashboard')"><span class="sb-ico"><i
+              class="fa-solid fa-house"></i></span>Dashboard</div>
+        <div class="sb-item" onclick="nav(this,'announcements')"><span class="sb-ico"><i
+              class="fa-solid fa-bullhorn"></i></span>Announcements<span class="sb-bdg">5</span></div>
+        <div class="sb-item" onclick="nav(this,'chat')"><span class="sb-ico"><i
+              class="fa-solid fa-comment-dots"></i></span>Messages<span class="sb-bdg">9</span></div>
+
+        <div class="sb-section"><i class="fa-solid fa-graduation-cap" style="margin-right:6px"></i>Academics</div>
+        <div class="sb-item" onclick="nav(this,'attendance')"><span class="sb-ico"><i
+              class="fa-solid fa-circle-check"></i></span>Attendance</div>
+        <div class="sb-item" onclick="nav(this,'timetable')"><span class="sb-ico"><i
+              class="fa-solid fa-calendar-days"></i></span>Timetable</div>
+        <div class="sb-item" onclick="nav(this,'assignments')"><span class="sb-ico"><i
+              class="fa-solid fa-pen-to-square"></i></span>Assignments<span class="sb-bdg">3</span></div>
+        <div class="sb-item" onclick="nav(this,'materials')"><span class="sb-ico"><i
+              class="fa-solid fa-folder-open"></i></span>Study Material</div>
+        <div class="sb-item" onclick="nav(this,'grades')"><span class="sb-ico"><i
+              class="fa-solid fa-chart-bar"></i></span>Grades</div>
+        <div class="sb-item" onclick="nav(this,'library')"><span class="sb-ico"><i
+              class="fa-solid fa-building-columns"></i></span>Library</div>
+        <div class="sb-item" onclick="nav(this,'ai')"><span class="sb-ico"><i class="fa-solid fa-robot"></i></span>AI
+          Assistant</div>
+
+        <div class="sb-section"><i class="fa-solid fa-school" style="margin-right:6px"></i>Campus</div>
+        <div class="sb-item" onclick="nav(this,'events')"><span class="sb-ico"><i
+              class="fa-solid fa-calendar-check"></i></span>Events</div>
+        <div class="sb-item" onclick="nav(this,'corner')"><span class="sb-ico"><i
+              class="fa-solid fa-graduation-cap"></i></span>Student Corner</div>
+        <div class="sb-item" onclick="nav(this,'teachers')"><span class="sb-ico"><i
+              class="fa-solid fa-chalkboard-user"></i></span>Teachers</div>
+        <div class="sb-item" onclick="nav(this,'marketplace')"><span class="sb-ico"><i
+              class="fa-solid fa-cart-shopping"></i></span>Marketplace</div>
+        <div class="sb-item" onclick="nav(this,'lostfound')"><span class="sb-ico"><i
+              class="fa-solid fa-magnifying-glass"></i></span>Lost &amp; Found</div>
+        <div class="sb-item" onclick="nav(this,'internships')"><span class="sb-ico"><i
+              class="fa-solid fa-briefcase"></i></span>Internships</div>
+      </div>
+
+      <div class="sb-foot">
+        <div class="sb-item" style="color:rgba(220,80,80,0.8);padding:0" onclick="doLogout()">
+          <span class="sb-ico"><i class="fa-solid fa-right-from-bracket"></i></span>Log Out
+        </div>
+      </div>
+    </aside>
+
+    <!-- â”€â”€â”€ MAIN â”€â”€â”€ -->
+    <div class="main" id="main">
+      <div class="topbar">
+        <div class="tb-title" id="tb-title">Dashboard</div>
+        <div class="tb-search"><i class="fa-solid fa-magnifying-glass"
+            style="color:var(--muted2);font-size:.75rem"></i><input id="global-search" placeholder="Search portal..."
+            oninput="globalSearch(this.value)"></div>
+        <div class="nb" id="notif-btn" onclick="toggleNotifications(event)">
+          <i class="fa-solid fa-bell" style="font-size:.8rem"></i>
+          <div class="ndot" id="notif-count" style="display:none">0</div>
+        </div>
+        <div style="font-size:.75rem;font-weight:600;color:var(--muted);cursor:pointer" id="tb-name"
+          onclick="nav(document.querySelector('[onclick*=\'profile\']'),'profile')">Student</div>
+      </div>
+      <div class="page" id="page-content"></div>
+    </div>
+
+    <!-- â”€â”€â”€ NOTIFICATION PANEL â”€â”€â”€ -->
+    <div class="notif-panel" id="notif-panel" onclick="event.stopPropagation()">
+      <div class="notif-hdr">
+        <span class="notif-title"><i class="fa-solid fa-bell"
+            style="margin-right:6px;color:var(--accent)"></i>Notifications</span>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-glass btn-xs" onclick="markAllRead()">Read all</button>
+          <button class="btn btn-glass btn-xs" onclick="toggleNotifications()"><i
+              class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+      <div class="notif-list" id="notif-list"></div>
+      <div class="notif-foot">
+        <button class="btn btn-glass btn-xs" onclick="clearAllNotifications()"><i class="fa-solid fa-trash"
+            style="margin-right:4px"></i>Clear all</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- â”€â”€â”€ TOAST â”€â”€â”€ -->
+  <div class="toast" id="toast" style="display:none"></div>
+
+  <!-- â”€â”€â”€ GLOBAL LOADER â”€â”€â”€ -->
+  <div class="global-loader hidden" id="global-loader">
+    <div class="loader-spinner"></div>
+  </div>
+
+  <script>
+    /* â”€â”€ STATIC FALLBACK DATA (used when backend has no classes for new students) â”€â”€ */
+    let SUBJECTS = [
+      { name: "Data Structures & Algorithms", code: "CSE301", teacher: "Prof. R. Sharma", att: 78, total: 48, present: 37, color: "#0d9488" },
+      { name: "Computer Networks", code: "CSE302", teacher: "Prof. S. Kulkarni", att: 91, total: 44, present: 40, color: "#7c3aed" },
+      { name: "Database Management Systems", code: "CSE303", teacher: "Prof. A. Joshi", att: 64, total: 42, present: 27, color: "#e8a020" },
+      { name: "Operating Systems", code: "CSE304", teacher: "Prof. M. Gupta", att: 86, total: 45, present: 39, color: "#c41e3a" },
+      { name: "Software Engineering", code: "CSE305", teacher: "Prof. P. Rao", att: 90, total: 38, present: 34, color: "#10b981" },
+    ];
+    let ASSIGNMENTS = [
+      { id: 1, sub: "Data Structures", title: "Implement Red-Black Tree", description: "Implement a complete Red-Black tree data structure with insertion, deletion, and balancing operations. Include visualization if possible.", due: "Mar 15", status: "Pending", priority: "High", assignedBy: "Prof. Rajesh Kumar", submissionLink: "" },
+      { id: 2, sub: "DBMS", title: "ER Diagram â€” University System", description: "Create an Entity-Relationship diagram for a comprehensive university management system including students, teachers, courses, and inventory.", due: "Mar 18", status: "Submitted", priority: "Medium", assignedBy: "Dr. Priya Singh", submissionLink: "https://drive.google.com/..." },
+      { id: 3, sub: "Computer Networks", title: "Socket Programming â€” Multi-client Chat", description: "Develop a multi-client chat application using socket programming. Must support real-time messaging across multiple clients.", due: "Mar 21", status: "Pending", priority: "High", assignedBy: "Prof. Arun Patel", submissionLink: "" },
+      { id: 4, sub: "Operating Systems", title: "CPU Scheduling Simulation", description: "Simulate and compare different CPU scheduling algorithms (FCFS, SJF, Round Robin, Priority). Analyze and report performance metrics.", due: "Mar 24", status: "Pending", priority: "Medium", assignedBy: "Dr. Sunil Kumar", submissionLink: "" },
+      { id: 5, sub: "Software Engineering", title: "UML Diagrams â€” E-Commerce App", description: "Design complete UML diagrams including use case, class, sequence, and activity diagrams for an e-commerce platform.", due: "Mar 28", status: "Submitted", priority: "Low", assignedBy: "Prof. Meera Sharma", submissionLink: "https://drive.google.com/..." },
+    ];
+    const ANNOUNCEMENTS = [
+      { title: "End Semester Exams â€” May 5â€“20", body: "ESE schedule for all UG/PG programs released. Hall tickets 1 week prior. Check portal for subject-wise dates.", date: "Mar 10", tag: "Exam", tt: "rose", author: "Exam Cell, Uni" },
+      { title: "Ideathon 2026 â€” Register Now!", body: "Uni's flagship innovation contest. Teams of 3â€“5. Cash prizes â‚¹1,50,000. Deadline March 20.", date: "Mar 9", tag: "Event", tt: "teal", author: "Innovation Cell" },
+      { title: "Central Library â€” 350 New Titles", body: "New books across Engineering, MBA, Design. Available at counter or via Library App.", date: "Mar 8", tag: "Library", tt: "gold", author: "Central Library" },
+      { title: "Campus Network Maintenance â€” Mar 16", body: "Network down 12AMâ€“4AM. Offline chat features will still work.", date: "Mar 7", tag: "Notice", tt: "white", author: "IT Dept." },
+      { title: "Sports Championship Trials â€” Mar 22", body: "Cricket, Badminton, Athletics. Register at Sports Block before March 19.", date: "Mar 6", tag: "Sports", tt: "green", author: "Sports Dept." },
+    ];
+
+    /* â”€â”€ NOTIFICATIONS SYSTEM â”€â”€ */
+    let NOTIFICATIONS = [];
+    let _stuUser = null;
+
+    // Fetch notifications from backend
+    async function loadNotifications() {
+      try {
+        const user = JSON.parse(sessionStorage.getItem('Uni_user') || '{}');
+        if (!user.id || !user.role) return;
+        _stuUser = user;
+
+        const resp = await fetch(`/api/notifications/${user.id}/${user.role}`);
+        const data = await resp.json();
+        if (data.ok && data.notifications) {
+          NOTIFICATIONS = data.notifications.map(n => ({
+            id: n.id,
+            title: n.title,
+            sub: n.body || 'Notification',
+            icon: 'fa-bell',
+            color: 'rgba(99,102,241,0.15)',
+            iconColor: '#a5b4fc',
+            read: n.read_status === 1,
+            created_at: n.created_at,
+            category: n.category
+          }));
+        }
+        updateNotifBadge();
+        renderNotifList();
+      } catch (e) {
+        console.error('Failed to load notifications:', e);
+      }
+    }
+
+    function getUnreadCount() {
+      return NOTIFICATIONS.filter(n => !n.read).length;
+    }
+
+    function updateNotifBadge() {
+      const cnt = getUnreadCount();
+      const dot = document.getElementById('notif-count');
+      if (!dot) return;
+      if (cnt > 0) {
+        dot.style.display = 'flex';
+        dot.textContent = cnt;
+      } else {
+        dot.style.display = 'none';
+      }
+    }
+
+    function renderNotifList() {
+      const list = document.getElementById('notif-list');
+      if (!list) return;
+      if (NOTIFICATIONS.length === 0) {
+        list.innerHTML = '<div class="notif-empty"><i class="fa-solid fa-bell-slash" style="font-size:1.8rem;display:block;margin-bottom:8px;opacity:.3"></i>All caught up!</div>';
+        return;
+      }
+      const unreadCount = getUnreadCount();
+      list.innerHTML = `<div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.08);font-size:.7rem;color:var(--muted);display:flex;justify-content:space-between;align-items:center">
+        <span>${unreadCount} unread notification${unreadCount !== 1 ? 's' : ''}</span>
+        ${unreadCount > 0 ? `<button class="btn btn-glass btn-xs" onclick="markAllRead()" style="padding:3px 8px;font-size:.62rem"><i class="fa-solid fa-check-double" style="margin-right:3px"></i>Mark all read</button>` : ''}
+      </div>` + NOTIFICATIONS.map((n, i) => `
+        <div class="notif-item ${n.read ? '' : 'unread'}" onclick="readNotif(${i})" style="cursor:pointer;transition:.2s">
+          <div class="notif-ico" style="background:${n.color};color:${n.iconColor}">
+            <i class="fa-solid ${n.icon}"></i>
+          </div>
+          <div class="notif-body">
+            <div class="notif-body-t">${n.title}</div>
+            <div class="notif-body-s">${n.sub}</div>
+          </div>
+          ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
+        </div>`).join('');
+    }
+
+    // Close notifications when clicking outside
+    document.addEventListener('click', () => {
+      const p = document.getElementById('notif-panel');
+      if (p && p.classList.contains('open')) p.classList.remove('open');
+    });
+
+    window.toggleNotifications = function (e) {
+      if (e) e.stopPropagation();
+      const panel = document.getElementById('notif-panel');
+      const isOpen = panel.classList.contains('open');
+      if (isOpen) {
+        panel.classList.remove('open');
+      } else {
+        panel.classList.add('open');
+        renderNotifList();
+      }
+    };
+
+    /**
+     * Mark a single notification as read via API
+     * Updates the notification and refreshes the UI
+     */
+    window.readNotif = async function (i) {
+      const notif = NOTIFICATIONS[i];
+      if (notif.read) return; // Already read
+
+      try {
+        const resp = await fetch(`/api/notifications/read/${notif.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await resp.json();
+        if (data.ok) {
+          notif.read = true;
+          updateNotifBadge();
+          renderNotifList();
+        }
+      } catch (e) {
+        console.error('Failed to mark notification as read:', e);
+      }
+    };
+
+    /**
+     * Mark all notifications as read via bulk API
+     */
+    window.markAllRead = async function () {
+      if (!_stuUser) return;
+      try {
+        const resp = await fetch('/api/notifications/mark-read', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: _stuUser.id, user_role: _stuUser.role })
+        });
+        const data = await resp.json();
+        if (data.ok) {
+          NOTIFICATIONS.forEach(n => n.read = true);
+          updateNotifBadge();
+          renderNotifList();
+        }
+      } catch (e) {
+        console.error('Failed to mark all as read:', e);
+      }
+    };
+
+    window.clearAllNotifications = function () {
+      if (confirm('Clear all notifications?')) {
+        NOTIFICATIONS = [];
+        updateNotifBadge();
+        renderNotifList();
+      }
+    };
+
+    // Close notification panel when clicking outside
+    document.addEventListener('click', function (e) {
+      const panel = document.getElementById('notif-panel');
+      const btn = document.getElementById('notif-btn');
+      if (panel && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
+        panel.classList.remove('open');
+      }
+    });
+
+    const EVENTS = [
+      { name: "TechXcelerate 2026", date: "Mar 22â€“24", venue: "Innovation Hub, Block F", cat: "Technical", icon: "fa-bolt", color: "#fbbf24", reg: 312, going: false },
+      { name: "Rang â€” Cultural Fest", date: "Mar 29", venue: "Open Air Amphitheatre", cat: "Cultural", icon: "fa-masks-theater", color: "#a78bfa", reg: 680, going: true },
+      { name: "Campus Placement â€” TCS & Infosys", date: "Apr 3", venue: "Seminar Hall A & B", cat: "Career", icon: "fa-briefcase", color: "#2dd4bf", reg: 145, going: false },
+      { name: "Research Symposium RISE 2026", date: "Apr 8", venue: "Convention Centre", cat: "Academic", icon: "fa-flask", color: "#34d399", reg: 78, going: false },
+      { name: "Uni Sports Day 2026", date: "Apr 14", venue: "Campus Sports Complex", cat: "Sports", icon: "fa-trophy", color: "var(--gold)", reg: 430, going: false },
+      { name: "Blood Donation Drive", date: "Apr 17", venue: "Health & Wellness Centre", cat: "Social", icon: "fa-heart-pulse", color: "#fb7185", reg: 92, going: false },
+    ];
+    const MATERIALS = [
+      { sub: "Data Structures", title: "Unit 4 â€” Graph Algorithms (BFS, DFS, Dijkstra)", type: "PDF", size: "5.1 MB", date: "Mar 8", teacher: "Prof. Sharma" },
+      { sub: "Computer Networks", title: "Complete OSI & TCP/IP Model Notes", type: "PDF", size: "3.2 MB", date: "Mar 7", teacher: "Prof. Kulkarni" },
+      { sub: "DBMS", title: "SQL Advanced Queries â€” Practice Set", type: "DOCX", size: "1.4 MB", date: "Mar 6", teacher: "Prof. Joshi" },
+      { sub: "Operating Systems", title: "Process Scheduling â€” Lecture Slides", type: "PPTX", size: "9.2 MB", date: "Mar 5", teacher: "Prof. Gupta" },
+      { sub: "Data Structures", title: "Lab Manual â€” Trees & Heaps", type: "PDF", size: "2.8 MB", date: "Mar 3", teacher: "Prof. Sharma" },
+    ];
+    const BOOKS = [
+      { title: "Introduction to Algorithms", author: "Cormen, CLRS", status: "Available", cat: "CS" },
+      { title: "Computer Networks", author: "Andrew Tanenbaum", status: "Issued", cat: "CS" },
+      { title: "Database System Concepts", author: "Silberschatz & Korth", status: "Available", cat: "CS" },
+      { title: "Operating System Concepts", author: "Silberschatz, Galvin", status: "Available", cat: "CS" },
+      { title: "Clean Code", author: "Robert C. Martin", status: "Issued", cat: "Programming" },
+      { title: "Design Patterns (GoF)", author: "Gang of Four", status: "Available", cat: "CS" },
+    ];
+    const MARKETPLACE = [
+      { name: "Engineering Maths Vol 1 & 2", price: 280, seller: "Rohit Patil", dept: "ME 2nd Year", icon: "fa-book", cond: "Good" },
+      { name: "Casio fx-991ES Plus", price: 420, seller: "Pooja Sharma", dept: "CSE 2nd Year", icon: "fa-calculator", cond: "Excellent" },
+      { name: "Dell Laptop Stand Aluminium", price: 380, seller: "Karan Mehta", dept: "IT 3rd Year", icon: "fa-laptop", cond: "Like New" },
+      { name: "AutoCAD Drawing Board A2", price: 190, seller: "Sneha Joshi", dept: "Civil 1st Year", icon: "fa-ruler-combined", cond: "Good" },
+      { name: "White Lab Coat â€” Size M", price: 130, seller: "Nikhil Aher", dept: "Physics 2nd Year", icon: "fa-vest", cond: "Good" },
+      { name: "Sony WH-1000XM4", price: 8500, seller: "Kavya Nair", dept: "CSE 4th Year", icon: "fa-headphones", cond: "Good" },
+    ];
+    const LOST_FOUND = [
+      { type: "Lost", item: "Blue Milton Water Bottle", loc: "Central Library, 2nd Floor", date: "Mar 9", id: "CSE2022047", icon: "fa-droplet" },
+      { type: "Found", item: "Black Leather Wallet", loc: "Campus Cafeteria", date: "Mar 10", id: "ME2023034", icon: "fa-wallet" },
+      { type: "Lost", item: "Engineering Maths Textbook", loc: "Room 304, Block B", date: "Mar 8", id: "MA2024012", icon: "fa-book" },
+      { type: "Found", item: "White Apple Earphones", loc: "Library Entrance", date: "Mar 10", id: "CSE2022047", icon: "fa-headphones" },
+      { type: "Lost", item: "Lab Access Card", loc: "Physics Laboratory", date: "Mar 7", id: "PH2023056", icon: "fa-id-card" },
+    ];
+    const INTERNSHIPS = [
+      { co: "Google India", role: "SWE Intern", loc: "Bangalore", stip: "â‚¹80,000/mo", dl: "Mar 20", skills: ["Python", "ML", "DSA"], type: "Summer" },
+      { co: "Infosys", role: "Full Stack Intern", loc: "Pune", stip: "â‚¹25,000/mo", dl: "Mar 25", skills: ["React", "Node.js", "SQL"], type: "Summer" },
+      { co: "Persistent Systems", role: "Backend Developer", loc: "Pune", stip: "â‚¹30,000/mo", dl: "Apr 1", skills: ["Java", "Spring", "AWS"], type: "Part-time" },
+      { co: "Microsoft", role: "Research Intern", loc: "Hyderabad", stip: "â‚¹90,000/mo", dl: "Apr 5", skills: ["C++", "Algorithms"], type: "Summer" },
+      { co: "CDAC Pune", role: "Software Trainee", loc: "Pune", stip: "â‚¹18,000/mo", dl: "Apr 10", skills: ["C", "Linux", "DSA"], type: "Summer" },
+    ];
+    const TEACHERS = [
+      { name: "Prof. R. Sharma", sub: "Data Structures", office: "Block B, Room 204", hours: "Monâ€“Wed 3â€“5 PM", icon: "fa-chalkboard-user", rating: 4.8 },
+      { name: "Prof. S. Kulkarni", sub: "Computer Networks", office: "Block B, Room 211", hours: "Tueâ€“Thu 2â€“4 PM", icon: "fa-chalkboard-user", rating: 4.9 },
+      { name: "Prof. A. Joshi", sub: "DBMS", office: "Block C, Room 112", hours: "Mon, Wed, Fri 11AMâ€“1PM", icon: "fa-chalkboard-user", rating: 4.6 },
+      { name: "Prof. M. Gupta", sub: "Operating Systems", office: "Block B, Room 206", hours: "Tue, Thu 10AMâ€“12PM", icon: "fa-chalkboard-user", rating: 4.7 },
+      { name: "Prof. P. Rao", sub: "Software Engineering", office: "Block C, Room 108", hours: "Mon, Wed 9â€“11AM", icon: "fa-chalkboard-user", rating: 4.8 },
+    ];
+    const CHATS = [
+      {
+        id: 1, name: "Prof. S. Kulkarni", role: "Faculty Â· CN", last: "Assignment deadline extended.", time: "10:14 AM", unread: 0, icon: "fa-chalkboard-user",
+        msgs: [{ me: false, text: "Please submit your socket programming assignment by next Friday." }, { me: true, text: "Thank you ma'am, will make sure to submit on time." }, { me: false, text: "Also make sure to handle multi-client connections properly." }]
+      },
+      {
+        id: 2, name: "Rahul Deshmukh", role: "Student Â· CSE", last: "Bro notes share kar yaar", time: "9:48 AM", unread: 3, icon: "fa-user-graduate",
+        msgs: [{ me: false, text: "Bro CN lab assignment ho gayi kya?" }, { me: true, text: "Haan almost done. Sharing drive link tomorrow." }, { me: false, text: "Bro notes share kar yaar" }]
+      },
+      {
+        id: 3, name: "CSE 3rd Year â€” Batch A", role: "Group Â· 64 members", last: "Exam schedule check karo!", time: "9:20 AM", unread: 6, icon: "fa-users",
+        msgs: [{ me: false, text: "Exam schedule kal release hogi" }, { me: false, text: "5 May se start hai exams" }, { me: true, text: "Thanks! Noted" }]
+      },
+      {
+        id: 4, name: "Prof. R. Sharma", role: "Faculty Â· DSA", last: "Office hours tomorrow 3PM", time: "Yesterday", unread: 0, icon: "fa-chalkboard-user",
+        msgs: [{ me: false, text: "Office hours tomorrow 3PM in Room 204." }, { me: true, text: "Sure sir, I'll be there." }]
+      },
+    ];
+    const GRADES = [
+      { sub: "Data Structures", code: "CSE301", internals: [18, 16, 19], ext: null },
+      { sub: "Computer Networks", code: "CSE302", internals: [20, 19, 20], ext: null },
+      { sub: "DBMS", code: "CSE303", internals: [14, 16, 15], ext: null },
+      { sub: "Operating Systems", code: "CSE304", internals: [17, 18, 16], ext: null },
+      { sub: "Software Engineering", code: "CSE305", internals: [19, 20, 18], ext: null },
+    ];
+    const TT = {
+      times: ["9:00", "10:00", "11:00", "12:00", "2:00", "3:00", "4:00"],
+      days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+      slots: [
+        [{ s: "DSA", c: "#0d9488" }, { s: "CN", c: "#7c3aed" }, { s: "", c: "" }, { s: "OS", c: "#c41e3a" }, { s: "DBMS", c: "#e8a020" }, { s: "SE", c: "#10b981" }],
+        [{ s: "CN", c: "#7c3aed" }, { s: "DSA", c: "#0d9488" }, { s: "DBMS", c: "#e8a020" }, { s: "", c: "" }, { s: "SE", c: "#10b981" }, { s: "OS", c: "#c41e3a" }],
+        [{ s: "OS", c: "#c41e3a" }, { s: "", c: "" }, { s: "DSA Lab", c: "#0d9488" }, { s: "DSA Lab", c: "#0d9488" }, { s: "CN", c: "#7c3aed" }, { s: "", c: "" }],
+        [{ s: "DBMS", c: "#e8a020" }, { s: "SE", c: "#10b981" }, { s: "", c: "" }, { s: "CN Lab", c: "#7c3aed" }, { s: "CN Lab", c: "#7c3aed" }, { s: "", c: "" }],
+        [{ s: "SE", c: "#10b981" }, { s: "OS", c: "#c41e3a" }, { s: "CN", c: "#7c3aed" }, { s: "DSA", c: "#0d9488" }, { s: "", c: "" }, { s: "", c: "" }],
+        [{ s: "", c: "" }, { s: "DBMS", c: "#e8a020" }, { s: "OS", c: "#c41e3a" }, { s: "SE", c: "#10b981" }, { s: "DSA", c: "#0d9488" }, { s: "", c: "" }],
+        [{ s: "", c: "" }, { s: "", c: "" }, { s: "", c: "" }, { s: "", c: "" }, { s: "", c: "" }, { s: "", c: "" }],
+      ]
+    };
+
+    /* â”€â”€ UTILS â”€â”€ */
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#34d399;font-size:.9rem"></i> ' + msg;
+      t.style.display = 'flex';
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.style.display = 'none', 2800);
+    }
+
+    function showLoader() {
+      const loader = document.getElementById('global-loader');
+      if (loader) loader.classList.remove('hidden');
+    }
+
+    function hideLoader() {
+      const loader = document.getElementById('global-loader');
+      if (loader) loader.classList.add('hidden');
+    }
+
+    function showError(msg, element = null) {
+      if (element) {
+        element.classList.add('error');
+        const errBox = element.nextElementSibling;
+        if (errBox && errBox.classList.contains('form-error')) {
+          errBox.textContent = msg;
+        }
+      }
+      showToast('âš ï¸ ' + msg);
+    }
+
+    function clearError(element) {
+      if (element) {
+        element.classList.remove('error');
+        const errBox = element.nextElementSibling;
+        if (errBox && errBox.classList.contains('form-error')) {
+          errBox.textContent = '';
+        }
+      }
+    }
+
+    function pct(p, a) { return Math.round(p / (p + a) * 100); }
+    function ringOffset(pct) { return 219.9 - (pct / 100) * 219.9; }
+
+    function tagHtml(text, cls) { return `<span class="tag t-${cls}">${text}</span>`; }
+
+    /**
+     * MODAL & CLOSE MODAL - Display and close modal dialogs
+     * Modal structure: <div class="modal-bg"><div class="modal">...</div></div>
+     */
+    window.modal = function (html) {
+      let container = document.getElementById('modal-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'modal-container';
+        container.style.cssText = 'position:fixed;inset:0;z-index:2000;';
+        document.body.appendChild(container);
+      }
+      container.innerHTML = html;
+    };
+
+    window.closeModal = function () {
+      const container = document.getElementById('modal-container');
+      if (container) container.innerHTML = '';
+    };
+
+    /**
+     * ASSIGNMENT DETAILS MODAL - Show full assignment details
+     */
+    window.showAssignmentDetails = function (assignmentId) {
+      const a = ASSIGNMENTS.find(x => x.id === assignmentId);
+      if (!a) return showToast('Assignment not found');
+
+      modal(`
+        <div class="modal-bg" onclick="if(event.target===this)closeModal()">
+          <div class="modal" style="width:500px">
+            <div class="modal-t">
+              <i class="fa-solid fa-file-contract" style="color:var(--admin);font-size:1.1rem"></i>
+              ${a.title}
+            </div>
+            <div class="modal-c" style="padding:20px 24px">
+              <div style="margin-bottom:18px">
+                <div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Subject</div>
+                <div style="font-size:.95rem;font-weight:600">${a.sub}</div>
+              </div>
+              
+              <div style="margin-bottom:18px">
+                <div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Description</div>
+                <div style="font-size:.85rem;line-height:1.6;color:rgba(255,255,255,0.8)">${a.description}</div>
+              </div>
+              
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">
+                <div>
+                  <div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Due Date</div>
+                  <div style="font-size:.95rem;font-weight:600">${a.due}</div>
+                </div>
+                <div>
+                  <div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Status</div>
+                  <div><span class="tag t-${a.status === 'Submitted' ? 'teal' : 'gold'}">${a.status}</span></div>
+                </div>
+              </div>
+              
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">
+                <div>
+                  <div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Priority</div>
+                  <div><span class="tag t-${a.priority === 'High' ? 'rose' : a.priority === 'Medium' ? 'gold' : 'teal'}">${a.priority}</span></div>
+                </div>
+                <div>
+                  <div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Assigned By</div>
+                  <div style="font-size:.9rem">${a.assignedBy}</div>
+                </div>
+              </div>
+
+              ${a.status !== 'Submitted' ? `
+              <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.1)">
+                <textarea class="inp" placeholder="Write your answer or submit link..." style="margin-bottom:10px;height:100px"></textarea>
+                <button class="btn btn-teal" onclick="showToast('Assignment submitted!'); closeModal();" style="width:100%">
+                  <i class="fa-solid fa-paper-plane" style="margin-right:6px"></i>Submit Assignment
+                </button>
+              </div>` : `
+              <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.1);background:rgba(16,185,129,0.1);padding:12px;border-radius:8px">
+                <i class="fa-solid fa-circle-check" style="color:#34d399;margin-right:8px"></i>
+                <span style="font-size:.85rem;">This assignment has been submitted</span>
+              </div>`}
+            </div>
+            <div class="modal-b">
+              <button class="btn btn-glass" onclick="closeModal()">Close</button>
+            </div>
+          </div>
+        </div>
+      `);
+    };
+
+    let activeChat = 0;
+
+    /* â”€â”€ BADGE MANAGEMENT SYSTEM â”€â”€ */
+    const BADGE_STATE = {
+      announcements: 5,
+      chat: 9,
+      assignments: 3
+    };
+
+    /**
+     * Initialize badges from state
+     * Called on page load to populate initial badge counts
+     */
+    function initBadges() {
+      Object.entries(BADGE_STATE).forEach(([section, count]) => {
+        updateBadge(section, count);
+      });
+    }
+
+    /**
+     * Update badge count for a section
+     * @param {string} section - Section ID (announcements, chat, assignments, etc.)
+     * @param {number} count - Badge count (0 = hide badge)
+     */
+    function updateBadge(section, count) {
+      BADGE_STATE[section] = count;
+      const items = document.querySelectorAll(`.sb-item[onclick*="'${section}'"]`);
+      items.forEach(item => {
+        let badge = item.querySelector('.sb-bdg');
+        if (count > 0) {
+          if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'sb-bdg';
+            item.appendChild(badge);
+          }
+          badge.textContent = count;
+          badge.style.display = 'inline-flex';
+        } else {
+          if (badge) {
+            badge.style.display = 'none';
+          }
+        }
+      });
+    }
+
+    /**
+     * Clear badges for a section when user opens it
+     * @param {string} section - Section ID to clear badges for
+     */
+    async function clearSectionBadges(section, userId, userRole) {
+      const count = BADGE_STATE[section] || 0;
+      if (count === 0) return; // Already cleared
+
+      // Call backend API to mark items as read
+      try {
+        const endpoint = section === 'announcements' ? 'announcements/read'
+          : section === 'chat' ? 'chat/read'
+            : section === 'assignments' ? 'assignments/read'
+              : null;
+
+        if (endpoint && userId && userRole) {
+          const resp = await fetch(`/api/${endpoint}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId, user_role: userRole })
+          }).catch(() => null); // Fail silently if API not ready
+        }
+      } catch (e) {
+        console.warn('Could not clear badges via API:', e.message);
+      }
+
+      // Update UI immediately
+      updateBadge(section, 0);
+    }
+
+    /* â”€â”€ NAVIGATION â”€â”€ */
+    const TITLES = {
+      dashboard: "Dashboard", announcements: "Announcements", chat: "Messages",
+      attendance: "Attendance", timetable: "Timetable", assignments: "Assignments",
+      materials: "Study Material", grades: "Grades & Marks", library: "Central Library",
+      ai: "AI Study Assistant", events: "Campus Events", corner: "Student Corner",
+      teachers: "Teacher Directory", marketplace: "Marketplace", lostfound: "Lost & Found",
+      internships: "Internship Board"
+    };
+
+    function nav(el, id) {
+      document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('tb-title').textContent = TITLES[id] || id;
+      document.getElementById('main').scrollTop = 0;
+      const fn = PAGES[id];
+      if (fn) { document.getElementById('page-content').innerHTML = fn(); bindPageEvents(id); }
+
+      // Clear badges for this section when user opens it
+      const user = JSON.parse(sessionStorage.getItem('Uni_user') || '{}');
+      if (user.id && user.role) {
+        clearSectionBadges(id, user.id, user.role);
+      }
+    }
+
+    /* navTo: navigate by page ID without needing an element reference */
+    function navTo(id) {
+      const match = [...document.querySelectorAll('.sb-item')].find(el => {
+        return (el.getAttribute('onclick') || '').includes("'" + id + "'");
+      });
+      if (match) nav(match, id);
+    }
+
+    function bindPageEvents(id) {
+      if (id === 'attendance') bindAttendance();
+      if (id === 'chat') bindChat();
+      if (id === 'assignments') bindAssignments();
+      if (id === 'events') bindEvents2();
+      if (id === 'lostfound') bindLostFound();
+      if (id === 'internships') bindInternships();
+      if (id === 'ai') bindAI();
+      if (id === 'library') bindLibrary();
+      if (id === 'corner') bindCorner();
+      if (id === 'marketplace') bindMkt();
+    }
+
+    /* â”€â”€ PAGE: DASHBOARD â”€â”€ */
+    function pageDashboard() {
+      // Use live DB data if available
+      const stu = window.DB_STUDENT;
+      const classes = window.DB_CLASSES || [];
+      let subjects = SUBJECTS;
+
+      // Build subjects from DB classes if student has enrollments
+      if (classes.length > 0) {
+        const colors = ['#0d9488', '#7c3aed', '#e8a020', '#c41e3a', '#10b981', '#6366f1', '#f59e0b'];
+        subjects = classes.map((c, i) => ({
+          name: c.name,
+          code: c.subject_code,
+          teacher: c.teacher_name,
+          att: stu ? Math.max(60, Math.min(98, (stu.attendance || 80) + (Math.random() * 10 - 5) | 0)) : 80,
+          total: 40 + (i * 3 % 10),
+          present: 30 + (i * 2 % 8),
+          color: colors[i % colors.length]
+        }));
+        SUBJECTS = subjects; // Keep in sync for attendance page
+      }
+
+      const studentName = stu ? stu.name.split(' ')[0] : (JSON.parse(sessionStorage.getItem('Uni_user') || '{}').name || 'Student').split(' ')[0];
+      const studentFull = stu ? stu.name : (JSON.parse(sessionStorage.getItem('Uni_user') || '{}').name || 'Student');
+      const studentId = stu ? stu.id : (JSON.parse(sessionStorage.getItem('Uni_user') || '{}').id || 'â€”');
+      const studentDept = stu ? stu.department : 'B.Tech';
+      const studentYear = stu ? `Year ${stu.year}` : '1st Year';
+      const studentSection = stu ? `Section ${stu.section}` : 'Section A';
+      const studentCgpa = stu ? stu.cgpa : '8.4';
+      const studentAttendance = stu ? stu.attendance : '85';
+      const studentBatch = stu ? stu.batch : '';
+      const studentEmail = stu ? stu.email : 'student@uni.edu';
+      const studentPhone = stu ? stu.phone : '+91 98765 43210';
+
+      const overall = subjects.length > 0 ? Math.round(subjects.reduce((a, s) => a + s.att, 0) / subjects.length) : (stu ? Math.round(stu.attendance) : 0);
+      const pending = ASSIGNMENTS.filter(a => a.status === 'Pending').length;
+      const low = subjects.filter(s => s.att < 75).length;
+      return `
+  <div class="panel">
+    <div class="hero">
+      <div style="font-size:.72rem;color:var(--muted);margin-bottom:4px"><i class="fa-solid fa-hand-wave" style="margin-right:4px;color:var(--gold)"></i>Welcome back</div>
+      <div class="hero-name">${studentFull}</div>
+      <div class="hero-sub">${studentId} Â· ${studentDept} Â· ${studentYear}, ${studentSection}</div>
+      <div class="hero-tags">
+        ${studentBatch ? `<span class="htag gold">Batch ${studentBatch}</span>` : ''}
+        <span class="htag">Knowledge City Campus, Pune</span>
+        <span class="htag" style="${overall < 75 ? 'color:#fb7185;border-color:rgba(225,29,72,.3)' : ''}">Overall ${overall}% Attendance</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="btn btn-white btn-sm" onclick="navTo('attendance')"><i class='fa-solid fa-chart-bar' style='margin-right:4px'></i>Attendance</button>
+        <button class="btn btn-glass btn-sm" onclick="navTo('timetable')"><i class='fa-solid fa-calendar-days' style='margin-right:4px'></i>Timetable</button>
+        <button class="btn btn-glass btn-sm" onclick="navTo('ai')"><i class='fa-solid fa-robot' style='margin-right:4px'></i>AI Study</button>
+      </div>
+    </div>
+
+    <div class="g4" style="margin-bottom:14px">
+      <div class="stat"><div class="stat-ico" style="background:rgba(13,148,136,0.15);color:#2dd4bf"><i class="fa-solid fa-circle-check"></i></div><div><div class="stat-n" style="color:#2dd4bf">${overall}%</div><div class="stat-l">Avg Attendance</div></div></div>
+      <div class="stat"><div class="stat-ico" style="background:rgba(232,160,32,0.15);color:var(--gold)"><i class="fa-solid fa-file-pen"></i></div><div><div class="stat-n" style="color:var(--gold)">${pending}</div><div class="stat-l">Pending Assignments</div></div></div>
+      <div class="stat"><div class="stat-ico" style="background:rgba(124,58,237,0.15);color:#a78bfa"><i class="fa-solid fa-book"></i></div><div><div class="stat-n" style="color:#a78bfa">${subjects.length || 'â€”'}</div><div class="stat-l">Subjects Enrolled</div></div></div>
+      <div class="stat"><div class="stat-ico" style="background:rgba(13,148,136,0.15);color:#2dd4bf"><i class="fa-solid fa-graduation-cap"></i></div><div><div class="stat-n" style="color:#2dd4bf">${studentCgpa}</div><div class="stat-l">CGPA</div></div></div>
+    </div>
+
+    <div class="g2" style="margin-bottom:14px">
+      <div class="gcard">
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-user-circle" style="margin-right:6px;color:#a5b4fc"></i>Profile Information</div><button class="btn btn-glass btn-xs" onclick="showStudentProfileModal()">Edit</button></div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:.76rem">
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+            <span style="color:var(--muted)">Full Name</span>
+            <span style="font-weight:600">${studentFull}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+            <span style="color:var(--muted)">Student ID</span>
+            <span style="font-weight:600">${studentId}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+            <span style="color:var(--muted)">Department</span>
+            <span style="font-weight:600">${studentDept}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+            <span style="color:var(--muted)">Year & Section</span>
+            <span style="font-weight:600">${studentYear}, ${studentSection}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+            <span style="color:var(--muted)">Email</span>
+            <span style="font-weight:600;font-size:.72rem">${studentEmail}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;">
+            <span style="color:var(--muted)">Phone</span>
+            <span style="font-weight:600">${studentPhone}</span>
+          </div>
+        </div>
+      </div>
+      <div class="gcard">
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-chart-line" style="margin-right:6px;color:#2dd4bf"></i>Academic Performance</div><button class="btn btn-glass btn-xs" onclick="navTo('grades')">View Grades</button></div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:6px">
+              <span style="color:var(--muted)">CGPA</span>
+              <span style="font-weight:700;color:#2dd4bf;font-size:.95rem">${studentCgpa}</span>
+            </div>
+            <div class="pb"><div class="pf" style="width:${(parseFloat(studentCgpa) / 10 * 100)}%;background:#0d9488"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:6px">
+              <span style="color:var(--muted)">Attendance</span>
+              <span style="font-weight:700;color:${studentAttendance >= 75 ? '#2dd4bf' : '#fb7185'};font-size:.95rem">${studentAttendance}%</span>
+            </div>
+            <div class="pb"><div class="pf" style="width:${studentAttendance}%;background:${studentAttendance >= 75 ? '#0d9488' : 'var(--rose)'}"></div></div>
+          </div>
+          <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:10px 12px;font-size:.72rem">
+            <div style="color:var(--muted);margin-bottom:4px">Performance Status</div>
+            <div style="font-weight:700;color:${studentCgpa >= 8 ? '#2dd4bf' : studentCgpa >= 7 ? 'var(--gold)' : '#fb7185'}">
+              ${studentCgpa >= 8 ? 'Excellent' : studentCgpa >= 7 ? 'Good' : 'Needs Improvement'}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="g2">
+      <div class="gcard">
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-bullhorn" style="margin-right:6px;color:#a78bfa"></i>Announcements</div><button class="btn btn-glass btn-xs" onclick="navTo('announcements')">View all</button></div>
+        ${ANNOUNCEMENTS.slice(0, 3).map(a => `
+        <div class="li">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;color:var(--muted)"><i class="fa-solid fa-bullhorn"></i></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.78rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.title}</div>
+            <div style="font-size:.65rem;color:var(--muted)">${a.date} Â· ${a.author}</div>
+          </div>
+          ${tagHtml(a.tag, 't-' + a.tt)}
+        </div>`).join('')}
+      </div>
+      <div class="gcard">
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-calendar-day" style="margin-right:6px;color:#fb7185"></i>Today's Classes</div><button class="btn btn-glass btn-xs" onclick="navTo('timetable')">Full TT</button></div>
+        ${[{ t: "9:00", s: "Data Structures", c: "#0d9488" }, { t: "10:00", s: "Computer Networks", c: "#7c3aed" }, { t: "2:00", s: "DBMS", c: "#e8a020" }, { t: "4:00", s: "Operating Systems", c: "#c41e3a" }].map(c => `
+        <div class="li">
+          <div style="font-size:.65rem;font-weight:700;color:var(--muted);width:36px;flex-shrink:0">${c.t}</div>
+          <div style="width:3px;height:32px;border-radius:2px;background:${c.c};flex-shrink:0"></div>
+          <div style="font-size:.78rem;font-weight:600">${c.s}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div style="margin-top:14px" class="gcard"><div class="sh"><div class="sh-t"><i class="fa-solid fa-circle-check" style="margin-right:6px;color:#2dd4bf"></i>Quick Attendance Overview</div><button class="btn btn-glass btn-xs" onclick="navTo('attendance')">Details</button></div>
+      ${subjects.length === 0 ? `<div style="text-align:center;padding:20px;color:var(--muted);font-size:.8rem"><i class="fa-solid fa-book-open" style="font-size:1.5rem;display:block;margin-bottom:8px;opacity:.3"></i>No subjects enrolled yet. Contact admin to enroll in courses.</div>` : `
+      <div style="display:flex;flex-direction:column;gap:10px">
+        ${subjects.map(s => `
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:5px">
+            <span style="font-weight:500">${s.name}</span>
+            <span style="color:${s.att >= 75 ? '#2dd4bf' : '#fb7185'};font-weight:700">${s.att}%${s.att < 75 ? ' <i class=\'fa-solid fa-triangle-exclamation\'></i>' : ''}</span>
+          </div>
+          <div class="pb"><div class="pf" style="width:${s.att}%;background:${s.color}"></div></div>
+        </div>`).join('')}
+      </div>`}
+    </div>
+
+    <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="gcard">
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-calendar-check" style="margin-right:6px;color:#fbbf24"></i>Upcoming Events</div><button class="btn btn-glass btn-xs" onclick="navTo('events')">All events</button></div>
+        ${EVENTS.slice(0, 3).map(e => `
+        <div class="li">
+          <div style="width:28px;height:28px;border-radius:7px;background:rgba(13,148,136,0.12);display:flex;align-items:center;justify-content:center;color:#2dd4bf;font-size:.8rem;flex-shrink:0"><i class="fa-solid fa-calendar-check"></i></div>
+          <div style="flex:1"><div style="font-size:.76rem;font-weight:600">${e.name}</div><div style="font-size:.65rem;color:var(--muted)">${e.date}</div></div>
+        </div>`).join('')}
+      </div>
+      <div class="gcard">
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-file-pen" style="margin-right:6px;color:#a5b4fc"></i>Pending Assignments</div><button class="btn btn-glass btn-xs" onclick="navTo('assignments')">All</button></div>
+        ${ASSIGNMENTS.filter(a => a.status === 'Pending').map(a => `
+        <div class="li">
+          <div style="width:26px;height:26px;border-radius:7px;background:rgba(232,160,32,0.12);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:.75rem;flex-shrink:0"><i class="fa-solid fa-file-pen"></i></div>
+          <div style="flex:1"><div style="font-size:.76rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.title}</div><div style="font-size:.65rem;color:${new Date(a.due + ',2026') < new Date() ? '#fb7185' : 'var(--muted)'}">Due: ${a.due}</div></div>
+          ${tagHtml(a.priority, a.priority === 'High' ? 'rose' : a.priority === 'Medium' ? 'gold' : 'teal')}
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+    }
+    window.showStudentProfileModal = function () {
+      const stu = window.DB_STUDENT || {};
+      const currentName = stu.name || 'Student';
+      const currentPhone = stu.phone || '';
+      const currentEmail = stu.email || '';
+      modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-user-circle" style="color:var(--admin);margin-right:8px"></i>Edit Profile</div><div class="g2"><div class="frow"><div class="flbl">Full Name</div><input class="inp" id="pm-name" value="${currentName}"></div><div class="frow"><div class="flbl">Phone</div><input class="inp" id="pm-phone" value="${currentPhone}"></div></div><div class="frow"><div class="flbl">Email</div><input class="inp" id="pm-email" type="email" value="${currentEmail}"></div><div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Cancel</button><button class="btn btn-teal" onclick="window.saveStudentProfile()">Save Changes</button></div></div></div>`);
+    };
+
+    window.saveStudentProfile = async function () {
+      try {
+        const u = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+        if (!u) { showError('Not logged in'); return; }
+
+        const nameEl = document.getElementById('pm-name');
+        const emailEl = document.getElementById('pm-email');
+        const phoneEl = document.getElementById('pm-phone');
+
+        const name = nameEl?.value?.trim();
+        const phone = phoneEl?.value?.trim();
+        const email = emailEl?.value?.trim();
+
+        if (!name || !email) {
+          if (!name) showError('Name is required', nameEl);
+          if (!email) showError('Email is required', emailEl);
+          return;
+        }
+
+        if (!email.includes('@')) {
+          showError('Invalid email address', emailEl);
+          return;
+        }
+
+        showLoader();
+        const btn = document.querySelector('.modal button[onclick*="saveStudentProfile"]');
+        if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+
+        const r = await fetch(`${API_BASE_URL}/student/${encodeURIComponent(u.id)}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, phone, email })
+        });
+
+        const d = await r.json();
+        if (d.ok) {
+          window.DB_STUDENT = { ...window.DB_STUDENT, name, phone, email };
+          sessionStorage.setItem('Uni_user', JSON.stringify({ ...u, name, phone, email }));
+          closeModal();
+          showToast('âœ… Profile updated successfully!');
+          navTo('dashboard');
+        } else {
+          showError(d.message || 'Error updating profile');
+        }
+      } catch (e) {
+        showError('Server error: ' + e.message);
+      } finally {
+        hideLoader();
+        const btn = document.querySelector('.modal button[onclick*="saveStudentProfile"]');
+        if (btn) { btn.disabled = false; btn.textContent = 'Save Changes'; }
+      }
+    };
+
+    /* â”€â”€ PAGE: ATTENDANCE â”€â”€ */
+    function pageAttendance() {
+      const overall = Math.round(SUBJECTS.reduce((a, s) => a + s.att, 0) / SUBJECTS.length);
+      const totalP = SUBJECTS.reduce((a, s) => a + s.present, 0);
+      const totalC = SUBJECTS.reduce((a, s) => a + s.total, 0);
+      return `
+  <div class="panel">
+    <div class="g3" style="margin-bottom:14px">
+      <div class="stat"><div class="stat-ico" style="background:rgba(13,148,136,0.15);color:#2dd4bf"><i class="fa-solid fa-chart-bar"></i></div><div><div class="stat-n" style="color:#2dd4bf">${overall}%</div><div class="stat-l">Overall Attendance</div></div></div>
+      <div class="stat"><div class="stat-ico" style="background:rgba(124,58,237,0.15);color:#a78bfa"><i class="fa-solid fa-circle-check"></i></div><div><div class="stat-n" style="color:#a78bfa">${totalP}/${totalC}</div><div class="stat-l">Total Classes Attended</div></div></div>
+      <div class="stat"><div class="stat-ico" style="background:rgba(225,29,72,0.15);color:#fb7185"><i class="fa-solid fa-triangle-exclamation"></i></div><div><div class="stat-n" style="color:#fb7185">${SUBJECTS.filter(s => s.att < 75).length > 0 ? SUBJECTS.filter(s => s.att < 75).length + ' Subject(s)' : 'None'}</div><div class="stat-l">Below 75%</div></div></div>
+    </div>
+    <div class="gcard" style="margin-bottom:14px;background:rgba(13,148,136,0.08);border-color:rgba(13,148,136,0.2)">
+      <div class="sh"><div class="sh-t"><i class="fa-solid fa-key" style="margin-right:6px;color:#2dd4bf"></i>Mark Attendance with OTP</div></div>
+      <div style="display:flex;gap:10px;align-items:flex-end;margin-bottom:10px">
+        <div style="flex:1">
+          <div class="flbl">Select Class</div>
+          <select class="inp" id="att-class-sel" style="width:100%">
+            <option value="">â€” Choose class â€”</option>
+            ${SUBJECTS.map((s, i) => `<option value="${i}">${s.name} (${s.code})</option>`).join('')}
+          </select>
+        </div>
+        <button class="btn btn-teal btn-sm" onclick="markAttendanceWithOTP()"><i class="fa-solid fa-finger-print" style="margin-right:4px"></i>Mark Attendance</button>
+      </div>
+      <div style="font-size:.7rem;color:var(--muted);background:rgba(255,255,255,.04);padding:10px 12px;border-radius:9px">
+        <i class="fa-solid fa-shield-check" style="margin-right:4px;color:#2dd4bf"></i>Your location will be verified (Geofencing). You can only mark attendance within the classroom area.
+      </div>
+    </div>
+    <div id="subj-list">
+      ${SUBJECTS.map((s, i) => {
+        const circ = 219.9; const offset = circ - (s.att / 100) * circ;
+        return `
+        <div class="subj-c" id="sc-${i}">
+          <div class="subj-head" onclick="toggleSubj(${i})">
+            <div class="att-wrap">
+              <svg class="att-svg" viewBox="0 0 80 80">
+                <circle class="att-ring-bg" cx="40" cy="40" r="35"/>
+                <circle class="att-ring-fill" cx="40" cy="40" r="35" stroke="${s.color}" stroke-dashoffset="${circ}" id="ring-${i}"/>
+              </svg>
+              <div class="att-center">
+                <div class="att-pct" style="color:${s.color}">${s.att}%</div>
+                <div class="att-lbl">Att.</div>
+              </div>
+            </div>
+            <div style="flex:1">
+              <div style="font-weight:700;font-size:.88rem">${s.name}</div>
+              <div style="font-size:.7rem;color:var(--muted);margin-top:2px">${s.code} Â· ${s.teacher}</div>
+              <div style="margin-top:8px">
+                <div class="pb" style="max-width:300px"><div class="pf" style="width:${s.att}%;background:${s.color}"></div></div>
+                <div style="font-size:.65rem;color:var(--muted);margin-top:3px">${s.present} attended Â· ${s.total - s.present} absent Â· ${s.total} total</div>
+              </div>
+              ${s.att < 75 ? `<div style="font-size:.68rem;color:#fb7185;margin-top:6px;background:rgba(225,29,72,0.08);padding:4px 8px;border-radius:6px"><i class='fa-solid fa-triangle-exclamation'></i> Need ${Math.ceil(s.total * .75) - s.present} more classes to reach 75%</div>` : ''}
+            </div>
+            <span class="tag t-${s.att >= 75 ? 'teal' : 'rose'}" style="flex-shrink:0">${s.att >= 75 ? '<i class=\'fa-solid fa-check\'></i> Safe' : '<i class=\'fa-solid fa-triangle-exclamation\'></i> Low'}</span>
+            <span class="subj-arrow"><i class="fa-solid fa-chevron-down"></i></span>
+          </div>
+          <div class="subj-detail" id="sd-${i}">
+            <div class="detail-inner">
+              <div style="font-size:.7rem;color:var(--muted);margin-bottom:8px;font-weight:600">MARCH 2026 Â· ATTENDANCE CALENDAR</div>
+              <div class="cal-grid" id="cal-${i}"></div>
+              <div style="display:flex;gap:16px;margin-top:10px;font-size:.68rem">
+                <span style="color:#34d399">â— Present: ${s.present}</span>
+                <span style="color:#fb7185">â— Absent: ${s.total - s.present}</span>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+    }
+
+    window.markAttendanceWithOTP = function () {
+      const classIdx = document.getElementById('att-class-sel')?.value;
+      if (!classIdx) {
+        showToast('Please select a class', 'error');
+        return;
+      }
+      const subj = SUBJECTS[classIdx];
+      modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
+        <div class="modal-t"><i class="fa-solid fa-key" style="color:var(--admin);margin-right:8px"></i>Mark Attendance â€” ${subj.name}</div>
+        <div class="gcard" style="margin-bottom:14px;background:rgba(13,148,136,.08);border:1px solid rgba(13,148,136,.2)">
+          <div style="font-size:.72rem;color:#2dd4bf;margin-bottom:8px"><i class="fa-solid fa-location-dot" style="margin-right:6px"></i>Location Status</div>
+          <div id="geo-status" style="font-size:.76rem;font-weight:600;color:var(--muted)">Checking your location...</div>
+          <div id="geo-detail" style="font-size:.65rem;color:var(--muted);margin-top:6px;display:none"></div>
+        </div>
+        <div class="frow"><div class="flbl">Enter OTP (6 digits)</div><input class="inp" id="otp-inp" maxlength="6" placeholder="000000" type="text" inputmode="numeric" onkeyup="this.value=this.value.replace(/[^0-9]/g,'')" autofocus></div>
+        <div id="otp-timer" style="text-align:center;font-size:.7rem;color:var(--muted);margin-bottom:10px">OTP expires in: <span id="timer-sec">300</span>s</div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn btn-glass" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-teal" onclick="verifyOTPAndMark('${classIdx}')"><i class="fa-solid fa-check" style="margin-right:4px"></i>Verify & Mark</button>
+        </div>
+      </div></div>`);
+
+      // Start geofencing check
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const acc = pos.coords.accuracy;
+          const classroom = { lat: 18.5905, lng: 73.8167 }; // Sample coordinates for Pune
+          const dist = Math.round(Math.sqrt(Math.pow(lat - classroom.lat, 2) + Math.pow(lng - classroom.lng, 2)) * 111000); // meters
+
+          const statusEl = document.getElementById('geo-status');
+          const detailEl = document.getElementById('geo-detail');
+          if (dist < 200) {
+            statusEl.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#2dd4bf;margin-right:6px"></i>You are inside the classroom area âœ“';
+            statusEl.style.color = '#2dd4bf';
+            detailEl.innerHTML = `Distance: ${dist}m (Allowed: 200m) | Accuracy: Â±${Math.round(acc)}m`;
+            detailEl.style.display = 'block';
+            window._geoVerified = true;
+          } else {
+            statusEl.innerHTML = '<i class="fa-solid fa-circle-xmark" style="color:#fb7185;margin-right:6px"></i>You are outside the classroom area';
+            statusEl.style.color = '#fb7185';
+            detailEl.innerHTML = `Distance: ${dist}m (${dist - 200}m outside limits) | Max distance: 200m`;
+            detailEl.style.display = 'block';
+            detailEl.style.color = '#fb7185';
+            window._geoVerified = false;
+          }
+        }, err => {
+          document.getElementById('geo-status').innerHTML = '<i class="fa-solid fa-exclamation-triangle" style="color:var(--gold);margin-right:6px"></i>Enable location to verify attendance';
+          document.getElementById('geo-status').style.color = 'var(--gold)';
+          window._geoVerified = false;
+        });
+      }
+
+      // Timer
+      let remaining = 300;
+      const timerInterval = setInterval(() => {
+        remaining--;
+        document.getElementById('timer-sec').textContent = remaining;
+        if (remaining <= 0) {
+          clearInterval(timerInterval);
+          showToast('OTP expired', 'error');
+          closeModal();
+        }
+      }, 1000);
+    };
+
+    window.verifyOTPAndMark = async function (clsIdx) {
+      const otpEl = document.getElementById('otp-inp');
+      const otp = otpEl?.value?.trim();
+      if (!otp || otp.length !== 6) {
+        showError('Please enter valid 6-digit OTP', otpEl);
+        return;
+      }
+
+      if (!window._geoVerified) {
+        showError('You must be within 200m of classroom to mark attendance');
+        return;
+      }
+
+      try {
+        const u = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+        const subj = SUBJECTS[clsIdx];
+
+        // Get current position for backend verification
+        if (!navigator.geolocation) {
+          showError('Geolocation not available on this device');
+          return;
+        }
+
+        showLoader();
+        const btn = document.querySelector('.modal .btn-success, .modal .btn-teal');
+        if (btn) { btn.disabled = true; }
+
+        navigator.geolocation.getCurrentPosition(async pos => {
+          try {
+            // Get class_id from SUBJECTS
+            const classId = subj.id || clsIdx;
+
+            const attResp = await fetch(`${API_BASE_URL}/attendance/verify-otp`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                otp,
+                student_id: u.id,
+                class_id: classId,
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude
+              })
+            });
+
+            const data = await attResp.json();
+            if (data.ok) {
+              showToast('âœ… Attendance marked successfully!');
+              closeModal();
+              // Refresh attendance data from backend
+              const freshAtt = await fetch(`${API_BASE_URL}/student/${encodeURIComponent(u.id)}/attendance`);
+              const freshData = await freshAtt.json();
+              if (freshData.ok) {
+                window.DB_ATTENDANCE = freshData.classes;
+              }
+              document.getElementById('page-content').innerHTML = pageAttendance();
+              bindAttendance();
+            } else {
+              showError(data.message || 'OTP verification failed');
+            }
+          } catch (e) {
+            showError('Server error: ' + e.message);
+          } finally {
+            hideLoader();
+            if (btn) { btn.disabled = false; }
+          }
+        }, err => {
+          hideLoader();
+          showError('Could not get location. Please allow location access.');
+          if (btn) { btn.disabled = false; }
+        });
+      } catch (e) {
+        hideLoader();
+        showError('Error: ' + e.message);
+      }
+    };
+
+    function bindAttendance() {
+      document.getElementById('main').scrollTop = 0;
+      SUBJECTS.forEach((s, i) => {
+        setTimeout(() => {
+          const ring = document.getElementById('ring-' + i);
+          if (ring) ring.style.strokeDashoffset = 219.9 - (s.att / 100) * 219.9;
+        }, 100 + i * 80);
+      });
+    }
+
+    function toggleSubj(i) {
+      const card = document.getElementById('sc-' + i);
+      const isOpen = card.classList.contains('open');
+      document.querySelectorAll('.subj-c').forEach(c => c.classList.remove('open'));
+      if (!isOpen) {
+        card.classList.add('open');
+        const cal = document.getElementById('cal-' + i);
+        const s = SUBJECTS[i];
+        let html = '';
+        let p = s.present, a = s.total - s.present;
+        for (let d = 1; d <= s.total; d++) {
+          const isP = Math.random() < p / (p + a - 0.001);
+          if (isP) p--; else a--;
+          html += `<div class="cal-d ${isP ? 'cal-p' : 'cal-a'}">${d}</div>`;
+        }
+        cal.innerHTML = html;
+      }
+    }
+
+    /* â”€â”€ PAGE: ANNOUNCEMENTS â”€â”€ */
+    function pageAnnouncements() {
+      return `
+  <div class="panel g2">
+    <div>
+      ${ANNOUNCEMENTS.map((a, i) => `
+      <div class="gcard" style="margin-bottom:10px;cursor:pointer;${i === 0 ? 'border-color:rgba(255,255,255,0.2)' : ''}" onclick="showAnno(${i})">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+          ${tagHtml(a.tag, 't-' + a.tt)}<span style="font-size:.65rem;color:var(--muted)">${a.date}</span>
+        </div>
+        <div style="font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;margin-bottom:4px;line-height:1.3">${a.title}</div>
+        <div style="font-size:.74rem;color:var(--muted);line-height:1.55">${a.body.slice(0, 80)}...</div>
+        <div style="font-size:.64rem;color:rgba(255,255,255,0.3);margin-top:6px">â€” ${a.author}</div>
+      </div>`).join('')}
+    </div>
+    <div>
+      <div class="gcard" id="anno-detail">
+        <div style="text-align:center;padding:40px 20px;color:var(--muted)">
+          <div style="font-size:2rem;margin-bottom:8px;color:rgba(255,255,255,0.15)"><i class="fa-solid fa-bullhorn"></i></div>
+          <div style="font-size:.82rem">Click an announcement to read it</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+    }
+
+    window.showAnno = function (i) {
+      const a = ANNOUNCEMENTS[i];
+      document.getElementById('anno-detail').innerHTML = `
+    <div class="panel">
+      ${tagHtml(a.tag, 't-' + a.tt)}
+      <div style="font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;margin:10px 0 6px;line-height:1.3">${a.title}</div>
+      <div style="font-size:.72rem;color:var(--muted);margin-bottom:14px">${a.date} Â· ${a.author}</div>
+      <div class="div"></div>
+      <div style="font-size:.84rem;line-height:1.8;color:rgba(255,255,255,0.85)">${a.body}</div>
+    </div>`;
+    };
+
+    /* â”€â”€ PAGE: CHAT â”€â”€ */
+    function pageChat() {
+      return `
+  <div class="panel" style="height:calc(100vh - 115px)">
+    <div class="chat-layout">
+      <div class="chat-left">
+        <div style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:.62rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:1px">Messages</div>
+        ${CHATS.map((c, i) => `
+        <div class="chat-si ${i === activeChat ? 'active' : ''}" id="csi-${i}" onclick="loadChat(${i})">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;color:var(--muted)"><i class="fa-solid ${c.icon}"></i></div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span class="chat-sn">${c.name}</span>
+                ${c.unread > 0 ? `<span class="sb-bdg">${c.unread}</span>` : ''}
+              </div>
+              <div class="chat-sp">${c.last}</div>
+            </div>
+          </div>
+        </div>`).join('')}
+      </div>
+      <div class="chat-main">
+        <div class="chat-hdr" id="chat-hdr">
+          <div style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--muted);flex-shrink:0"><i class="fa-solid ${CHATS[activeChat].icon}"></i></div>
+          <div><div style="font-weight:700;font-size:.84rem">${CHATS[activeChat].name}</div><div style="font-size:.68rem;color:var(--muted)">${CHATS[activeChat].role}</div></div>
+          <div style="margin-left:auto;display:flex;gap:6px">
+            <button class="btn btn-glass btn-xs"><i class="fa-solid fa-phone" style="margin-right:4px"></i>Call</button>
+            <button class="btn btn-glass btn-xs"><i class="fa-solid fa-paperclip"></i></button>
+          </div>
+        </div>
+        <div class="chat-msgs" id="chat-msgs">${renderMsgs(CHATS[activeChat].msgs)}</div>
+        <div class="chat-inp">
+          <input class="inp" style="flex:1" id="chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg()">
+          <button class="btn btn-white btn-sm" onclick="sendMsg()"><i class="fa-solid fa-paper-plane" style="margin-right:4px"></i>Send</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+    }
+
+    function renderMsgs(msgs) {
+      return msgs.map(m => `<div class="cmsg ${m.me ? 'cm-me' : 'cm-them'}">${m.text}</div>`).join('');
+    }
+
+    window.loadChat = function (i) {
+      activeChat = i;
+      document.querySelectorAll('.chat-si').forEach((el, j) => el.classList.toggle('active', j === i));
+      const c = CHATS[i];
+      document.getElementById('chat-hdr').innerHTML = `
+    <div style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--muted);flex-shrink:0"><i class="fa-solid ${c.icon}"></i></div>
+    <div><div style="font-weight:700;font-size:.84rem">${c.name}</div><div style="font-size:.68rem;color:var(--muted)">${c.role}</div></div>
+    <div style="margin-left:auto;display:flex;gap:6px">
+      <button class="btn btn-glass btn-xs"><i class="fa-solid fa-phone" style="margin-right:4px"></i>Call</button>
+      <button class="btn btn-glass btn-xs"><i class="fa-solid fa-paperclip"></i></button>
+    </div>`;
+      const msgs = document.getElementById('chat-msgs');
+      msgs.innerHTML = renderMsgs(c.msgs);
+      msgs.scrollTop = msgs.scrollHeight;
+    };
+
+    function bindChat() {
+      const msgs = document.getElementById('chat-msgs');
+      if (msgs) msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    window.sendMsg = function () {
+      const inp = document.getElementById('chat-input');
+      const text = inp?.value?.trim();
+      if (!text) return;
+      CHATS[activeChat].msgs.push({ me: true, text });
+      inp.value = '';
+      const msgs = document.getElementById('chat-msgs');
+      if (msgs) { msgs.innerHTML = renderMsgs(CHATS[activeChat].msgs); msgs.scrollTop = msgs.scrollHeight; }
+    };
+
+    /* â”€â”€ PAGE: ASSIGNMENTS â”€â”€ */
+    function pageAssignments() {
+      return `
+  <div class="panel">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${ASSIGNMENTS.map((a, i) => `
+      <div class="gcard" style="cursor:pointer" id="asgn-${i}" onclick="toggleAsgn(${i})">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:38px;height:38px;border-radius:10px;background:${a.status === 'Submitted' ? 'rgba(16,185,129,0.12)' : 'rgba(232,160,32,0.12)'};display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;color:${a.status === 'Submitted' ? '#34d399' : 'var(--gold)'}">
+            ${a.status === 'Submitted' ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-file-pen"></i>'}
+          </div>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:.85rem">${a.title}</div>
+            <div style="font-size:.7rem;color:var(--muted);margin-top:2px">${a.sub} Â· Due: ${a.due}</div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            ${tagHtml(a.priority, a.priority === 'High' ? 'rose' : a.priority === 'Medium' ? 'gold' : 'teal')}
+            ${tagHtml(a.status, a.status === 'Submitted' ? 'teal' : 'gold')}
+          </div>
+        </div>
+        <div id="asgn-form-${i}" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06)">
+          <textarea class="inp" placeholder="Write your answer or paste submission link..." style="margin-bottom:8px"></textarea>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-white btn-sm" onclick="event.stopPropagation();showToast('Assignment submitted!')">Submit</button>
+            <button class="btn btn-glass btn-sm" onclick="event.stopPropagation()"><i class="fa-solid fa-paperclip" style="margin-right:4px"></i>Attach File</button>
+          </div>
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+    }
+
+    window.toggleAsgn = function (i) {
+      const f = document.getElementById('asgn-form-' + i);
+      if (!f || ASSIGNMENTS[i].status === 'Submitted') return;
+      f.style.display = f.style.display === 'none' ? 'block' : 'none';
+    };
+
+    function bindAssignments() { document.getElementById('main').scrollTop = 0; }
+
+    /* â”€â”€ PAGE: MATERIALS â”€â”€ */
+    function pageMaterials() {
+      return `
+  <div class="panel">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${MATERIALS.map(m => `
+      <div class="gcard" style="display:flex;align-items:center;gap:12px">
+        <div style="width:38px;height:38px;border-radius:10px;background:${m.type === 'PDF' ? 'rgba(225,29,72,0.12)' : m.type === 'PPTX' ? 'rgba(232,160,32,0.12)' : 'rgba(13,148,136,0.12)'};display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;color:${m.type === 'PDF' ? '#fb7185' : m.type === 'PPTX' ? 'var(--gold)' : '#2dd4bf'}">
+          ${m.type === 'PDF' ? '<i class="fa-solid fa-file-pdf"></i>' : m.type === 'PPTX' ? '<i class="fa-solid fa-file-powerpoint"></i>' : '<i class="fa-solid fa-file-word"></i>'}
+        </div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:.84rem">${m.title}</div>
+          <div style="font-size:.68rem;color:var(--muted);margin-top:2px">${m.sub} Â· ${m.teacher} Â· ${m.date}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:.65rem;color:var(--muted);margin-bottom:4px">${m.size}</div>
+          ${tagHtml(m.type, m.type === 'PDF' ? 'rose' : m.type === 'PPTX' ? 'gold' : 'teal')}
+        </div>
+        <button class="btn btn-glass btn-xs" onclick="showToast('Downloaded ${m.title}')"><i class="fa-solid fa-download"></i></button>
+      </div>`).join('')}
+    </div>
+  </div>`;
+    }
+
+    /* â”€â”€ PAGE: GRADES â”€â”€ */
+    function pageGrades() {
+      const marksData = window.DB_MARKS || [];
+      const stu = window.DB_STUDENT || {};
+
+      if (!marksData.length) {
+        return `<div class="panel"><div class="gcard" style="text-align:center;padding:40px"><i class="fa-solid fa-book" style="font-size:2rem;opacity:.3;display:block;margin-bottom:12px"></i><div style="color:var(--muted);font-size:.85rem">No grades available yet. Check back after assessments are evaluated.</div></div></div>`;
+      }
+
+      let gradeSummary = '';
+      marksData.forEach(classMarks => {
+        let total = 0, maxTotal = 0;
+        classMarks.marks.forEach(m => {
+          total += m.obtained;
+          maxTotal += m.max;
+        });
+        const pct = maxTotal > 0 ? Math.round(total / maxTotal * 100) : 0;
+        const grade = pct >= 90 ? 'A+' : pct >= 80 ? 'A' : pct >= 70 ? 'B+' : pct >= 60 ? 'B' : 'C';
+        const col = pct >= 80 ? '#34d399' : pct >= 70 ? '#fbbf24' : '#fb7185';
+        gradeSummary += `<tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
+          <td style="padding:10px 12px;font-weight:600">${classMarks.class_name}</td>
+          <td style="padding:10px 12px;color:var(--muted);font-size:.7rem">${classMarks.subject_code}</td>
+          ${classMarks.marks.map(m => `<td style="padding:10px 12px;font-weight:500">${Math.round(m.obtained)}</td>`).join('')}
+          <td style="padding:10px 12px;font-weight:700;color:${col}">${total}/${maxTotal}</td>
+          <td style="padding:10px 12px">${tagHtml(grade, pct >= 80 ? 'teal' : pct >= 70 ? 'gold' : 'rose')}</td>
+        </tr>`;
+      });
+
+      const overallGPA = stu.cgpa || '8.4';
+      return `
+  <div class="panel">
+      <div class="gcard" style="margin-bottom:14px">
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-chart-bar" style="margin-right:6px;color:#a5b4fc"></i>Assessment Marks â€” All Semesters</div></div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:.78rem">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.08)">
+              ${['Subject', 'Code', 'IA-1', 'IA-2', 'IA-3', 'Total', 'Grade'].map(h => `<th style="padding:10px 12px;text-align:left;color:var(--muted);font-weight:600;font-size:.65rem;text-transform:uppercase;letter-spacing:.5px">${h}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${gradeSummary || '<tr><td colspan="7" style="padding:20px;text-align:center;color:var(--muted)">No marks entered yet</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="g3">
+      ${[{ l: "Current GPA", v: overallGPA, c: "#2dd4bf" }, { l: "Performance", v: overallGPA >= 8 ? "Excellent" : overallGPA >= 7 ? "Good" : "Avg", c: overallGPA >= 8 ? "#2dd4bf" : "#a78bfa" }, { l: "Attendance (Avg)", v: (stu.attendance || 85) + "%", c: (stu.attendance || 85) >= 75 ? "#34d399" : "#fb7185" }].map(s => `
+      <div class="stat"><div class="stat-ico" style="background:rgba(255,255,255,0.06);color:${s.c}"><i class="fa-solid fa-graduation-cap"></i></div><div><div class="stat-n" style="color:${s.c}">${s.v}</div><div class="stat-l">${s.l}</div></div></div>`).join('')}
+    </div>
+  </div>`;
+    }
+
+    /* â”€â”€ PAGE: FEES â”€â”€ */
+    function pageFees() {
+      const feesData = window.DB_FEES || [];
+      const stu = window.DB_STUDENT || {};
+
+      let totalAmount = 0, totalPaid = 0, pendingAmount = 0;
+      feesData.forEach(f => {
+        totalAmount += f.amount || 0;
+        totalPaid += f.paid || 0;
+        if (f.status !== 'Paid') pendingAmount += (f.amount - f.paid) || 0;
+      });
+
+      const paidPct = totalAmount > 0 ? Math.round(totalPaid / totalAmount * 100) : 0;
+      const paymentStatus = paidPct === 100 ? 'fully_paid' : paidPct > 0 ? 'partial' : 'pending';
+
+      if (!feesData.length) {
+        return `<div class="panel"><div class="gcard" style="text-align:center;padding:40px"><i class="fa-solid fa-receipt" style="font-size:2rem;opacity:.3;display:block;margin-bottom:12px"></i></i><div style="color:var(--muted);font-size:.85rem">No fee records found.</div></div></div>`;
+      }
+
+      return `
+  <div class="panel">
+    <div class="g3" style="margin-bottom:14px">
+      <div class="stat"><div class="stat-ico" style="background:rgba(13,148,136,0.15);color:#2dd4bf"><i class="fa-solid fa-wallet"></i></div><div><div class="stat-n" style="color:#2dd4bf">â‚¹${totalAmount.toLocaleString()}</div><div class="stat-l">Total Due</div></div></div>
+      <div class="stat"><div class="stat-ico" style="background:rgba(16,185,129,0.15);color:#34d399"><i class="fa-solid fa-check-circle"></i></div><div><div class="stat-n" style="color:#34d399">â‚¹${totalPaid.toLocaleString()}</div><div class="stat-l">Paid</div></div></div>
+      <div class="stat"><div class="stat-ico"style="background:rgba(225,29,72,0.15);color:#fb7185"><i class="fa-solid fa-hourglass-end"></i></div><div><div class="stat-n" style="color:#fb7185">â‚¹${pendingAmount.toLocaleString()}</div><div class="stat-l">Pending</div></div></div>
+    </div>
+    
+    <div class="gcard" style="margin-bottom:14px">
+      <div class="sh"><div class="sh-t">Payment Progress</div><span style="font-size:.75rem;font-weight:600;color:#a78bfa">${paidPct}%</span></div>
+      <div class="pb"><div class="pf" style="width:${paidPct}%;background:${paidPct === 100 ? '#34d399' : paidPct > 0 ? '#fbbf24' : '#fb7185'}"></div></div>
+      <div style="margin-top:10px;font-size:.75rem;color:var(--muted);display:flex;justify-content:space-between">
+        <span>${paymentStatus === 'fully_paid' ? 'âœ“ All fees paid' : paymentStatus === 'partial' ? `â‚¹${pendingAmount.toLocaleString()} pending` : 'Payment due'}</span>
+        <span style="font-weight:600">${feesData.filter(f => f.status === 'Paid').length}/${feesData.length} installments paid</span>
+      </div>
+    </div>
+    
+    <div class="gcard">
+      <div class="sh"><div class="sh-t">Fee Breakdown</div></div>
+      ${feesData.map((f, i) => {
+        const statusColor = f.status === 'Paid' ? '#34d399' : f.paid > 0 ? '#fbbf24' : '#fb7185';
+        const statusLabel = f.status === 'Paid' ? 'Paid' : f.paid > 0 ? `Partial (â‚¹${f.paid})` : 'Pending';
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+          <div>
+            <div style="font-weight:600;font-size:.78rem">${f.description || f.semester}</div>
+            <div style="font-size:.65rem;color:var(--muted)">${f.due_date || 'N/A'}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-weight:700;font-size:.78rem;color:${statusColor}">${statusLabel}</div>
+            <div style="font-size:.65rem;color:var(--muted)">â‚¹${f.amount.toLocaleString()}</div>
+          </div>
+          ${f.status !== 'Paid' && f.paid < f.amount ? `<button class="btn btn-teal btn-xs" onclick="window.showPaymentModal(${i}, ${f.amount - f.paid})">Pay</button>` : ''}
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+    }
+
+    window.showPaymentModal = function (feeIdx, amount) {
+      modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-credit-card" style="color:#2dd4bf;margin-right:8px"></i>Pay Fee</div>
+      <div class="gcard" style="margin-bottom:12px;background:rgba(13,148,136,.1);border-color:rgba(13,148,136,.2)">
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px">Amount Due</div>
+        <div style="font-size:1.5rem;font-weight:700;color:#2dd4bf">â‚¹${amount.toLocaleString()}</div>
+      </div>
+      <div class="frow">
+        <div class="flbl">Payment Method</div>
+        <select class="inp" id="pay-method">
+          <option>Online (UPI/Card/Bank)</option>
+          <option>Bank Transfer</option>
+          <option>Check</option>
+          <option>Cash</option>
+        </select>
+      </div>
+      <div class="frow" style="margin-top:10px">
+        <div class="flbl">Amount to Pay</div>
+        <input class="inp" type="number" id="pay-amt" value="${amount}" min="0" max="${amount}">
+      </div>
+      <div class="frow" style="margin-top:10px">
+        <div class="flbl">Reference (Optional)</div>
+        <input class="inp" id="pay-ref" placeholder="Transaction ID or check number...">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+        <button class="btn btn-glass" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-teal" onclick="window.processFeePayment(${feeIdx})">Process Payment</button>
+      </div></div></div>`);
+    };
+
+    window.processFeePayment = async function (feeIdx) {
+      try {
+        const u = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+        const amtEl = document.getElementById('pay-amt');
+        const amount = parseInt(amtEl?.value || 0);
+        const method = document.getElementById('pay-method')?.value || 'Online';
+        const ref = document.getElementById('pay-ref')?.value || '';
+
+        if (!amount || amount <= 0) {
+          showError('Enter valid amount', amtEl);
+          return;
+        }
+
+        const fees = window.DB_FEES || [];
+        const fee = fees[feeIdx];
+        if (!fee) {
+          showError('Fee record not found');
+          return;
+        }
+
+        showLoader();
+        const btn = document.querySelector('.modal .btn-teal');
+        if (btn) { btn.disabled = true; btn.textContent = 'Processing...'; }
+
+        const r = await fetch(`${API_BASE_URL}/student/${encodeURIComponent(u.id)}/pay-fee`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fee_id: fee.id, amount, method, reference: ref })
+        });
+
+        const d = await r.json();
+        if (d.ok) {
+          // Update local fee record
+          fee.paid = d.new_paid;
+          fee.status = d.status;
+          closeModal();
+          document.getElementById('page-content').innerHTML = pageFees();
+          showToast('âœ… Payment recorded successfully!');
+        } else {
+          showError(d.message || 'Payment processing failed');
+        }
+      } catch (e) {
+        showError('Server error: ' + e.message);
+      } finally {
+        hideLoader();
+        const btn = document.querySelector('.modal .btn-teal');
+        if (btn) { btn.disabled = false; btn.textContent = 'Process Payment'; }
+      }
+    };
+
+    /* â”€â”€ PAGE: TIMETABLE â”€â”€ */
+    function pageTimetable() {
+      return `
+  <div class="panel">
+    <div class="gcard" style="overflow-x:auto">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        ${SUBJECTS.map(s => `<div style="display:flex;align-items:center;gap:4px;font-size:.68rem;color:rgba(255,255,255,0.6)"><div style="width:8px;height:8px;border-radius:2px;background:${s.color}"></div>${s.name.split(' ')[0]}</div>`).join('')}
+      </div>
+      <div class="tt" style="min-width:560px">
+        <div></div>
+        ${TT.days.map(d => `<div class="tt-h">${d}</div>`).join('')}
+        ${TT.times.map((t, ti) => `
+          <div class="tt-t">${t}</div>
+          ${TT.slots[ti].map(s => s.s ? `<div class="tt-c tt-s" style="background:${s.c}88;border:1px solid ${s.c}44">${s.s}</div>` : `<div class="tt-c tt-e"></div>`).join('')}
+        `).join('')}
+      </div>
+    </div>
+  </div>`;
+    }
+
+    /* â”€â”€ PAGE: LIBRARY â”€â”€ */
+    function pageLibrary() {
+      return `
+  <div class="panel">
+    <div style="margin-bottom:14px">
+      <div style="position:relative"><i class="fa-solid fa-magnifying-glass" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted2);font-size:.75rem;pointer-events:none"></i><input class="inp" id="lib-q" placeholder="Search books by title or author..." oninput="filterBooks()" style="padding-left:34px"></div>
+    </div>
+    <div class="g2" id="book-list">
+      ${renderBooks(BOOKS)}
+    </div>
+  </div>`;
+    }
+
+    function renderBooks(books) {
+      return books.map(b => `
+  <div class="bk-c">
+    <div style="width:40px;height:50px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;color:var(--muted)"><i class="fa-solid fa-book"></i></div>
+    <div style="flex:1">
+      <div style="font-weight:700;font-size:.82rem;margin-bottom:2px">${b.title}</div>
+      <div style="font-size:.68rem;color:var(--muted);margin-bottom:6px">${b.author}</div>
+      <div style="display:flex;gap:5px">${tagHtml(b.status, b.status === 'Available' ? 'teal' : 'rose')}${tagHtml(b.cat, 'white')}</div>
+    </div>
+    ${b.status === 'Available' ? `<button class="btn btn-glass btn-xs" onclick="showToast('Book issued!')">Issue</button>` : ''}
+  </div>`).join('');
+    }
+
+    function bindLibrary() { document.getElementById('main').scrollTop = 0; }
+
+    window.filterBooks = function () {
+      const q = document.getElementById('lib-q')?.value?.toLowerCase() || '';
+      const filtered = BOOKS.filter(b => b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q));
+      document.getElementById('book-list').innerHTML = renderBooks(filtered);
+    };
+
+    /* â”€â”€ PAGE: AI ASSISTANT â”€â”€ */
+    let aiMsgs = [{ me: false, text: "Namaste! I'm your Uni AI Study Assistant.\n\nI can help you:\nâ€¢ Explain concepts from your syllabus\nâ€¢ Generate practice MCQs\nâ€¢ Summarize topics\nâ€¢ Help with assignment approach\n\nWhat would you like to study?" }];
+    let aiLoading = false;
+
+    function pageAI() {
+      const suggestions = ["Explain Binary Trees with examples", "Generate 5 MCQs on Computer Networks", "Summarize the OSI Model layers", "Help me understand Virtual Memory"];
+      return `
+  <div class="panel" style="display:flex;flex-direction:column;height:calc(100vh - 115px)">
+    ${aiMsgs.length === 1 ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">${suggestions.map(s => `<button class="btn btn-glass btn-sm" onclick="sendAI('${s}')">${s}</button>`).join('')}</div>` : ''}
+    <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-bottom:12px" id="ai-msgs">
+      ${renderAIMsgs()}
+    </div>
+    <div style="display:flex;gap:8px;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px">
+      <input class="inp" style="flex:1" id="ai-inp" placeholder="Ask anything about your subjects..." onkeydown="if(event.key==='Enter')sendAI()">
+      <button class="btn btn-white" id="ai-btn" onclick="sendAI()">Ask â†’</button>
+    </div>
+  </div>`;
+    }
+
+    function renderAIMsgs() {
+      return aiMsgs.map(m => `
+  <div style="display:flex;justify-content:${m.me ? 'flex-end' : 'flex-start'};gap:6px">
+    ${!m.me ? `<div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#0d9488,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0;margin-top:2px;color:#fff"><i class='fa-solid fa-robot'></i></div>` : ''}
+    <div style="max-width:78%;background:${m.me ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)'};border:1px solid ${m.me ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.08)'};border-radius:${m.me ? '12px 12px 2px 12px' : '2px 12px 12px 12px'};padding:10px 14px;font-size:.8rem;line-height:1.7;white-space:pre-wrap">
+      ${m.text}
+    </div>
+  </div>`).join('');
+    }
+
+    window.sendAI = async function (text) {
+      const inp = document.getElementById('ai-inp');
+      const t = text || inp?.value?.trim();
+      if (!t || aiLoading) return;
+      if (inp) inp.value = '';
+      aiMsgs.push({ me: true, text: t });
+      aiLoading = true;
+      const btn = document.getElementById('ai-btn');
+      if (btn) btn.disabled = true;
+      refreshAI();
+      try {
+        const r = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514', max_tokens: 900,
+            system: 'You are an AI Study Assistant for B.Tech CSE students. Give clear, concise explanations with examples. Be encouraging. Use emojis sparingly.',
+            messages: [{ role: 'user', content: t }]
+          })
+        });
+        const d = await r.json();
+        aiMsgs.push({ me: false, text: d.content?.[0]?.text || 'Sorry, something went wrong.' });
+      } catch (e) {
+        aiMsgs.push({ me: false, text: 'Could not connect to AI. Please check your connection and try again.' });
+      }
+      aiLoading = false;
+      refreshAI();
+      if (btn) btn.disabled = false;
+    };
+
+    function refreshAI() {
+      const el = document.getElementById('ai-msgs');
+      if (el) { el.innerHTML = renderAIMsgs(); el.scrollTop = el.scrollHeight; }
+    }
+
+    function bindAI() { const el = document.getElementById('ai-msgs'); if (el) el.scrollTop = el.scrollHeight; }
+
+    /* â”€â”€ PAGE: EVENTS â”€â”€ */
+    function pageEvents() {
+      return `
+  <div class="panel">
+    <div class="g3" id="events-grid">
+      ${renderEvents()}
+    </div>
+  </div>`;
+    }
+    function renderEvents() {
+      return EVENTS.map((e, i) => `
+  <div class="ev-c">
+    <div style="height:80px;background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;font-size:2rem;color:${e.color}">
+      <i class="fa-solid ${e.icon}"></i>
+    </div>
+    <div style="padding:14px">
+      <div style="font-family:'Playfair Display',serif;font-size:.92rem;font-weight:700;margin-bottom:4px">${e.name}</div>
+      <div style="font-size:.68rem;color:var(--muted);margin-bottom:3px"><i class="fa-solid fa-calendar" style="margin-right:4px"></i>${e.date}</div>
+      <div style="font-size:.68rem;color:var(--muted);margin-bottom:10px"><i class="fa-solid fa-location-dot" style="margin-right:4px"></i>${e.venue}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        ${tagHtml(e.cat, 'teal')}<span style="font-size:.62rem;color:var(--muted)">${e.reg + (e.going ? 1 : 0)} going</span>
+      </div>
+      <div class="div" style="margin:.6rem 0"></div>
+      <button id="rsvp-${i}" class="btn btn-${e.going ? 'glass' : 'white'} btn-sm" style="width:100%;justify-content:center" onclick="toggleRSVP(${i})">
+        ${e.going ? '<i class="fa-solid fa-check" style="margin-right:4px"></i>Going' : 'Register Now'}
+      </button>
+    </div>
+  </div>`).join('');
+    }
+    function bindEvents2() { document.getElementById('main').scrollTop = 0; }
+    window.toggleRSVP = function (i) {
+      EVENTS[i].going = !EVENTS[i].going;
+      document.getElementById('events-grid').innerHTML = renderEvents();
+      showToast(EVENTS[i].going ? `Registered for ${EVENTS[i].name}!` : `Removed from ${EVENTS[i].name}`);
+    };
+
+    /* â”€â”€ PAGE: STUDENT CORNER â”€â”€ */
+    const POSTS = [
+      { user: "Rohit Patil", dept: "CSE 3rd Year", text: "Anyone have DBMS Unit 5 notes? Need before tomorrow's test ðŸ˜° Been through everything but can't find proper normalization examples.", time: "1h ago", likes: 11, liked: false, emoji: "ðŸ‘¨â€ðŸ’»" },
+      { user: "Sneha Kulkarni", dept: "CSE 3rd Year", text: "Study group for OS exam â€” Saturday 4PM at Library Room 2! We'll be covering scheduling algorithms and deadlock. DM me to join! ðŸ“š", time: "2h ago", likes: 18, liked: false, emoji: "ðŸ‘©â€ðŸŽ“" },
+      { user: "Aryan Mehta", dept: "CSE 3rd Year", text: "Pro tip: Anki flashcards for CN theory = absolute game changer. Memorized all OSI layers + protocols in 2 hours. Highly recommend ðŸ™Œ", time: "4h ago", likes: 31, liked: true, emoji: "ðŸ§‘â€ðŸ’»" },
+      { user: "Kavya Nair", dept: "CSE 3rd Year", text: "Has anyone done the Socket Programming assignment? Stuck on handling multiple clients with select() system call. Any help appreciated!", time: "6h ago", likes: 7, liked: false, emoji: "ðŸ‘©â€ðŸ’»" },
+    ];
+
+    function pageCorner() {
+      return `
+  <div class="panel">
+    <div class="gcard" style="margin-bottom:12px">
+      <textarea class="inp" id="new-post" placeholder="Share something with your classmates... ðŸŽ“" style="min-height:70px;margin-bottom:10px"></textarea>
+      <div style="display:flex;justify-content:flex-end">
+        <button class="btn btn-white btn-sm" onclick="addPost()">Post</button>
+      </div>
+    </div>
+    <div id="posts-list">
+      ${renderPosts()}
+    </div>
+  </div>`;
+    }
+
+    function renderPosts() {
+      return POSTS.map((p, i) => `
+  <div class="post">
+    <div style="display:flex;gap:10px;margin-bottom:10px">
+      <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;color:var(--muted)"><i class="fa-solid fa-user"></i></div>
+      <div><div style="font-weight:700;font-size:.8rem">${p.user}</div><div style="font-size:.65rem;color:var(--muted)">${p.dept} Â· ${p.time}</div></div>
+    </div>
+    <div style="font-size:.82rem;line-height:1.65;margin-bottom:10px;color:rgba(255,255,255,0.85)">${p.text}</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-glass btn-xs" onclick="likePost(${i})" id="like-${i}" style="${p.liked ? 'color:var(--rose)' : ''}"><i class="fa-solid fa-heart" style="margin-right:3px"></i>${p.likes}</button>
+      <button class="btn btn-glass btn-xs" onclick="showToast('Reply feature coming soon!')"><i class="fa-solid fa-comment" style="margin-right:3px"></i>Reply</button>
+      <button class="btn btn-glass btn-xs" onclick="showToast('Link copied!')"><i class="fa-solid fa-share-nodes" style="margin-right:3px"></i>Share</button>
+    </div>
+  </div>`).join('');
+    }
+
+    window.likePost = function (i) {
+      POSTS[i].liked = !POSTS[i].liked;
+      POSTS[i].likes += POSTS[i].liked ? 1 : -1;
+      document.getElementById('posts-list').innerHTML = renderPosts();
+    };
+
+    window.addPost = function () {
+      const txt = document.getElementById('new-post')?.value?.trim();
+      if (!txt) return;
+      POSTS.unshift({ user: "Aryan Deshmukh", dept: "CSE 3rd Year", text: txt, time: "just now", likes: 0, liked: false, emoji: "ðŸ‘¨â€ðŸ’»" });
+      document.getElementById('posts-list').innerHTML = renderPosts();
+      document.getElementById('new-post').value = '';
+      showToast('Post shared!');
+    };
+
+    function bindCorner() { document.getElementById('main').scrollTop = 0; }
+
+    /* â”€â”€ PAGE: TEACHERS â”€â”€ */
+    function pageTeachers() {
+      return `
+  <div class="panel g2">
+    ${TEACHERS.map(t => `
+    <div class="gcard">
+      <div style="display:flex;gap:12px;margin-bottom:10px">
+        <div style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;color:var(--muted)"><i class="fa-solid ${t.icon}"></i></div>
+        <div>
+          <div style="font-weight:700;font-size:.86rem">${t.name}</div>
+          <div style="font-size:.7rem;color:var(--muted)">${t.sub}</div>
+          <div style="font-size:.68rem;color:var(--gold);margin-top:2px"><i class="fa-solid fa-star"></i> ${t.rating}/5.0</div>
+        </div>
+      </div>
+      <div style="font-size:.72rem;color:var(--muted);margin-bottom:3px"><i class="fa-solid fa-building" style="margin-right:5px"></i>${t.office}</div>
+      <div style="font-size:.72rem;color:var(--muted);margin-bottom:12px"><i class="fa-solid fa-clock" style="margin-right:5px"></i>${t.hours}</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-glass btn-xs" style="flex:1;justify-content:center" onclick="showToast('Message sent to ${t.name}')"><i class="fa-solid fa-comment" style="margin-right:4px"></i>Message</button>
+        <button class="btn btn-white btn-xs" style="flex:1;justify-content:center" onclick="showToast('Slot booked with ${t.name}!')"><i class="fa-solid fa-calendar-check" style="margin-right:4px"></i>Book Slot</button>
+      </div>
+    </div>`).join('')}
+  </div>`;
+    }
+
+    /* â”€â”€ PAGE: MARKETPLACE â”€â”€ */
+    function pageMarketplace() {
+      return `
+  <div class="panel">
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <div style="position:relative;flex:1"><i class="fa-solid fa-magnifying-glass" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted2);font-size:.75rem;pointer-events:none"></i><input class="inp" placeholder="Search items..." style="width:100%;padding-left:34px" id="mkt-q" oninput="filterMkt()"></div>
+      <button class="btn btn-gold" onclick="showToast('Listing feature coming soon!')">+ List Item</button>
+    </div>
+    <div class="g3" id="mkt-grid">${renderMkt(MARKETPLACE)}</div>
+  </div>`;
+    }
+
+    function renderMkt(items) {
+      return items.map((m, i) => `
+  <div class="mkt-c" onclick="showToast('Contacting ${m.seller}...')">
+    <div class="mkt-img" style="font-size:1.8rem;color:var(--muted)"><i class="fa-solid ${m.icon}"></i></div>
+    <div style="padding:12px">
+      <div style="font-weight:700;font-size:.82rem;margin-bottom:2px">${m.name}</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:#2dd4bf;margin-bottom:4px">â‚¹${m.price}</div>
+      <div style="font-size:.66rem;color:var(--muted);margin-bottom:8px"><i class="fa-solid fa-user" style="margin-right:4px"></i>${m.seller} Â· ${m.dept}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        ${tagHtml(m.cond, 'green')}<button class="btn btn-white btn-xs">Contact</button>
+      </div>
+    </div>
+  </div>`).join('');
+    }
+
+    function bindMkt() { document.getElementById('main').scrollTop = 0; }
+
+    window.filterMkt = function () {
+      const q = document.getElementById('mkt-q')?.value?.toLowerCase() || '';
+      const f = MARKETPLACE.filter(m => m.name.toLowerCase().includes(q) || m.seller.toLowerCase().includes(q));
+      document.getElementById('mkt-grid').innerHTML = renderMkt(f);
+    };
+
+    /* â”€â”€ PAGE: LOST & FOUND â”€â”€ */
+    let lfTab = 'all';
+    function pageLostFound() {
+      return `
+  <div class="panel">
+    <div style="display:flex;gap:6px;margin-bottom:14px">
+      ${['all', 'lost', 'found'].map(t => `<button class="btn btn-${lfTab === t ? 'white' : 'glass'} btn-sm" style="text-transform:capitalize" id="lf-${t}" onclick="setLFTab('${t}')">${t}</button>`).join('')}
+      <button class="btn btn-gold btn-sm" style="margin-left:auto" onclick="showToast('Report submitted!')">+ Report Item</button>
+    </div>
+    <div id="lf-list" style="display:flex;flex-direction:column;gap:8px">
+      ${renderLF()}
+    </div>
+  </div>`;
+    }
+
+    function renderLF() {
+      const items = lfTab === 'all' ? LOST_FOUND : LOST_FOUND.filter(i => i.type.toLowerCase() === lfTab);
+      return items.map(item => `
+  <div class="gcard" style="display:flex;align-items:center;gap:12px">
+    <div style="width:42px;height:42px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;color:var(--muted)"><i class="fa-solid ${item.icon}"></i></div>
+    <div style="flex:1">
+      <div style="display:flex;gap:6px;align-items:center;margin-bottom:3px">
+        ${tagHtml(item.type, item.type === 'Lost' ? 'rose' : 'teal')}
+        <span style="font-weight:700;font-size:.84rem">${item.item}</span>
+      </div>
+      <div style="font-size:.68rem;color:var(--muted)"><i class="fa-solid fa-location-dot" style="margin-right:4px"></i>${item.loc} &nbsp;Â·&nbsp; <i class="fa-solid fa-calendar" style="margin-right:4px"></i>${item.date}</div>
+      <div style="font-size:.66rem;color:rgba(255,255,255,0.3);margin-top:2px"><i class="fa-solid fa-id-card" style="margin-right:4px"></i>Contact: ${item.id}</div>
+    </div>
+    <button class="btn btn-glass btn-xs" onclick="showToast('Contact request sent!')">Contact</button>
+  </div>`).join('');
+    }
+
+    function bindLostFound() { document.getElementById('main').scrollTop = 0; }
+
+    window.setLFTab = function (t) {
+      lfTab = t;
+      document.querySelectorAll('[id^=lf-]').forEach(b => b.className = `btn btn-glass btn-sm`);
+      document.getElementById('lf-' + t).className = 'btn btn-white btn-sm';
+      document.getElementById('lf-list').innerHTML = renderLF();
+    };
+
+    /* â”€â”€ PAGE: INTERNSHIPS â”€â”€ */
+    const applied = {};
+    function pageInternships() { return `<div class="panel"><div id="intern-list" style="display:flex;flex-direction:column;gap:8px">${renderInternships()}</div></div>`; }
+
+    function renderInternships() {
+      return INTERNSHIPS.map((j, i) => `
+  <div class="gcard">
+    <div style="display:flex;align-items:flex-start;gap:12px">
+      <div style="width:42px;height:42px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;color:var(--muted)"><i class="fa-solid fa-building"></i></div>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+          <div>
+            <div style="font-weight:700;font-size:.88rem">${j.role}</div>
+            <div style="font-size:.72rem;color:var(--muted)">${j.co} Â· ${j.loc}</div>
+          </div>
+          ${tagHtml(j.type, j.type === 'Summer' ? 'gold' : 'violet')}
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin:.5rem 0">
+          ${j.skills.map(s => tagHtml(s, 'white')).join('')}
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <span style="font-family:'Playfair Display',serif;font-weight:700;color:#2dd4bf;font-size:.92rem">${j.stip}</span>
+            <span style="font-size:.68rem;color:var(--muted);margin-left:8px">Deadline: ${j.dl}</span>
+          </div>
+          <button class="btn btn-${applied[i] ? 'glass' : 'white'} btn-sm" id="appl-${i}" onclick="applyJob(${i})">${applied[i] ? '<i class="fa-solid fa-check" style="margin-right:4px"></i>Applied' : 'Apply Now'}</button>
+        </div>
+      </div>
+    </div>
+  </div>`).join('');
+    }
+
+    function bindInternships() { document.getElementById('main').scrollTop = 0; }
+
+    window.applyJob = function (i) {
+      applied[i] = !applied[i];
+      document.getElementById('intern-list').innerHTML = renderInternships();
+      showToast(applied[i] ? `Applied to ${INTERNSHIPS[i].co}!` : `Removed application`);
+    };
+
+    /* â”€â”€ PAGES MAP â”€â”€ */
+    const PAGES = {
+      dashboard: pageDashboard, announcements: pageAnnouncements, chat: pageChat,
+      attendance: pageAttendance, timetable: pageTimetable, assignments: pageAssignments,
+      materials: pageMaterials, grades: pageGrades, fees: pageFees, library: pageLibrary,
+      ai: pageAI, events: pageEvents, corner: pageCorner,
+      teachers: pageTeachers, marketplace: pageMarketplace,
+      lostfound: pageLostFound, internships: pageInternships,
+    };
+
+    /* â”€â”€ CHALK BG â”€â”€ */
+    const board = document.getElementById('chalkboard');
+    const glow = document.getElementById('mouse-glow');
+    const icons = [];
+    const iconTypes = ['fa-code', 'fa-terminal', 'fa-microchip', 'fa-book', 'fa-graduation-cap', 'fa-flask', 'fa-atom', 'fa-calculator', 'fa-laptop-code', 'fa-database', 'fa-network-wired', 'fa-chart-line', 'fa-brain', 'fa-pencil', 'fa-compass', 'fa-shapes'];
+    const rows = 12, cols = 14;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const icon = document.createElement('i');
+        icon.className = `fa-solid ${iconTypes[Math.floor(Math.random() * iconTypes.length)]} chalk-icon`;
+        const xPos = (c * (100 / cols)) + (Math.random() * 5);
+        const yPos = (r * (100 / rows)) + (Math.random() * 5);
+        icon.style.left = `${xPos}%`;
+        icon.style.top = `${yPos}%`;
+        icon.style.fontSize = `${18 + Math.random() * 20}px`;
+        icon.style.opacity = '0.4';
+        board.appendChild(icon);
+        icons.push({ el: icon, x: 0, y: 0, vx: 0, vy: 0 });
+      }
+    }
+
+    let mX = window.innerWidth / 2, mY = window.innerHeight / 2;
+    document.addEventListener('mousemove', e => {
+      mX = e.clientX; mY = e.clientY;
+      glow.style.left = `${mX}px`;
+      glow.style.top = `${mY}px`;
+    });
+
+    function animateChalk() {
+      icons.forEach(icon => {
+        const rect = icon.el.getBoundingClientRect();
+        const iX = rect.left + rect.width / 2;
+        const iY = rect.top + rect.height / 2;
+        const dx = mX - iX, dy = mY - iY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 200) {
+          const angle = Math.atan2(dy, dx);
+          const force = (200 - dist) / 200;
+          icon.vx -= Math.cos(angle) * force * 5;
+          icon.vy -= Math.sin(angle) * force * 5;
+          icon.el.style.color = 'rgba(180, 180, 255, 0.95)';
+          icon.el.style.opacity = '1';
+          icon.el.style.filter = 'drop-shadow(0 0 12px rgba(99, 102, 241, 0.9))';
+        } else {
+          icon.el.style.color = 'rgba(255, 255, 255, 0.35)';
+          icon.el.style.opacity = '0.4';
+          icon.el.style.filter = 'drop-shadow(0 0 5px rgba(255, 255, 255, 0.1))';
+        }
+        icon.vx *= 0.9;
+        icon.vy *= 0.9;
+        icon.x += icon.vx;
+        icon.y += icon.vy;
+        icon.x *= 0.95;
+        icon.y *= 0.95;
+        icon.el.style.transform = `translate(${icon.x}px, ${icon.y}px)`;
+      });
+      requestAnimationFrame(animateChalk);
+    }
+    animateChalk();
+
+    /* â”€â”€ BACKEND CONFIG â”€â”€ */
+    const API_BASE_URL = 'http://localhost:3001/api';
+
+    /* â”€â”€ AUTH GUARD & NAME INJECTION â”€â”€ */
+    (async function () {
+      const u = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+      if (!u || u.role !== 'Student') { window.location.href = 'index.html'; return; }
+      const initials = u.name.split(' ').map(x => x[0]).join('').slice(0, 2).toUpperCase();
+      document.getElementById('sb-av').textContent = initials;
+      document.getElementById('sb-name').textContent = u.name;
+      document.getElementById('tb-name').textContent = u.name.split(' ')[0];
+
+      /* Init notification badge & load notifications from API */
+      updateNotifBadge();
+      loadNotifications(); // Fetch notifications from backend
+
+      /* Fetch live student data from backend */
+      try {
+        const resp = await fetch(`${API_BASE_URL}/student/${encodeURIComponent(u.id)}`);
+        const data = await resp.json();
+        if (data.ok) {
+          const s = data.student;
+          /* Update displayed name & initials from DB */
+          const dbInitials = s.name.split(' ').map(x => x[0]).join('').slice(0, 2).toUpperCase();
+          document.getElementById('sb-av').textContent = dbInitials;
+          document.getElementById('sb-name').textContent = s.name;
+          document.getElementById('tb-name').textContent = s.name.split(' ')[0];
+
+          /* Store enriched session */
+          sessionStorage.setItem('Uni_user', JSON.stringify({
+            ...u, ...s, role: 'Student',
+            classes: data.classes
+          }));
+
+          /* Expose for dashboard rendering */
+          window.DB_STUDENT = s;
+          window.DB_CLASSES = data.classes;
+
+          /* If student has DB classes, set up SUBJECTS from them */
+          if (data.classes && data.classes.length > 0) {
+            const colors = ['#0d9488', '#7c3aed', '#e8a020', '#c41e3a', '#10b981', '#6366f1', '#f59e0b'];
+            SUBJECTS = data.classes.map((c, i) => ({
+              id: c.id,
+              name: c.name,
+              code: c.subject_code,
+              teacher: c.teacher_name,
+              att: Math.max(60, Math.min(98, Math.round((s.attendance || 80) + (Math.random() * 8 - 4)))),
+              total: 40 + (i * 3 % 10),
+              present: Math.round((40 + (i * 3 % 10)) * ((s.attendance || 80) / 100)),
+              color: colors[i % colors.length]
+            }));
+          } else if (data.classes && data.classes.length === 0) {
+            // New student with no enrollments â€” show empty state
+            SUBJECTS = [];
+            ASSIGNMENTS = [];
+          }
+        }
+      } catch (e) {
+        console.warn('Backend unavailable, using session data:', e.message);
+      }
+
+      /* â”€â”€ Real-time chat via Socket.IO â”€â”€ */
+      let _stuSocket = null, _stuActiveRoom = null, _stuChatContacts = [];
+      try {
+        _stuSocket = io('http://localhost:3001');
+
+        // Listen for new notifications
+        _stuSocket.on('notification', (data) => {
+          if (data.user_id === u.id && data.user_role === 'Student') {
+            // Add to notifications
+            if (!NOTIFICATIONS) NOTIFICATIONS = [];
+            NOTIFICATIONS.unshift({
+              title: data.title,
+              body: data.body || '',
+              tag: data.category || 'general',
+              read: 0,
+              date: new Date().toLocaleDateString()
+            });
+            updateNotifBadge();
+            showToast(`ðŸ“¬ ${data.title}`);
+            // Auto-refresh if on notifications page
+            const content = document.getElementById('page-content');
+            if (content && content.innerHTML.includes('Announcements')) {
+              setTimeout(() => {
+                content.innerHTML = pageAnnouncements();
+              }, 500);
+            }
+          }
+        });
+
+        // Listen for marks updates
+        _stuSocket.on('marks_updated', (data) => {
+          if (data.student_id === u.id) {
+            // Refresh marks from API
+            fetch(`${API_BASE_URL}/student/${encodeURIComponent(u.id)}/marks`)
+              .then(r => r.json())
+              .then(d => {
+                if (d.ok) {
+                  window.DB_MARKS = d.marks;
+                  showToast('ðŸ“Š Your marks have been updated!');
+                  // Refresh if on grades page
+                  const content = document.getElementById('page-content');
+                  if (content && content.innerHTML.includes('Grade')) {
+                    setTimeout(() => { content.innerHTML = pageGrades(); }, 500);
+                  }
+                }
+              });
+          }
+        });
+
+        // Listen for attendance updates
+        _stuSocket.on('attendance_updated', (data) => {
+          if (data.student_id === u.id) {
+            fetch(`${API_BASE_URL}/student/${encodeURIComponent(u.id)}/attendance`)
+              .then(r => r.json())
+              .then(d => {
+                if (d.ok) {
+                  window.DB_ATTENDANCE = d.classes;
+                  window.DB_OVERALL_ATTENDANCE = Math.round(d.overall_pct);
+                  showToast('âœ“ Attendance updated!');
+                }
+              });
+          }
+        });
+
+        _stuSocket.on('receive_message', (data) => {
+          if (data.room_id !== _stuActiveRoom) return;
+          const msgsEl = document.getElementById('chat-msgs');
+          const u2 = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+          if (msgsEl) {
+            msgsEl.innerHTML += `<div class="cmsg ${data.sender_id === u2?.id ? 'cm-me' : 'cm-them'}">${data.text}<div style="font-size:.58rem;color:rgba(255,255,255,.3);margin-top:2px">${data.sender_name}</div></div>`;
+            msgsEl.scrollTop = msgsEl.scrollHeight;
+          }
+        });
+      } catch (e) {
+        console.warn('Socket not available');
+      }
+
+      /* Load contacts from API (includes peer students now) */
+      try {
+        const cr = await fetch(`${API_BASE_URL}/chat/contacts/${encodeURIComponent(u.id)}/Student`);
+        const cd = await cr.json();
+        if (cd.ok) _stuChatContacts = cd.contacts;
+      } catch (e) { }
+
+      /* Fetch marks and attendance data from backend */
+      try {
+        const [marksResp, attResp, feesResp] = await Promise.all([
+          fetch(`${API_BASE_URL}/student/${encodeURIComponent(u.id)}/marks`),
+          fetch(`${API_BASE_URL}/student/${encodeURIComponent(u.id)}/attendance`),
+          fetch(`${API_BASE_URL}/student/${encodeURIComponent(u.id)}/fees`)
+        ]);
+        const marksData = await marksResp.json();
+        const attData = await attResp.json();
+        const feesData = await feesResp.json();
+
+        // Store marks and attendance for display
+        window.DB_MARKS = marksData.ok ? marksData.marks : [];
+        window.DB_ATTENDANCE = attData.ok ? attData.classes : [];
+        window.DB_FEES = feesData.ok ? feesData.fees : [];
+        window.DB_OVERALL_ATTENDANCE = attData.ok ? Math.round(attData.overall_pct) : 0;
+      } catch (e) { console.warn('Could not fetch marks/attendance/fees'); }
+
+      /* Override pageChat to use real API contacts with grouped sections */
+      window.pageChat = function () {
+        const contacts = _stuChatContacts.length ? _stuChatContacts : [
+          { id: 'default', name: 'Support', role_label: 'Uni Admin', role: 'Admin' }
+        ];
+        const teachers = contacts.filter(c => c.role === 'Teacher');
+        const peers = contacts.filter(c => c.role === 'Student');
+        const admins = contacts.filter(c => c.role === 'Admin');
+
+        function contactItem(c, i) {
+          const icon = c.role === 'Teacher' ? 'fa-chalkboard-user' : c.role === 'Student' ? 'fa-user-graduate' : 'fa-shield-halved';
+          const clr = c.role === 'Teacher' ? '#2dd4bf' : c.role === 'Student' ? '#a78bfa' : '#6366f1';
+          return `<div class="chat-si" id="scsi-${i}" onclick="stuOpenChat(${i})">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;color:${clr}"><i class="fa-solid ${icon}"></i></div>
+              <div style="flex:1;min-width:0">
+                <div class="chat-sn">${c.name}</div>
+                <div class="chat-sp">${c.role_label}</div>
+              </div>
+            </div>
+          </div>`;
+        }
+
+        function section(label, items, startIdx) {
+          if (items.length === 0) return '';
+          return `<div style="padding:6px 12px 2px;font-size:.58rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:1.2px">${label}</div>
+            ${items.map((c, i) => contactItem(c, startIdx + i)).join('')}`;
+        }
+
+        return `<div class="panel" style="height:calc(100vh - 115px)">
+          <div class="chat-layout">
+            <div class="chat-left">
+              <div style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;gap:8px">
+                <div style="font-size:.62rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:1px">Messages</div>
+                <button class="btn btn-admin btn-xs" onclick="stuCreateNewChat()" title="Start new conversation">
+                  <i class="fa-solid fa-plus" style="margin-right:3px"></i>New
+                </button>
+              </div>
+              ${section('Faculty', teachers, 0)}
+              ${section('Classmates', peers, teachers.length)}
+              ${section('Admin', admins, teachers.length + peers.length)}
+              ${contacts.length === 0 ? '<div style="padding:20px;text-align:center;color:var(--muted);font-size:.75rem">No contacts found</div>' : ''}
+            </div>
+            <div class="chat-main" id="stu-chat-main">
+              <div style="flex:1;display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);opacity:.4">
+                <div style="text-align:center"><i class="fa-solid fa-comments" style="font-size:2rem;margin-bottom:8px;display:block"></i>Select a contact to start chatting</div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      };
+      // Update PAGES map with real contacts
+      PAGES['chat'] = window.pageChat;
+
+      window.stuOpenChat = async function (i) {
+        const contacts = _stuChatContacts.length ? _stuChatContacts : [{ id: 'Admin@404', name: 'Support', role_label: 'Uni Admin', role: 'Admin' }];
+        const c = contacts[i];
+        if (!c) return;
+        document.querySelectorAll('.chat-si').forEach((el, j) => el.classList.toggle('active', j === i));
+        const u2 = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+        const roomId = [u2.id, c.id].sort().join('_');
+        _stuActiveRoom = roomId;
+        if (_stuSocket) _stuSocket.emit('join_room', roomId);
+        const chatMain = document.getElementById('stu-chat-main');
+        if (!chatMain) return;
+        chatMain.innerHTML = `
+          <div class="chat-hdr">
+            <div style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--muted)">
+              <i class="fa-solid ${c.role === 'Teacher' ? 'fa-chalkboard-user' : c.role === 'Student' ? 'fa-user-graduate' : 'fa-shield-halved'}"></i>
+            </div>
+            <div><div style="font-weight:700;font-size:.84rem">${c.name}</div><div style="font-size:.68rem;color:var(--muted)">${c.role} Â· ${c.role_label}</div></div>
+          </div>
+          <div class="chat-msgs" id="chat-msgs"><div style="text-align:center;color:var(--muted);font-size:.75rem;margin:20px"><i class="fa-solid fa-spinner fa-spin"></i></div></div>
+          <div class="chat-inp">
+            <input class="inp" style="flex:1" id="chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg()">
+            <button class="btn btn-white btn-sm" onclick="sendMsg()"><i class="fa-solid fa-paper-plane" style="margin-right:4px"></i>Send</button>
+          </div>`;
+        // Load history
+        try {
+          const hr = await fetch(`${API_BASE_URL}/chat/messages/${encodeURIComponent(roomId)}`);
+          const hd = await hr.json();
+          const msgsEl = document.getElementById('chat-msgs');
+          if (msgsEl && hd.ok) {
+            if (hd.messages.length === 0) {
+              msgsEl.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:.75rem;padding:20px">No messages yet</div>';
+            } else {
+              msgsEl.innerHTML = hd.messages.map(m => `<div class="cmsg ${m.sender_id === u2?.id ? 'cm-me' : 'cm-them'}">${m.text}<div style="font-size:.58rem;color:rgba(255,255,255,.3);margin-top:2px">${m.sender_name}</div></div>`).join('');
+              msgsEl.scrollTop = msgsEl.scrollHeight;
+            }
+          }
+        } catch (e) { }
+      };
+
+      /**
+       * Create a new chat by selecting a contact
+       * Shows a dialog with available contacts to start a conversation
+       */
+      window.stuCreateNewChat = async function () {
+        const contacts = _stuChatContacts.length ? _stuChatContacts : [{ id: 'default', name: 'Support', role_label: 'Uni Admin', role: 'Admin' }];
+        const u2 = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+
+        // Create contact selection dialog
+        const dialogHtml = `
+          <div class="modal-bg" id="new-chat-dialog" onclick="if(event.target.id==='new-chat-dialog') document.getElementById('new-chat-dialog').remove()">
+            <div class="modal" style="width:420px;max-width:95vw">
+              <div class="modal-t"><i class="fa-solid fa-pen-to-square" style="margin-right:8px;color:var(--admin)"></i>Start New Chat</div>
+              <div style="border-bottom:1px solid rgba(255,255,255,0.08);padding:12px 16px;font-size:.7rem;color:var(--muted)">Select a contact to message</div>
+              <div style="max-height:400px;overflow-y:auto;padding:8px 0">
+                ${contacts.map((c, idx) => `
+                  <div class="li" style="margin:0;padding:12px 16px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.04)" onclick="stuSelectContactForChat(${idx})">
+                    <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;color:${c.role === 'Teacher' ? '#2dd4bf' : c.role === 'Student' ? '#a78bfa' : '#6366f1'};font-size:.9rem;flex-shrink:0">
+                      <i class="fa-solid ${c.role === 'Teacher' ? 'fa-chalkboard-user' : c.role === 'Student' ? 'fa-user-graduate' : 'fa-shield-halved'}"></i>
+                    </div>
+                    <div style="flex:1;">
+                      <div style="font-weight:600;font-size:.8rem">${c.name}</div>
+                      <div style="font-size:.68rem;color:var(--muted)">${c.role_label}</div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>`;
+
+        document.body.insertAdjacentHTML('beforeend', dialogHtml);
+      };
+
+      /**
+       * Select a contact and create/open chat with them
+       */
+      window.stuSelectContactForChat = async function (idx) {
+        const contacts = _stuChatContacts.length ? _stuChatContacts : [{ id: 'default', name: 'Support', role_label: 'Uni Admin', role: 'Admin' }];
+        const contact = contacts[idx];
+        const u2 = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+
+        // Remove dialog
+        const dialog = document.getElementById('new-chat-dialog');
+        if (dialog) dialog.remove();
+
+        // Call backend to create/get chat
+        try {
+          const resp = await fetch(`${API_BASE_URL}/chat/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              user1_id: u2.id,
+              user2_id: contact.id,
+              user1_name: u2.name,
+              user2_name: contact.name,
+              user1_role: 'Student',
+              user2_role: contact.role
+            })
+          });
+          const data = await resp.json();
+          if (data.ok) {
+            showToast('âœ“ Chat opened successfully');
+            // Open the chat
+            stuOpenChat(idx);
+          } else {
+            showToast('Failed to create chat', 'error');
+          }
+        } catch (e) {
+          console.error('Chat create error:', e);
+          showToast('Error creating chat', 'error');
+        }
+      };
+
+      /* Override sendMsg for real-time */
+      window.sendMsg = function () {
+        const inp = document.getElementById('chat-input');
+        const text = inp?.value?.trim();
+        if (!text) return;
+        const u3 = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+        if (_stuSocket && _stuActiveRoom) {
+          _stuSocket.emit('send_message', {
+            room_id: _stuActiveRoom,
+            sender_id: u3.id,
+            sender_name: u3.name,
+            sender_role: 'Student',
+            text
+          });
+          inp.value = '';
+        } else {
+          // Fallback: show message locally
+          const msgsEl = document.getElementById('chat-msgs');
+          if (msgsEl) {
+            msgsEl.innerHTML += `<div class="cmsg cm-me">${text}</div>`;
+            msgsEl.scrollTop = msgsEl.scrollHeight;
+          }
+          inp.value = '';
+        }
+      };
+
+      /* Render dashboard after data fetch */
+      document.getElementById('page-content').innerHTML = pageDashboard();
+      bindPageEvents('dashboard');
+
+      // Initialize badge counts on page load
+      initBadges();
+    })();
+
+    function doLogout() { sessionStorage.removeItem('Uni_user'); window.location.href = 'index.html'; }
+
+    /* â”€â”€ GLOBAL SEARCH â”€â”€ */
+    function globalSearch(q) {
+      q = q.toLowerCase().trim();
+      if (!q) {
+        document.querySelectorAll('.li, .gcard, tbody tr').forEach(el => el.style.display = '');
+        return;
+      }
+      document.querySelectorAll('.li').forEach(el => {
+        el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+      document.querySelectorAll('tbody tr').forEach(el => {
+        el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    }
+
+    /* â”€â”€ INIT â€“ handled by async auth guard above â”€â”€ */
+  </script>
+</body>
+
+</html>

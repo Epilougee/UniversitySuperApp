@@ -1,0 +1,2500 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uni | Admin Panel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap"
+    rel="stylesheet">
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    :root {
+      --bg-dark: #020408;
+      --chalk-white: #fff;
+      --glass: rgba(255, 255, 255, .04);
+      --glass-border: rgba(255, 255, 255, .1);
+      --glass-hover: rgba(255, 255, 255, .1);
+      --muted: rgba(255, 255, 255, .45);
+      --muted2: rgba(255, 255, 255, .25);
+      --gold: #e8a020;
+      --gold2: #f5c842;
+      --teal: #0d9488;
+      --rose: #e11d48;
+      --green: #10b981;
+      --violet: #7c3aed;
+      --admin: #6366f1;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    body,
+    html {
+      width: 100%;
+      height: 100%;
+      background: #020408;
+      font-family: 'Inter', -apple-system, sans-serif;
+      color: #fff;
+      overflow: hidden
+    }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, .02);
+      border-radius: 99px
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(255, 255, 255, .25), rgba(255, 255, 255, .08));
+      border-radius: 99px;
+      border: 1px solid rgba(255, 255, 255, .06)
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, rgba(255, 255, 255, .45), rgba(255, 255, 255, .18))
+    }
+
+    /* CHALK */
+    #chalkboard {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden
+    }
+
+    #mouse-glow {
+      position: fixed;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(99, 102, 241, .07) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: screen;
+      transition: left .05s, top .05s
+    }
+
+    .chalk-icon {
+      position: absolute;
+      color: rgba(255, 255, 255, .35);
+      pointer-events: none;
+      filter: drop-shadow(0 0 5px rgba(255, 255, 255, .1));
+      will-change: transform, color, opacity;
+      transition: color .3s, opacity .3s
+    }
+
+    /* LAYOUT */
+    .app {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      height: 100vh;
+      width: 100%
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 230px;
+      flex-shrink: 0;
+      background: var(--glass);
+      border-right: 1px solid var(--glass-border);
+      backdrop-filter: blur(30px);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      overflow-x: hidden;
+      position: relative
+    }
+
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 200px;
+      background: radial-gradient(ellipse at 50% 0%, rgba(99, 102, 241, .08), transparent);
+      pointer-events: none
+    }
+
+    .sb-head {
+      padding: 20px 18px 14px;
+      border-bottom: 1px solid var(--glass-border);
+      flex-shrink: 0
+    }
+
+    .sb-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: -.5px;
+      color: #fff
+    }
+
+    .sb-logo span {
+      color: var(--admin)
+    }
+
+    .sb-uni {
+      font-size: .56rem;
+      color: var(--muted2);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-top: 2px
+    }
+
+    .sb-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(99, 102, 241, .15);
+      border: 1px solid rgba(99, 102, 241, .25);
+      color: #818cf8;
+      font-size: .55rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 99px;
+      margin-top: 6px;
+      letter-spacing: .5px
+    }
+
+    .sb-profile {
+      margin: 12px 10px;
+      padding: 10px 12px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .sb-av {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, var(--admin), #818cf8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .75rem;
+      font-weight: 800;
+      color: #fff
+    }
+
+    .sb-name {
+      font-size: .76rem;
+      font-weight: 600
+    }
+
+    .sb-role {
+      font-size: .6rem;
+      color: var(--muted)
+    }
+
+    .sb-section {
+      font-size: .54rem;
+      color: var(--muted2);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 10px 18px 4px
+    }
+
+    .sb-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 18px;
+      cursor: pointer;
+      transition: all .15s;
+      border-left: 2px solid transparent;
+      font-size: .76rem;
+      font-weight: 500;
+      color: var(--muted);
+      position: relative
+    }
+
+    .sb-item:hover {
+      background: rgba(255, 255, 255, .04);
+      color: rgba(255, 255, 255, .85)
+    }
+
+    .sb-item.active {
+      background: rgba(99, 102, 241, .08);
+      color: #a5b4fc;
+      border-left-color: var(--admin)
+    }
+
+    .sb-ico {
+      font-size: .82rem;
+      width: 16px;
+      text-align: center;
+      flex-shrink: 0
+    }
+
+    .sb-bdg {
+      margin-left: auto;
+      background: var(--rose);
+      color: #fff;
+      font-size: .52rem;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 99px;
+      min-width: 15px;
+      text-align: center
+    }
+
+    .sb-foot {
+      margin-top: auto;
+      padding: 12px 18px;
+      border-top: 1px solid var(--glass-border)
+    }
+
+    /* MAIN */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden
+    }
+
+    .main::-webkit-scrollbar {
+      width: 5px
+    }
+
+    .main::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(255, 255, 255, .25), rgba(255, 255, 255, .08));
+      border-radius: 99px
+    }
+
+    /* TOPBAR */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(2, 4, 8, .85);
+      backdrop-filter: blur(30px);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 12px 22px;
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .tb-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      flex: 1
+    }
+
+    .tb-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 99px;
+      padding: 6px 14px
+    }
+
+    .tb-search input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      font-size: .76rem;
+      color: #fff;
+      width: 150px
+    }
+
+    .tb-search input::placeholder {
+      color: var(--muted2)
+    }
+
+    .nb {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: var(--glass);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: .82rem;
+      position: relative;
+      transition: .2s
+    }
+
+    .nb:hover {
+      border-color: rgba(255, 255, 255, .3)
+    }
+
+    .ndot {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 6px;
+      height: 6px;
+      background: var(--rose);
+      border-radius: 50%;
+      border: 1.5px solid var(--bg-dark)
+    }
+
+    .page {
+      padding: 18px 22px 40px
+    }
+
+    /* CARDS */
+    .gcard {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      backdrop-filter: blur(30px);
+      padding: 16px 18px;
+      transition: border-color .2s;
+      position: relative;
+      overflow: hidden
+    }
+
+    .gcard:hover {
+      border-color: rgba(255, 255, 255, .18)
+    }
+
+    .stat {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      backdrop-filter: blur(30px);
+      transition: .2s
+    }
+
+    .stat:hover {
+      border-color: rgba(255, 255, 255, .2);
+      transform: translateY(-1px)
+    }
+
+    .stat-ico {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0
+    }
+
+    .stat-n {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      line-height: 1
+    }
+
+    .stat-l {
+      font-size: .65rem;
+      color: var(--muted);
+      margin-top: 2px
+    }
+
+    /* GRIDS */
+    .g2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px
+    }
+
+    .g3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px
+    }
+
+    .g4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px
+    }
+
+    .g5 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px
+    }
+
+    /* UI COMPONENTS */
+    .sh {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px
+    }
+
+    .sh-t {
+      font-family: 'Playfair Display', serif;
+      font-size: .95rem;
+      font-weight: 700
+    }
+
+    .div {
+      height: 1px;
+      background: rgba(255, 255, 255, .07);
+      margin: .7rem 0
+    }
+
+    .pb {
+      height: 4px;
+      background: rgba(255, 255, 255, .08);
+      border-radius: 99px;
+      overflow: hidden
+    }
+
+    .pf {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 1s cubic-bezier(.4, 0, .2, 1)
+    }
+
+    .li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 6px;
+      border-radius: 10px;
+      transition: .15s;
+      cursor: pointer
+    }
+
+    .li:hover {
+      background: rgba(255, 255, 255, .04)
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 7px;
+      border-radius: 99px;
+      font-size: .6rem;
+      font-weight: 600
+    }
+
+    .t-gold {
+      background: rgba(232, 160, 32, .15);
+      color: var(--gold);
+      border: 1px solid rgba(232, 160, 32, .25)
+    }
+
+    .t-teal {
+      background: rgba(13, 148, 136, .15);
+      color: #2dd4bf;
+      border: 1px solid rgba(13, 148, 136, .25)
+    }
+
+    .t-rose {
+      background: rgba(225, 29, 72, .15);
+      color: #fb7185;
+      border: 1px solid rgba(225, 29, 72, .25)
+    }
+
+    .t-green {
+      background: rgba(16, 185, 129, .15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, .25)
+    }
+
+    .t-violet {
+      background: rgba(124, 58, 237, .15);
+      color: #a78bfa;
+      border: 1px solid rgba(124, 58, 237, .25)
+    }
+
+    .t-white {
+      background: rgba(255, 255, 255, .1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, .15)
+    }
+
+    .t-admin {
+      background: rgba(99, 102, 241, .15);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, .25)
+    }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 13px;
+      border-radius: 9px;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      font-size: .73rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .2s
+    }
+
+    .btn-white {
+      background: #fff;
+      color: #000
+    }
+
+    .btn-white:hover {
+      background: rgba(255, 255, 255, .9);
+      box-shadow: 0 0 18px rgba(255, 255, 255, .15)
+    }
+
+    .btn-glass {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      color: #fff
+    }
+
+    .btn-glass:hover {
+      background: var(--glass-hover)
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: #000
+    }
+
+    .btn-gold:hover {
+      background: var(--gold2)
+    }
+
+    .btn-admin {
+      background: var(--admin);
+      color: #fff
+    }
+
+    .btn-admin:hover {
+      background: #4f46e5
+    }
+
+    .btn-rose {
+      background: var(--rose);
+      color: #fff
+    }
+
+    .btn-rose:hover {
+      background: #be123c
+    }
+
+    .btn-teal {
+      background: var(--teal);
+      color: #fff
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: .68rem
+    }
+
+    .btn-xs {
+      padding: 3px 8px;
+      font-size: .62rem
+    }
+
+    /* INPUTS */
+    .inp {
+      width: 100%;
+      padding: 9px 12px;
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 9px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: .8rem;
+      outline: none;
+      transition: .2s
+    }
+
+    .inp:focus {
+      background: rgba(255, 255, 255, .07);
+      border-color: rgba(255, 255, 255, .3)
+    }
+
+    .inp::placeholder {
+      color: var(--muted2)
+    }
+
+    .inp.error {
+      border-color: #fb7185;
+      background: rgba(251, 113, 133, .08)
+    }
+
+    .inp.success {
+      border-color: #34d399;
+      background: rgba(52, 211, 153, .08)
+    }
+
+    select.inp option {
+      background: #0d1117;
+      color: #fff
+    }
+
+    /* TABLE */
+    .tbl {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .76rem
+    }
+
+    .tbl th {
+      padding: 9px 12px;
+      text-align: left;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: .62rem;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      border-bottom: 1px solid rgba(255, 255, 255, .08)
+    }
+
+    .tbl td {
+      padding: 9px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, .04);
+      vertical-align: middle
+    }
+
+    .tbl tr:hover td {
+      background: rgba(255, 255, 255, .025)
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 999;
+      background: rgba(255, 255, 255, .12);
+      backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, .2);
+      color: #fff;
+      padding: 11px 16px;
+      border-radius: 11px;
+      font-size: .78rem;
+      font-weight: 500;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .5);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: fadeUp .3s ease
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    /* GLOBAL LOADER */
+    .global-loader {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .4);
+      backdrop-filter: blur(30px);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn .2s ease
+    }
+
+    .global-loader.hidden {
+      display: none
+    }
+
+    .loader-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 255, 255, .15);
+      border-top-color: rgba(255, 255, 255, .8);
+      border-radius: 50%;
+      animation: spin 1s linear infinite
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .panel {
+      animation: fadeUp .3s ease both
+    }
+
+    /* MODAL */
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .6);
+      backdrop-filter: blur(30px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .modal {
+      background: #0d1117;
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 24px;
+      width: 480px;
+      max-width: 95vw;
+      max-height: 85vh;
+      overflow-y: auto
+    }
+
+    .modal-t {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 16px
+    }
+
+    .frow {
+      margin-bottom: 12px
+    }
+
+    .flbl {
+      font-size: .65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      margin-bottom: 4px;
+      font-weight: 600
+    }
+
+    /* â”€â”€ NOTIFICATION DROPDOWN â”€â”€ */
+    .notif-panel {
+      position: fixed;
+      top: 58px;
+      right: 16px;
+      width: 320px;
+      max-height: 480px;
+      background: rgba(10, 12, 24, 0.96);
+      backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      z-index: 999;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      animation: panelIn .2s ease both;
+      display: none;
+    }
+
+    .notif-panel.open {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .notif-hdr {
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .notif-title {
+      font-size: .82rem;
+      font-weight: 700;
+    }
+
+    .notif-list {
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .notif-list::-webkit-scrollbar {
+      width: 2px;
+    }
+
+    .notif-item {
+      padding: 11px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      cursor: pointer;
+      transition: background .15s;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .notif-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .notif-item.unread {
+      background: rgba(99, 102, 241, 0.06);
+    }
+
+    .notif-ico {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .8rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .notif-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .notif-body-t {
+      font-size: .76rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+      line-height: 1.35;
+    }
+
+    .notif-body-s {
+      font-size: .66rem;
+      color: var(--muted);
+    }
+
+    .notif-unread-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--admin);
+      flex-shrink: 0;
+      margin-top: 6px;
+    }
+
+    .notif-empty {
+      padding: 30px 16px;
+      text-align: center;
+      color: var(--muted);
+      font-size: .78rem;
+    }
+
+    .notif-foot {
+      padding: 10px 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      text-align: center;
+    }
+
+    @keyframes panelIn {
+      from {
+        opacity: 0;
+        transform: translateY(-8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="mouse-glow"></div>
+  <div id="chalkboard"></div>
+
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sb-head">
+        <div class="sb-logo">Un<span>i</span></div>
+        <div class="sb-uni">Admin Control Panel Â· 2025â€“26</div>
+        <div class="sb-badge"><i class="fa-solid fa-shield-halved"></i> Super Admin</div>
+      </div>
+      <div class="sb-profile">
+        <div class="sb-av" id="sb-av">AD</div>
+        <div>
+          <div class="sb-name" id="sb-name">Admin</div>
+          <div class="sb-role">Administrator</div>
+        </div>
+      </div>
+
+      <div id="sb-nav">
+        <div class="sb-section"><i class="fa-solid fa-star" style="margin-right:6px"></i>Overview</div>
+        <div class="sb-item active" onclick="nav(this,'dashboard')"><span class="sb-ico"><i
+              class="fa-solid fa-gauge-high"></i></span>Dashboard</div>
+
+        <div class="sb-section"><i class="fa-solid fa-users" style="margin-right:6px"></i>People</div>
+        <div class="sb-item" onclick="nav(this,'students')"><span class="sb-ico"><i
+              class="fa-solid fa-user-graduate"></i></span>Students<span class="sb-bdg">3</span></div>
+        <div class="sb-item" onclick="nav(this,'faculty')"><span class="sb-ico"><i
+              class="fa-solid fa-chalkboard-user"></i></span>Faculty</div>
+
+        <div class="sb-section"><i class="fa-solid fa-graduation-cap" style="margin-right:6px"></i>Academics</div>
+        <div class="sb-item" onclick="nav(this,'timetable')"><span class="sb-ico"><i
+              class="fa-solid fa-calendar-days"></i></span>Timetable</div>
+        <div class="sb-item" onclick="nav(this,'exams')"><span class="sb-ico"><i
+              class="fa-solid fa-clipboard-list"></i></span>Exams</div>
+        <div class="sb-item" onclick="nav(this,'calendar')"><span class="sb-ico"><i
+              class="fa-solid fa-calendar-week"></i></span>Acad. Calendar</div>
+        <div class="sb-item" onclick="nav(this,'marks')"><span class="sb-ico"><i
+              class="fa-solid fa-pen-ruler"></i></span>Marks Entry</div>
+
+        <div class="sb-section"><i class="fa-solid fa-message" style="margin-right:6px"></i>Communication</div>
+        <div class="sb-item" onclick="nav(this,'announce')"><span class="sb-ico"><i
+              class="fa-solid fa-bullhorn"></i></span>Announcements<span class="sb-bdg">2</span></div>
+        <div class="sb-item" onclick="nav(this,'notifications')"><span class="sb-ico"><i
+              class="fa-solid fa-bell"></i></span>Push Notify</div>
+        <div class="sb-item" onclick="nav(this,'chats')"><span class="sb-ico"><i
+              class="fa-solid fa-comments"></i></span>Chat<span class="sb-bdg">1</span></div>
+
+        <div class="sb-section"><i class="fa-solid fa-school" style="margin-right:6px"></i>Campus</div>
+        <div class="sb-item" onclick="nav(this,'events')"><span class="sb-ico"><i
+              class="fa-solid fa-calendar-check"></i></span>Events</div>
+        <div class="sb-item" onclick="nav(this,'reports')"><span class="sb-ico"><i
+              class="fa-solid fa-chart-pie"></i></span>Reports</div>
+
+        <div class="sb-section"><i class="fa-solid fa-gears" style="margin-right:6px"></i>System</div>
+        <div class="sb-item" onclick="nav(this,'settings')"><span class="sb-ico"><i
+              class="fa-solid fa-sliders"></i></span>Settings</div>
+      </div>
+
+      <div class="sb-foot">
+        <div class="sb-item" style="color:rgba(220,80,80,.8);padding:0" onclick="doLogout()">
+          <span class="sb-ico"><i class="fa-solid fa-right-from-bracket"></i></span>Log Out
+        </div>
+      </div>
+    </aside>
+
+    <div class="main" id="main">
+      <div class="topbar">
+        <div class="tb-title" id="tb-title">Dashboard</div>
+        <div class="tb-search">
+          <i class="fa-solid fa-magnifying-glass" style="color:var(--muted2);font-size:.73rem"></i>
+          <input id="global-search" placeholder="Search anything..." oninput="globalSearch(this.value)">
+        </div>
+        <div class="nb" onclick="toggleAdminNotifications(event)"><i class="fa-solid fa-bell"
+            style="font-size:.78rem"></i>
+          <div class="ndot"></div>
+        </div>
+        <div class="nb" onclick="showAdminHelp()"><i class="fa-solid fa-circle-question" style="font-size:.78rem"></i>
+        </div>
+        <div style="font-size:.73rem;font-weight:600;color:var(--muted);cursor:pointer" id="tb-name"
+          onclick="nav(document.querySelector('[onclick*=\'settings\']'),'settings')">Admin</div>
+      </div>
+      <div class="page" id="page-content"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" style="display:none"></div>
+  <div class="global-loader hidden" id="global-loader">
+    <div class="loader-spinner"></div>
+  </div>
+  <div id="modal-root"></div>
+
+  <div class="notif-panel" id="notif-panel" onclick="event.stopPropagation()">
+    <div class="notif-hdr">
+      <span class="notif-title"><i class="fa-solid fa-bell"
+          style="margin-right:6px;color:var(--admin)"></i>Notifications</span>
+      <button class="btn btn-glass btn-xs" onclick="markAdminAllRead()">Mark all read</button>
+    </div>
+    <div class="notif-list" id="admin-notif-list">
+      <!-- Admin specific notifications -->
+      <div class="notif-item unread">
+        <div class="notif-ico" style="background:rgba(225,29,72,.12);color:#fb7185"><i
+            class="fa-solid fa-file-invoice"></i></div>
+        <div class="notif-body">
+          <div class="notif-body-t">Leave Request: Prof. A. Joshi</div>
+          <div class="notif-body-s">Requested medical leave for Mar 15-17. Action required.</div>
+          <div style="font-size:.6rem;color:var(--muted2);margin-top:4px">12 mins ago</div>
+        </div>
+        <div class="notif-unread-dot"></div>
+      </div>
+      <div class="notif-item unread">
+        <div class="notif-ico" style="background:rgba(232,160,32,.12);color:var(--gold)"><i
+            class="fa-solid fa-server"></i></div>
+        <div class="notif-body">
+          <div class="notif-body-t">System Alert: High Server Load</div>
+          <div class="notif-body-s">Student portal experiencing 84% traffic load. Monitoring active.</div>
+          <div style="font-size:.6rem;color:var(--muted2);margin-top:4px">52 mins ago</div>
+        </div>
+        <div class="notif-unread-dot"></div>
+      </div>
+      <div class="notif-item">
+        <div class="notif-ico" style="background:rgba(99,102,241,.12);color:#a5b4fc"><i
+            class="fa-solid fa-bullhorn"></i></div>
+        <div class="notif-body">
+          <div class="notif-body-t">Announcements: ESE Schedule</div>
+          <div class="notif-body-s">End Semester Exam schedule published to student portals.</div>
+          <div style="font-size:.6rem;color:var(--muted2);margin-top:4px">3 hours ago</div>
+        </div>
+      </div>
+      <div class="notif-item">
+        <div class="notif-ico" style="background:rgba(16,185,129,.12);color:#34d399"><i
+            class="fa-solid fa-chart-line"></i></div>
+        <div class="notif-body">
+          <div class="notif-body-t">Report Ready: Faculty Attendance</div>
+          <div class="notif-body-s">February 2026 consolidated report is now available in Reports.</div>
+          <div style="font-size:.6rem;color:var(--muted2);margin-top:4px">Yesterday</div>
+        </div>
+      </div>
+    </div>
+    <div class="notif-foot">
+      <button class="btn btn-glass btn-xs" onclick="showToast('Notifications cleared')"><i class="fa-solid fa-trash"
+          style="margin-right:4px"></i>Clear all</button>
+    </div>
+  </div>
+
+  <script>
+    /* â”€â”€ DATA â”€â”€ */
+    const DEPTS = [
+      { name: 'Computer Science & Eng.', code: 'CSE', hod: 'Dr. A. Kulkarni', students: 320, faculty: 18, att: 81 },
+      { name: 'Information Technology', code: 'IT', hod: 'Dr. S. Mehta', students: 280, faculty: 15, att: 78 },
+      { name: 'Mechanical Engineering', code: 'ME', hod: 'Dr. R. Joshi', students: 240, faculty: 16, att: 74 },
+      { name: 'Civil Engineering', code: 'CE', hod: 'Dr. P. Sharma', students: 200, faculty: 14, att: 76 },
+      { name: 'Electronics & Comm.', code: 'EC', hod: 'Dr. N. Rao', students: 180, faculty: 13, att: 80 },
+    ];
+    const STUDENTS = [
+      { id: 'Uni2022CS047', name: 'Aryan Deshmukh', dept: 'CSE', year: 3, sec: 'A', att: 81, status: 'Active', email: 'aryan.d@uni.edu' },
+      { id: 'Uni2022CS048', name: 'Priya Sharma', dept: 'CSE', year: 3, sec: 'A', att: 62, status: 'Active', email: 'priya.s@uni.edu' },
+      { id: 'Uni2022CS050', name: 'Rahul Patil', dept: 'CSE', year: 3, sec: 'B', att: 91, status: 'Active', email: 'rahul.p@uni.edu' },
+      { id: 'Uni2023IT021', name: 'Sneha Kulkarni', dept: 'IT', year: 2, sec: 'A', att: 55, status: 'Active', email: 'sneha.k@uni.edu' },
+      { id: 'Uni2021ME015', name: 'Karan Mehta', dept: 'ME', year: 4, sec: 'A', att: 74, status: 'Active', email: 'karan.m@uni.edu' },
+      { id: 'Uni2024CE003', name: 'Kavya Nair', dept: 'CE', year: 1, sec: 'A', att: 88, status: 'Active', email: 'kavya.n@uni.edu' },
+      { id: 'Uni2022EC031', name: 'Nikhil Aher', dept: 'EC', year: 3, sec: 'A', att: 69, status: 'Detained', email: 'nikhil.a@uni.edu' },
+      { id: 'Uni2023IT045', name: 'Pooja Singh', dept: 'IT', year: 2, sec: 'B', att: 95, status: 'Active', email: 'pooja.s@uni.edu' },
+    ];
+    const FACULTY = [
+      { id: 'FAC001', name: 'Prof. R. Sharma', dept: 'CSE', subjects: ['DSA', 'Algorithms'], office: 'B-204', hours: 'Mon-Wed 3-5PM', rating: 4.8, leaves: 1, status: 'Active' },
+      { id: 'FAC002', name: 'Prof. S. Kulkarni', dept: 'CSE', subjects: ['Computer Networks'], office: 'B-211', hours: 'Tue-Thu 2-4PM', rating: 4.9, leaves: 0, status: 'Active' },
+      { id: 'FAC003', name: 'Prof. A. Joshi', dept: 'CSE', subjects: ['DBMS'], office: 'C-112', hours: 'MWF 11AM-1PM', rating: 4.6, leaves: 2, status: 'On Leave' },
+      { id: 'FAC004', name: 'Prof. M. Gupta', dept: 'ME', subjects: ['Thermodynamics', 'Fluid Mechanics'], office: 'D-301', hours: 'Tue-Thu 10AM-12PM', rating: 4.7, leaves: 0, status: 'Active' },
+      { id: 'FAC005', name: 'Prof. P. Rao', dept: 'IT', subjects: ['Software Engineering', 'Web Dev'], office: 'C-108', hours: 'Mon-Wed 9-11AM', rating: 4.8, leaves: 0, status: 'Active' },
+    ];
+    const ANNOUNCEMENTS_DATA = [
+      { id: 1, title: 'End Semester Exams â€” May 5-20', body: 'ESE schedule released. Hall tickets 1 week prior.', target: 'All', urgency: 'High', date: 'Mar 10', author: 'Exam Cell', reads: 1240 },
+      { id: 2, title: 'Ideathon 2026 â€” Register Now', body: 'Cash prizes Rs 1,50,000. Deadline March 20.', target: 'UG', urgency: 'Medium', date: 'Mar 9', author: 'Innovation Cell', reads: 890 },
+      { id: 3, title: 'Network Maintenance Mar 16', body: 'Campus network down 12AM-4AM.', target: 'All', urgency: 'Low', date: 'Mar 7', author: 'IT Dept.', reads: 450 },
+    ];
+    const EVENTS_DATA = [
+      { id: 1, name: 'TechXcelerate 2026', date: 'Mar 22-24', venue: 'Block F', cat: 'Technical', limit: 400, reg: 312, status: 'Open' },
+      { id: 2, name: 'Rang Cultural Fest', date: 'Mar 29', venue: 'Amphitheatre', cat: 'Cultural', limit: 700, reg: 680, status: 'Closing' },
+      { id: 3, name: 'Campus Placement Drive', date: 'Apr 3', venue: 'Seminar Hall', cat: 'Career', limit: 200, reg: 145, status: 'Open' },
+      { id: 4, name: 'Research Symposium RISE', date: 'Apr 8', venue: 'Convention Centre', cat: 'Academic', limit: 150, reg: 78, status: 'Open' },
+    ];
+    const LEAVES = [
+      { id: 1, faculty: 'Prof. A. Joshi', dept: 'CSE', from: 'Mar 15', to: 'Mar 17', reason: 'Medical', sub: 'Prof. R. Sharma', status: 'Pending' },
+      { id: 2, faculty: 'Prof. R. Sharma', dept: 'CSE', from: 'Mar 22', to: 'Mar 22', reason: 'Conference', sub: 'To be assigned', status: 'Pending' },
+      { id: 3, faculty: 'Prof. M. Gupta', dept: 'ME', from: 'Mar 10', to: 'Mar 11', reason: 'Personal', sub: 'Prof. N. Singh', status: 'Approved' },
+    ];
+    const CAL_EVENTS = [
+      { date: 'Mar 25', event: 'Mid-Sem Exams Begin', type: 'Exam' },
+      { date: 'Apr 1', event: 'Mid-Sem Results', type: 'Result' },
+      { date: 'Apr 14', event: 'Dr. Ambedkar Jayanti Holiday', type: 'Holiday' },
+      { date: 'Apr 22', event: 'Earth Day â€” Campus Drive', type: 'Event' },
+      { date: 'May 5', event: 'End-Sem Exams Begin', type: 'Exam' },
+      { date: 'May 20', event: 'End-Sem Exams End', type: 'Exam' },
+      { date: 'Jun 1', event: 'Summer Vacation Begins', type: 'Holiday' },
+    ];
+
+    /* â”€â”€ UTILS â”€â”€ */
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      const clr = type === 'error' ? '#fb7185' : type === 'warn' ? 'var(--gold)' : '#34d399';
+      const ic = type === 'error' ? 'fa-circle-xmark' : type === 'warn' ? 'fa-triangle-exclamation' : 'fa-circle-check';
+      t.innerHTML = `<i class="fa-solid ${ic}" style="color:${clr};font-size:.9rem"></i> ${msg}`;
+      t.style.display = 'flex'; clearTimeout(t._t);
+      t._t = setTimeout(() => t.style.display = 'none', 2800);
+    }
+    function tagHtml(txt, cls) { return `<span class="tag t-${cls}">${txt}</span>`; }
+    function modal(html) { document.getElementById('modal-root').innerHTML = html; }
+    function closeModal() { document.getElementById('modal-root').innerHTML = ''; }
+    function showLoader() { const l = document.getElementById('global-loader'); if (l) l.classList.remove('hidden'); }
+    function hideLoader() { const l = document.getElementById('global-loader'); if (l) l.classList.add('hidden'); }
+
+    // Close notifications when clicking outside
+    document.addEventListener('click', () => {
+      const p = document.getElementById('notif-panel');
+      if (p && p.classList.contains('open')) p.classList.remove('open');
+    });
+
+    function toggleAdminNotifications(e) {
+      if (e) e.stopPropagation();
+      const p = document.getElementById('notif-panel');
+      if (!p) return;
+
+      const isOpen = p.classList.contains('open');
+      // Close other panels if any (like profile dropdown if added later)
+
+      p.classList.toggle('open');
+
+      const dot = document.querySelector('.ndot');
+      if (p.classList.contains('open') && dot) dot.style.display = 'none';
+    }
+
+    function markAdminAllRead() {
+      document.querySelectorAll('.notif-item.unread').forEach(i => i.classList.remove('unread'));
+      document.querySelectorAll('.notif-unread-dot').forEach(d => d.style.display = 'none');
+      showToast('All notifications marked as read');
+    }
+    function showAdminHelp() {
+      modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
+        <div class="modal-t"><i class="fa-solid fa-circle-question" style="color:var(--admin);margin-right:8px"></i>Admin Help & Support</div>
+        <p style="font-size:.8rem;color:var(--muted);line-height:1.6;margin-bottom:12px">Welcome to the Uni Admin Control Panel. Here you can manage students, faculty, academics, and communication across the campus.</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="padding:10px;background:rgba(255,255,255,.04);border-radius:8px">
+            <div style="font-weight:600;font-size:.75rem;margin-bottom:2px">Need technical support?</div>
+            <div style="font-size:.7rem;color:var(--muted)">Contact the IT infrastructure team at support@uni.edu or call ext. 404.</div>
+          </div>
+          <div style="padding:10px;background:rgba(255,255,255,.04);border-radius:8px">
+            <div style="font-weight:600;font-size:.75rem;margin-bottom:2px">User Manual</div>
+            <div style="font-size:.7rem;color:var(--muted)">Download the <a href="#" style="color:var(--admin)">Admin Operations Guide (PDF)</a> for detailed workflows.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <button class="btn btn-admin" onclick="closeModal()">Got it</button>
+        </div>
+      </div></div>`);
+    }
+
+    /* â”€â”€ BADGE MANAGEMENT SYSTEM FOR ADMIN â”€â”€ */
+    const BADGE_STATE = {
+      students: 3,
+      announce: 2,
+      chats: 1
+    };
+
+    function initBadges() {
+      Object.entries(BADGE_STATE).forEach(([section, count]) => {
+        updateBadge(section, count);
+      });
+    }
+
+    function updateBadge(section, count) {
+      BADGE_STATE[section] = count;
+      const items = document.querySelectorAll(`.sb-item[onclick*="'${section}'"]`);
+      items.forEach(item => {
+        let badge = item.querySelector('.sb-bdg');
+        if (count > 0) {
+          if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'sb-bdg';
+            item.appendChild(badge);
+          }
+          badge.textContent = count;
+          badge.style.display = 'inline-flex';
+        } else {
+          if (badge) {
+            badge.style.display = 'none';
+          }
+        }
+      });
+    }
+
+    async function clearSectionBadges(section, userId, userRole) {
+      const count = BADGE_STATE[section] || 0;
+      if (count === 0) return;
+
+      try {
+        const endpoint = section === 'chats' ? 'chat/read' : `${section}/read`;
+        if (userId && userRole) {
+          await fetch(`/api/${endpoint}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId, user_role: userRole })
+          }).catch(() => null);
+        }
+      } catch (e) {
+        console.warn('Could not clear badges via API:', e.message);
+      }
+
+      updateBadge(section, 0);
+    }
+
+    const TITLES = {
+      dashboard: 'Dashboard', students: 'Student Management', faculty: 'Faculty Management',
+      timetable: 'Timetable Manager', exams: 'Exam Schedule', calendar: 'Academic Calendar',
+      marks: 'Marks Entry', announce: 'Announcements', notifications: 'Push Notifications',
+      events: 'Event Management', chats: 'Admin Chat', reports: 'Reports & Analytics', settings: 'System Settings'
+    };
+    function nav(el, id) {
+      document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('tb-title').textContent = TITLES[id] || id;
+      document.getElementById('main').scrollTop = 0;
+      const fn = PAGES[id];
+      if (fn) { document.getElementById('page-content').innerHTML = fn(); }
+
+      // Clear badges for this section
+      const u = JSON.parse(sessionStorage.getItem('Uni_user') || '{}');
+      if (u.id && u.role) {
+        clearSectionBadges(id, u.id, u.role);
+      }
+    }
+
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       PAGE: DASHBOARD
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    function pageDashboard() {
+      const totalStu = DEPTS.reduce((a, d) => a + d.students, 0);
+      const totalFac = DEPTS.reduce((a, d) => a + d.faculty, 0);
+      const avgAtt = Math.round(DEPTS.reduce((a, d) => a + d.att, 0) / DEPTS.length);
+      const pending = LEAVES.filter(l => l.status === 'Pending').length;
+      return `<div class="panel">
+  <div class="g5" style="margin-bottom:14px">
+    <div class="stat"><div class="stat-ico" style="background:rgba(99,102,241,.15);color:#a5b4fc"><i class="fa-solid fa-user-graduate"></i></div><div><div class="stat-n" style="color:#a5b4fc">${totalStu}</div><div class="stat-l">Total Students</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(13,148,136,.15);color:#2dd4bf"><i class="fa-solid fa-chalkboard-user"></i></div><div><div class="stat-n" style="color:#2dd4bf">${totalFac}</div><div class="stat-l">Total Faculty</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(232,160,32,.15);color:var(--gold)"><i class="fa-solid fa-building-columns"></i></div><div><div class="stat-n" style="color:var(--gold)">${DEPTS.length}</div><div class="stat-l">Departments</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(16,185,129,.15);color:#34d399"><i class="fa-solid fa-chart-bar"></i></div><div><div class="stat-n" style="color:#34d399">${avgAtt}%</div><div class="stat-l">Avg Attendance</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(225,29,72,.15);color:#fb7185"><i class="fa-solid fa-clock-rotate-left"></i></div><div><div class="stat-n" style="color:#fb7185">${pending}</div><div class="stat-l">Pending Actions</div></div></div>
+  </div>
+  <div class="g2" style="margin-bottom:14px">
+    <div class="gcard">
+      <div class="sh"><div class="sh-t"><i class="fa-solid fa-building-columns" style="margin-right:6px;color:var(--admin)"></i>Department Overview</div><button class="btn btn-glass btn-xs" onclick="nav(document.querySelector('[onclick*=students]'),\'students\')">Details</button></div>
+      ${DEPTS.map(d => `<div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:5px">
+          <span style="font-weight:600">${d.code} <span style="color:var(--muted);font-weight:400">Â· ${d.hod}</span></span>
+          <span style="color:${d.att >= 75 ? '#2dd4bf' : '#fb7185'};font-weight:700">${d.att}%</span>
+        </div>
+        <div class="pb"><div class="pf" style="width:${d.att}%;background:${d.att >= 75 ? '#0d9488' : 'var(--rose)'}"></div></div>
+        <div style="font-size:.62rem;color:var(--muted);margin-top:2px">${d.students} students Â· ${d.faculty} faculty</div>
+      </div>`).join('')}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="gcard">
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-clock-rotate-left" style="margin-right:6px;color:var(--gold)"></i>Pending Actions</div></div>
+        ${LEAVES.filter(l => l.status === 'Pending').map(l => `
+        <div class="li">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(232,160,32,.1);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:.8rem;flex-shrink:0"><i class="fa-solid fa-clock"></i></div>
+          <div style="flex:1">
+            <div style="font-size:.76rem;font-weight:600">Leave: ${l.faculty}</div>
+            <div style="font-size:.64rem;color:var(--muted)">${l.from} â†’ ${l.to} Â· ${l.reason}</div>
+          </div>
+          <div style="display:flex;gap:4px">
+            <button class="btn btn-teal btn-xs" onclick="showToast('Leave approved')"><i class="fa-solid fa-check"></i></button>
+            <button class="btn btn-rose btn-xs" onclick="showToast('Leave rejected')"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+        </div>`).join('')}
+        ${ANNOUNCEMENTS_DATA.filter(a => a.urgency === 'High').slice(0, 1).map(a => `
+        <div class="li">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(225,29,72,.1);display:flex;align-items:center;justify-content:center;color:#fb7185;font-size:.8rem;flex-shrink:0"><i class="fa-solid fa-bullhorn"></i></div>
+          <div style="flex:1"><div style="font-size:.76rem;font-weight:600">${a.title}</div><div style="font-size:.64rem;color:var(--muted)">${a.reads} reads Â· ${a.date}</div></div>
+        </div>`).join('')}
+      </div>
+      <div class="gcard">
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-calendar-check" style="margin-right:6px;color:#a78bfa"></i>Upcoming Events</div></div>
+        ${EVENTS_DATA.slice(0, 3).map(e => `
+        <div class="li">
+          <div style="width:28px;height:28px;border-radius:7px;background:rgba(99,102,241,.12);display:flex;align-items:center;justify-content:center;color:#a5b4fc;font-size:.75rem"><i class="fa-solid fa-calendar-check"></i></div>
+          <div style="flex:1"><div style="font-size:.76rem;font-weight:600">${e.name}</div><div style="font-size:.64rem;color:var(--muted)">${e.date} Â· ${e.reg}/${e.limit} registered</div></div>
+          ${tagHtml(e.status, e.status === 'Closing' ? 'rose' : 'teal')}
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>
+  <div class="gcard">
+    <div class="sh"><div class="sh-t"><i class="fa-solid fa-users" style="margin-right:6px;color:#2dd4bf"></i>Active Users Today</div><span style="font-size:.68rem;color:var(--muted)">Simulated â€” live data via WebSocket in production</span></div>
+    <div class="g4">
+      ${[{ l: 'Students Online', v: 218, c: '#a5b4fc', ic: 'fa-user-graduate' }, { l: 'Faculty Active', v: 34, c: '#2dd4bf', ic: 'fa-chalkboard-user' }, { l: 'Portal Logins Today', v: 612, c: 'var(--gold)', ic: 'fa-right-to-bracket' }, { l: 'Reports Generated', v: 47, c: '#34d399', ic: 'fa-file-chart-column' }].map(s => `
+      <div class="stat"><div class="stat-ico" style="background:rgba(255,255,255,.05);color:${s.c}"><i class="fa-solid ${s.ic}"></i></div><div><div class="stat-n" style="color:${s.c}">${s.v}</div><div class="stat-l">${s.l}</div></div></div>`).join('')}
+    </div>
+  </div>
+</div>`;
+    }
+
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       PAGE: STUDENTS
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    let stuFilter = { dept: 'all', year: 'all', q: '' };
+    function pageStudents() {
+      return `<div class="panel">
+  <div class="g4" style="margin-bottom:14px">
+    <div class="stat"><div class="stat-ico" style="background:rgba(99,102,241,.15);color:#a5b4fc"><i class="fa-solid fa-users"></i></div><div><div class="stat-n" style="color:#a5b4fc">${STUDENTS.length}</div><div class="stat-l">Total (sample)</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(225,29,72,.15);color:#fb7185"><i class="fa-solid fa-triangle-exclamation"></i></div><div><div class="stat-n" style="color:#fb7185">${STUDENTS.filter(s => s.att < 75).length}</div><div class="stat-l">Defaulters (&lt;75%)</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(16,185,129,.15);color:#34d399"><i class="fa-solid fa-circle-check"></i></div><div><div class="stat-n" style="color:#34d399">${STUDENTS.filter(s => s.status === 'Active').length}</div><div class="stat-l">Active</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(232,160,32,.15);color:var(--gold)"><i class="fa-solid fa-building-columns"></i></div><div><div class="stat-n" style="color:var(--gold)">${DEPTS.length}</div><div class="stat-l">Departments</div></div></div>
+  </div>
+  <div class="gcard">
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <div style="position:relative;flex:1;min-width:160px"><i class="fa-solid fa-magnifying-glass" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted2);font-size:.72rem;pointer-events:none"></i><input class="inp" placeholder="Search name or ID..." style="padding-left:30px" id="stu-q" oninput="filterStudents()"></div>
+      <select class="inp" style="width:120px" id="stu-dept" onchange="filterStudents()">
+        <option value="all">All Depts</option>${DEPTS.map(d => `<option value="${d.code}">${d.code}</option>`).join('')}
+      </select>
+      <select class="inp" style="width:110px" id="stu-year" onchange="filterStudents()">
+        <option value="all">All Years</option><option value="1">Year 1</option><option value="2">Year 2</option><option value="3">Year 3</option><option value="4">Year 4</option>
+      </select>
+      <button class="btn btn-admin btn-sm" onclick="showAddStudent()"><i class="fa-solid fa-user-plus" style="margin-right:4px"></i>Add Student</button>
+      <button class="btn btn-glass btn-sm" onclick="showToast('CSV import ready â€” drag & drop supported in production')"><i class="fa-solid fa-file-import" style="margin-right:4px"></i>Import CSV</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="tbl" id="stu-table">
+        <thead><tr><th>Student</th><th>ID</th><th>Dept</th><th>Year/Sec</th><th>Attendance</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="stu-body">${renderStudentRows(STUDENTS)}</tbody>
+      </table>
+    </div>
+  </div>
+</div>`;
+    }
+    function renderStudentRows(list) {
+      if (!list.length) return `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted)">No students found</td></tr>`;
+      return list.map((s, i) => `<tr>
+        <td><div style="font-weight:600;font-size:.8rem">${s.name}</div><div style="font-size:.64rem;color:var(--muted)">${s.email}</div></td>
+        <td style="color:var(--muted);font-size:.72rem">${s.id}</td>
+        <td>${tagHtml(s.dept, 'admin')}</td>
+        <td style="font-size:.74rem">Y${s.year} Â· Sec ${s.sec}</td>
+        <td><div style="display:flex;align-items:center;gap:8px"><div class="pb" style="width:70px"><div class="pf" style="width:${s.att}%;background:${s.att >= 75 ? '#0d9488' : 'var(--rose)'}"></div></div><span style="font-size:.72rem;color:${s.att >= 75 ? '#2dd4bf' : '#fb7185'};font-weight:700">${s.att}%</span></div></td>
+        <td>${tagHtml(s.status, s.status === 'Active' ? 'teal' : 'rose')}</td>
+        <td><div style="display:flex;gap:4px">
+          <button class="btn btn-glass btn-xs" onclick="showEditStudent('${s.id}')"><i class="fa-solid fa-pen"></i></button>
+          <button class="btn btn-rose btn-xs" onclick="deleteStudentAPI('${s.id}','${s.name}')"><i class="fa-solid fa-trash"></i></button>
+        </div></td>
+      </tr>`).join('');
+    }
+    window.showEditStudent = async function (id) {
+      const s = STUDENTS.find(x => x.id === id);
+      if (!s) return;
+      modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
+        <div class="modal-t"><i class="fa-solid fa-pen" style="color:var(--admin);margin-right:8px"></i>Edit Student â€” ${s.name}</div>
+        <div class="g2">
+          <div class="frow"><div class="flbl">Full Name</div><input class="inp" id="ed-name" value="${s.name}"></div>
+          <div class="frow"><div class="flbl">Department</div><select class="inp" id="ed-dept">${DEPTS.map(d => `<option value="${d.code}" ${d.code === s.dept ? 'selected' : ''}>${d.code}</option>`).join('')}</select></div>
+        </div>
+        <div class="g3">
+          <div class="frow"><div class="flbl">Year</div><select class="inp" id="ed-year">${[1, 2, 3, 4].map(y => `<option value="${y}" ${y === s.year ? 'selected' : ''}>${y}</option>`).join('')}</select></div>
+          <div class="frow"><div class="flbl">Section</div><select class="inp" id="ed-sec">${['A', 'B', 'C'].map(sc => `<option ${sc === s.sec ? 'selected' : ''}>${sc}</option>`).join('')}</select></div>
+          <div class="frow"><div class="flbl">Attendance %</div><input class="inp" id="ed-att" type="number" min="0" max="100" value="${s.att}"></div>
+        </div>
+        <div class="g2">
+          <div class="frow"><div class="flbl">Email</div><input class="inp" id="ed-email" value="${s.email || ''}"></div>
+          <div class="frow"><div class="flbl">Phone</div><input class="inp" id="ed-phone" value="${s.phone || ''}"></div>
+        </div>
+        <div id="ed-err" style="color:#fb7185;font-size:.72rem;min-height:18px;margin-top:4px"></div>
+        <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+          <button class="btn btn-glass" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-admin" id="ed-btn" onclick="submitEditStudent('${id}')"><i class="fa-solid fa-floppy-disk" style="margin-right:4px"></i>Save Changes</button>
+        </div>
+      </div></div>`);
+    };
+    window.submitEditStudent = async function (id) {
+      const btn = document.getElementById('ed-btn');
+      if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+      const name = document.getElementById('ed-name')?.value?.trim();
+      const dept = document.getElementById('ed-dept')?.value;
+      const year = parseInt(document.getElementById('ed-year')?.value) || 1;
+      const sec = document.getElementById('ed-sec')?.value;
+      const att = parseFloat(document.getElementById('ed-att')?.value) || 0;
+      const email = document.getElementById('ed-email')?.value?.trim();
+      const phone = document.getElementById('ed-phone')?.value?.trim();
+      try {
+        const r = await fetch(`${API_BASE}/admin/student/${encodeURIComponent(id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, department: dept, year, section: sec, attendance: att, cgpa: 0, phone, email, batch: '' }) });
+        const d = await r.json();
+        if (d.ok) {
+          const idx = STUDENTS.findIndex(s => s.id === id);
+          if (idx !== -1) STUDENTS[idx] = { ...STUDENTS[idx], name, dept, year, sec, att, email };
+          closeModal();
+          document.getElementById('page-content').innerHTML = pageStudents();
+          showToast(`${name} updated successfully!`);
+        } else { document.getElementById('ed-err').textContent = d.message || 'Update failed.'; if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-floppy-disk" style="margin-right:4px"></i>Save Changes'; } }
+      } catch (e) { document.getElementById('ed-err').textContent = 'Server error'; if (btn) { btn.disabled = false; } }
+    };
+    window.filterStudents = function () {
+      const q = (document.getElementById('stu-q')?.value || '').toLowerCase();
+      const dept = document.getElementById('stu-dept')?.value || 'all';
+      const year = document.getElementById('stu-year')?.value || 'all';
+      const f = STUDENTS.filter(s => (dept === 'all' || s.dept === dept) && (year === 'all' || s.year == year) && (s.name.toLowerCase().includes(q) || s.id.toLowerCase().includes(q)));
+      const b = document.getElementById('stu-body');
+      if (b) b.innerHTML = renderStudentRows(f);
+    };
+    window.showAddStudent = function () {
+      modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
+        <div class="modal-t"><i class="fa-solid fa-user-plus" style="color:var(--admin);margin-right:8px"></i>Enrol New Student</div>
+        <div class="g2"><div class="frow"><div class="flbl">Full Name</div><input class="inp" id="add-name" placeholder="e.g. Rahul Sharma"></div>
+        <div class="frow"><div class="flbl">University ID</div><input class="inp" id="add-id" placeholder="E25X022XXX"></div></div>
+        <div class="g3"><div class="frow"><div class="flbl">Department</div><select class="inp" id="add-dept">${DEPTS.map(d => `<option value="${d.code}">${d.code}</option>`).join('')}</select></div>
+        <div class="frow"><div class="flbl">Year</div><select class="inp" id="add-year"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
+        <div class="frow"><div class="flbl">Section</div><select class="inp" id="add-sec"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select></div></div>
+        <div class="g2"><div class="frow"><div class="flbl">Email</div><input class="inp" id="add-email" placeholder="student@uni.edu"></div>
+        <div class="frow"><div class="flbl">Batch</div><input class="inp" id="add-batch" placeholder="2024-28"></div></div>
+        <div id="add-err" style="color:#fb7185;font-size:.72rem;min-height:18px;margin-top:4px"></div>
+        <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+          <button class="btn btn-glass" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-admin" id="add-btn" onclick="submitAddStudent()"><i class="fa-solid fa-circle-check" style="margin-right:4px"></i>Enrol</button>
+        </div>
+      </div></div>`);
+    };
+    window.submitAddStudent = async function () {
+      const id = document.getElementById('add-id')?.value?.trim();
+      const name = document.getElementById('add-name')?.value?.trim();
+      const dept = document.getElementById('add-dept')?.value;
+      const year = document.getElementById('add-year')?.value;
+      const sec = document.getElementById('add-sec')?.value;
+      const email = document.getElementById('add-email')?.value?.trim();
+      const batch = document.getElementById('add-batch')?.value?.trim();
+      const errEl = document.getElementById('add-err');
+      if (!id || !name || !dept) { if (errEl) errEl.textContent = 'ID, Name & Department are required.'; return; }
+      const btn = document.getElementById('add-btn');
+      if (btn) { btn.disabled = true; btn.textContent = 'Adding...'; }
+      await addStudentToAPI(id, name, dept, year, sec, email, batch);
+      if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-circle-check" style="margin-right:4px"></i>Enrol'; }
+    };
+
+    /* FACULTY PAGE */
+    function pageFaculty() {
+      return `<div class="panel">
+  <div class="g4" style="margin-bottom:14px">
+    <div class="stat"><div class="stat-ico" style="background:rgba(13,148,136,.15);color:#2dd4bf"><i class="fa-solid fa-chalkboard-user"></i></div><div><div class="stat-n" style="color:#2dd4bf">${FACULTY.length}</div><div class="stat-l">Faculty (DB)</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(16,185,129,.15);color:#34d399"><i class="fa-solid fa-circle-check"></i></div><div><div class="stat-n" style="color:#34d399">${FACULTY.filter(f => f.status === 'Active').length}</div><div class="stat-l">Active</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(232,160,32,.15);color:var(--gold)"><i class="fa-solid fa-clock"></i></div><div><div class="stat-n" style="color:var(--gold)">${LEAVES.filter(l => l.status === 'Pending').length}</div><div class="stat-l">Pending Leaves</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(124,58,237,.15);color:#a78bfa"><i class="fa-solid fa-star"></i></div><div><div class="stat-n" style="color:#a78bfa">${FACULTY.length ? ((FACULTY.reduce((a, f) => a + f.rating, 0) / FACULTY.length).toFixed(1)) : 'â€”'}</div><div class="stat-l">Avg Rating</div></div></div>
+  </div>
+  <div class="g2">
+    <div class="gcard">
+      <div class="sh"><div class="sh-t">Faculty Directory</div><button class="btn btn-admin btn-sm" onclick="showAddFaculty()"><i class="fa-solid fa-plus" style="margin-right:4px"></i>Add Faculty</button></div>
+      ${FACULTY.map(f => `<div class="gcard" style="margin-bottom:8px;padding:12px 14px">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:38px;height:38px;border-radius:50%;background:rgba(13,148,136,.12);border:1px solid rgba(13,148,136,.2);display:flex;align-items:center;justify-content:center;color:#2dd4bf;font-size:.9rem;flex-shrink:0"><i class="fa-solid fa-chalkboard-user"></i></div>
+          <div style="flex:1">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-weight:700;font-size:.84rem">${f.name}</span>${tagHtml(f.status, f.status === 'Active' ? 'teal' : 'rose')}
+            </div>
+            <div style="font-size:.67rem;color:var(--muted);margin-top:1px">${f.dept} Â· <i class="fa-solid fa-star" style="color:var(--gold)"></i> ${f.rating}</div>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:5px">${f.subjects.map(s => tagHtml(s, 'white')).join('')}</div>
+            <div style="font-size:.65rem;color:var(--muted);margin-top:5px"><i class="fa-solid fa-building" style="margin-right:4px"></i>${f.office} &nbsp;Â·&nbsp; <i class="fa-solid fa-clock" style="margin-right:4px"></i>${f.hours}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:10px">
+          <button class="btn btn-glass btn-xs" onclick="showEditFaculty('${f.id}')"><i class="fa-solid fa-pen" style="margin-right:3px"></i>Edit</button>
+          <button class="btn btn-rose btn-xs" onclick="deleteFacultyAPI('${f.id}','${f.name}')"><i class="fa-solid fa-trash" style="margin-right:3px"></i>Remove</button>
+          <button class="btn btn-teal btn-xs" onclick="openChatWith('${f.id}','${f.name}','Teacher')"><i class="fa-solid fa-comment" style="margin-right:3px"></i>Chat</button>
+        </div>
+      </div>`).join('')}
+    </div>
+    <div class="gcard">
+      <div class="sh"><div class="sh-t">Leave Requests</div></div>
+      ${LEAVES.map((l, i) => `<div class="gcard" style="margin-bottom:8px;padding:12px 14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-weight:600;font-size:.82rem">${l.faculty}</span>${tagHtml(l.status, l.status === 'Pending' ? 'gold' : l.status === 'Approved' ? 'teal' : 'rose')}
+        </div>
+        <div style="font-size:.68rem;color:var(--muted);margin-bottom:3px"><i class="fa-solid fa-calendar" style="margin-right:4px"></i>${l.from} â†’ ${l.to} &nbsp;Â·&nbsp; ${l.reason}</div>
+        <div style="font-size:.66rem;color:rgba(255,255,255,.3)">Substitute: ${l.sub}</div>
+        ${l.status === 'Pending' ? `<div style="display:flex;gap:6px;margin-top:8px">
+          <button class="btn btn-teal btn-sm" style="flex:1;justify-content:center" onclick="showToast('Leave approved for ${l.faculty}')"><i class="fa-solid fa-check" style="margin-right:4px"></i>Approve</button>
+          <button class="btn btn-rose btn-sm" style="flex:1;justify-content:center" onclick="showToast('Leave rejected')"><i class="fa-solid fa-xmark" style="margin-right:4px"></i>Reject</button>
+        </div>`: ''}
+      </div>`).join('')}
+    </div>
+  </div>
+</div>`;
+    }
+
+    /* TIMETABLE */
+    function pageTimetable() {
+      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const times = ['9:00', '10:00', '11:00', '12:00', '2:00', '3:00', '4:00'];
+      const slots = { CSE: [['DSA', '#0d9488'], ['CN', '#7c3aed'], ['', ''], ['OS', '#c41e3a'], ['DBMS', '#e8a020'], ['SE', '#10b981']], IT: [['WebDev', '#0d9488'], ['SE', '#10b981'], ['DBMS', '#e8a020'], ['', ''], ['CN', '#7c3aed'], ['OS', '#c41e3a']] };
+      let dept = 'CSE';
+      return `<div class="panel">
+  <div class="gcard" style="margin-bottom:14px">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <select class="inp" style="width:150px" id="tt-dept"><option value="CSE">CSE</option><option value="IT">IT</option></select>
+      <select class="inp" style="width:130px"><option>Year 3</option><option>Year 2</option><option>Year 1</option></select>
+      <select class="inp" style="width:110px"><option>Section A</option><option>Section B</option></select>
+      <button class="btn btn-admin btn-sm" onclick="showToast('Timetable published & notified!')"><i class="fa-solid fa-paper-plane" style="margin-right:4px"></i>Publish</button>
+      <button class="btn btn-glass btn-sm" onclick="showToast('Drafted timetable saved')"><i class="fa-solid fa-floppy-disk" style="margin-right:4px"></i>Save Draft</button>
+    </div>
+  </div>
+  <div class="gcard" style="overflow-x:auto">
+    <div class="sh"><div class="sh-t">Weekly Schedule â€” CSE Year 3 Section A</div></div>
+    <table style="width:100%;border-collapse:collapse;font-size:.68rem;min-width:560px">
+      <thead><tr><th style="padding:8px;width:55px"></th>${days.map(d => `<th style="padding:8px;text-align:center;background:rgba(255,255,255,.06);border-radius:4px;color:rgba(255,255,255,.7);font-size:.62rem">${d}</th>`).join('')}</tr></thead>
+      <tbody>${times.map((t, ti) => `<tr>
+        <td style="padding:6px 4px;color:var(--muted);font-size:.6rem;text-align:right">${t}</td>
+        ${[['DSA', '#0d9488'], ['CN', '#7c3aed'], ['', ''], ['OS', '#c41e3a'], ['DBMS', '#e8a020'], ['SE', '#10b981']].map(([s, c]) => s ? `<td style="padding:3px"><div style="background:${c}88;border:1px solid ${c}44;border-radius:5px;padding:5px;min-height:40px;cursor:pointer;font-weight:600;color:#fff" onclick="showToast('Edit: ${s}')">${s}</div></td>` : `<td style="padding:3px"><div style="border:1px dashed rgba(255,255,255,.07);border-radius:5px;min-height:40px;cursor:pointer" onclick="showToast('Add class for this slot')"></div></td>`).join('')}
+      </tr>`).join('')}</tbody>
+    </table>
+  </div>
+</div>`;
+    }
+
+    /* EXAMS */
+    function pageExams() {
+      const exams = window.DB_EXAMS || [];
+      return `<div class="panel">
+  <div class="gcard" style="margin-bottom:14px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-admin btn-sm" onclick="showAddExam()"><i class="fa-solid fa-plus" style="margin-right:4px"></i>Add Exam</button>
+      <button class="btn btn-white btn-sm" onclick="showToast('Hall tickets generated & emailed to all students!')"><i class="fa-solid fa-id-card" style="margin-right:4px"></i>Generate Hall Tickets</button>
+      <button class="btn btn-glass btn-sm" onclick="showToast('Schedule published â€” students notified!')"><i class="fa-solid fa-paper-plane" style="margin-right:4px"></i>Publish Schedule</button>
+      <select class="inp" style="width:130px;margin-left:auto"><option>CSE Â· Semester 6</option><option>IT Â· Semester 4</option></select>
+    </div>
+  </div>
+  <div class="gcard">
+    <div class="sh"><div class="sh-t"><i class="fa-solid fa-file-lines" style="margin-right:6px;color:var(--admin)"></i>Exam Schedule</div></div>
+    ${exams.length ? `<table class="tbl">
+      <thead><tr><th>Subject</th><th>Code</th><th>Date</th><th>Time</th><th>Venue</th><th>Dept</th><th>Actions</th></tr></thead>
+      <tbody>${exams.map(e => `<tr>
+        <td style="font-weight:600">${e.subject}</td>
+        <td>${tagHtml(e.subject_code || 'â€”', 'admin')}</td>
+        <td style="color:#2dd4bf;font-weight:600">${e.date}</td>
+        <td style="color:var(--muted)">${e.time}</td>
+        <td style="color:var(--muted)">${e.venue}</td>
+        <td>${tagHtml(e.department, 'teal')}</td>
+        <td><div style="display:flex;gap:4px"><button class="btn btn-glass btn-xs" onclick="showToast('Editing exam')"><i class="fa-solid fa-pen"></i></button><button class="btn btn-rose btn-xs" onclick="deleteExamAPI(${e.id},'${e.subject}')"><i class="fa-solid fa-trash"></i></button></div></td>
+      </tr>`).join('')}</tbody>
+    </table>` : `<div style="text-align:center;padding:30px;color:var(--muted)">No exams scheduled</div>`}
+  </div>
+</div>`;
+    }
+    window.showAddExam = function () {
+      modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
+        <div class="modal-t"><i class="fa-solid fa-calendar-plus" style="color:var(--admin);margin-right:8px"></i>Add Exam</div>
+        <div class="frow"><div class="flbl">Subject</div><input class="inp" id="add-exam-subject" placeholder="Subject name"></div>
+        <div class="frow"><div class="flbl">Subject Code</div><input class="inp" id="add-exam-code" placeholder="e.g. CSE301"></div>
+        <div class="g2"><div class="frow"><div class="flbl">Date</div><input class="inp" id="add-exam-date" type="date"></div><div class="frow"><div class="flbl">Time</div><input class="inp" id="add-exam-time" type="time"></div></div>
+        <div class="g2"><div class="frow"><div class="flbl">Venue</div><input class="inp" id="add-exam-venue" placeholder="Hall A"></div><div class="frow"><div class="flbl">Department</div><select class="inp" id="add-exam-dept">${DEPTS.map(d => `<option value="${d.code}">${d.code}</option>`).join('')}</select></div></div>
+        <div id="add-exam-err" style="color:#fb7185;font-size:.72rem;min-height:18px;margin-top:4px"></div>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <button class="btn btn-glass" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-admin" id="add-exam-btn" onclick="submitAddExam()">Add Exam</button>
+        </div>
+      </div></div>`);
+    };
+    window.submitAddExam = async function () {
+      const subEl = document.getElementById('add-exam-subject');
+      const dateEl = document.getElementById('add-exam-date');
+      const timeEl = document.getElementById('add-exam-time');
+      const venEl = document.getElementById('add-exam-venue');
+      const deptEl = document.getElementById('add-exam-dept');
+      const errEl = document.getElementById('add-exam-err');
+      const subject = subEl?.value?.trim();
+      const code = document.getElementById('add-exam-code')?.value?.trim();
+      const date = dateEl?.value;
+      const time = timeEl?.value;
+      const venue = venEl?.value?.trim();
+      const dept = deptEl?.value;
+
+      if (!subject || !date || !time || !venue || !dept) {
+        if (errEl) errEl.textContent = 'All fields required.';
+        [subEl, dateEl, timeEl, venEl, deptEl].forEach(e => { if (e && (!e.value || !e.value.trim())) e.style.borderColor = '#fb7185'; });
+        return;
+      }
+      [subEl, dateEl, timeEl, venEl, deptEl].forEach(e => { if (e) e.style.borderColor = ''; });
+      if (errEl) errEl.textContent = '';
+
+      const btn = document.getElementById('add-exam-btn');
+      if (btn) { btn.disabled = true; btn.textContent = 'Adding...'; }
+      showLoader();
+      try {
+        const r = await fetch(`${API_BASE}/admin/exams`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ subject, subject_code: code, date, time, venue, department: dept }) });
+        const d = await r.json();
+        if (d.ok) {
+          if (!window.DB_EXAMS) window.DB_EXAMS = [];
+          window.DB_EXAMS.push({ id: d.id, subject, subject_code: code, date, time, venue, department: dept });
+          closeModal();
+          document.getElementById('page-content').innerHTML = pageExams();
+          showToast('âœ… Exam added & students notified!');
+        } else {
+          if (errEl) errEl.textContent = d.message || 'Error adding exam';
+        }
+      } catch (e) {
+        if (errEl) errEl.textContent = 'Server error: ' + e.message;
+      } finally {
+        hideLoader();
+        if (btn) { btn.disabled = false; btn.textContent = 'Add Exam'; }
+      }
+    };
+    window.deleteExamAPI = async function (id, subject) {
+      if (!confirm(`Delete exam: ${subject}?`)) return;
+      try {
+        await fetch(`${API_BASE}/admin/exams/${id}`, { method: 'DELETE' });
+        const idx = (window.DB_EXAMS || []).findIndex(e => e.id === id);
+        if (idx !== -1) window.DB_EXAMS.splice(idx, 1);
+        document.getElementById('page-content').innerHTML = pageExams();
+        showToast('Exam removed.');
+      } catch (e) { showToast('Error deleting exam', 'error'); }
+    };
+
+    /* CALENDAR */
+    function pageCalendar() {
+      const events = window.DB_CAL_EVENTS || [];
+      return `<div class="panel">
+  <div class="gcard" style="margin-bottom:14px">
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn btn-admin btn-sm" onclick="showAddCalEvent()"><i class="fa-solid fa-plus" style="margin-right:4px"></i>Add Event</button>
+      <button class="btn btn-white btn-sm" onclick="showToast('Calendar exported as PDF')"><i class="fa-solid fa-file-pdf" style="margin-right:4px"></i>Export PDF</button>
+    </div>
+  </div>
+  <div class="gcard">
+    <div class="sh"><div class="sh-t">Academic Calendar 2025â€“26</div></div>
+    ${events.length ? events.map(e => `<div class="li">
+      <div style="width:50px;height:42px;border-radius:10px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+        <div style="font-size:.58rem;color:var(--muted2);text-transform:uppercase">${e.date.split(' ')[0]}</div>
+        <div style="font-size:.8rem;font-weight:700;color:#a5b4fc">${e.date.split(' ')[1]}</div>
+      </div>
+      <div style="flex:1"><div style="font-weight:600;font-size:.8rem">${e.event}</div></div>
+      ${tagHtml(e.type, e.type === 'Exam' ? 'rose' : e.type === 'Holiday' ? 'gold' : e.type === 'Result' ? 'green' : 'teal')}
+      <button class="btn btn-glass btn-xs" onclick="deleteCalEventAPI(${e.id})"><i class="fa-solid fa-trash"></i></button>
+    </div>`).join('') : `<div style="text-align:center;padding:30px;color:var(--muted)">No events scheduled</div>`}
+  </div>
+</div>`;
+    }
+    window.showAddCalEvent = function () {
+      modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
+        <div class="modal-t"><i class="fa-solid fa-calendar-plus" style="color:var(--admin);margin-right:8px"></i>Add Calendar Event</div>
+        <div class="frow"><div class="flbl">Event Name</div><input class="inp" id="cal-event" placeholder="e.g. Summer Vacation Begins"></div>
+        <div class="g2"><div class="frow"><div class="flbl">Date</div><input class="inp" id="cal-date" type="date"></div><div class="frow"><div class="flbl">Type</div><select class="inp" id="cal-type"><option>Exam</option><option>Holiday</option><option>Event</option><option>Result</option></select></div></div>
+        <div id="cal-err" style="color:#fb7185;font-size:.72rem;min-height:18px;margin-top:4px"></div>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <button class="btn btn-glass" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-admin" id="cal-btn" onclick="submitAddCalEvent()">Save</button>
+        </div>
+      </div></div>`);
+    };
+    window.submitAddCalEvent = async function () {
+      const evEl = document.getElementById('cal-event');
+      const dateEl = document.getElementById('cal-date');
+      const typeEl = document.getElementById('cal-type');
+      const errEl = document.getElementById('cal-err');
+
+      const event = evEl?.value?.trim();
+      const date = dateEl?.value;
+      const type = typeEl?.value;
+
+      if (!event || !date) {
+        if (errEl) errEl.textContent = 'Event name and date required.';
+        [evEl, dateEl].forEach(e => { if (e && !e.value?.trim()) e.style.borderColor = '#fb7185'; });
+        return;
+      }
+      [evEl, dateEl].forEach(e => { if (e) e.style.borderColor = ''; });
+      if (errEl) errEl.textContent = '';
+
+      const btn = document.getElementById('cal-btn');
+      if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+      showLoader();
+      try {
+        const r = await fetch(`${API_BASE}/admin/calendar`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event, date, type }) });
+        const d = await r.json();
+        if (d.ok) {
+          if (!window.DB_CAL_EVENTS) window.DB_CAL_EVENTS = [];
+          window.DB_CAL_EVENTS.push({ id: d.id, event, date, type });
+          closeModal();
+          document.getElementById('page-content').innerHTML = pageCalendar();
+          showToast('âœ… Event added to calendar!');
+        } else {
+          if (errEl) errEl.textContent = d.message || 'Error adding event';
+        }
+      } catch (e) {
+        if (errEl) errEl.textContent = 'Server error: ' + e.message;
+      } finally {
+        hideLoader();
+        if (btn) { btn.disabled = false; btn.textContent = 'Save'; }
+      }
+    };
+    window.deleteCalEventAPI = async function (id) {
+      if (!confirm('Delete this event?')) return;
+      try {
+        await fetch(`${API_BASE}/admin/calendar/${id}`, { method: 'DELETE' });
+        const idx = (window.DB_CAL_EVENTS || []).findIndex(e => e.id === id);
+        if (idx !== -1) window.DB_CAL_EVENTS.splice(idx, 1);
+        document.getElementById('page-content').innerHTML = pageCalendar();
+        showToast('Event removed.');
+      } catch (e) { showToast('Error deleting event', 'error'); }
+    };
+
+    /* MARKS */
+    function pageMarks() {
+      return `<div class="panel">
+  <div class="gcard" style="margin-bottom:14px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <select class="inp" style="width:160px"><option>CSE Â· Year 3 Â· Sec A</option><option>IT Â· Year 2 Â· Sec B</option></select>
+      <select class="inp" style="width:180px"><option>Data Structures (CSE301)</option><option>Computer Networks (CSE302)</option></select>
+      <select class="inp" style="width:130px"><option>Internal Assessment 3</option><option>Internal Assessment 2</option><option>Internal Assessment 1</option></select>
+      <button class="btn btn-admin btn-sm" onclick="showToast('Marks saved & sent for approval')"><i class="fa-solid fa-floppy-disk" style="margin-right:4px"></i>Save Marks</button>
+    </div>
+  </div>
+  <div class="gcard">
+    <div class="sh"><div class="sh-t"><i class="fa-solid fa-pen-ruler" style="margin-right:6px;color:#a5b4fc"></i>Enter Marks â€” IA-3 Â· DSA Â· CSE Year 3 A</div><span style="font-size:.68rem;color:var(--muted)">Max: 20 marks</span></div>
+    <table class="tbl">
+      <thead><tr><th>Student</th><th>ID</th><th>Marks (/20)</th><th>Grade</th></tr></thead>
+      <tbody>${STUDENTS.filter(s => s.dept === 'CSE').map(s => { const m = Math.floor(12 + Math.random() * 8); const g = m >= 18 ? 'A+' : m >= 16 ? 'A' : m >= 14 ? 'B+' : 'B'; return `<tr><td style="font-weight:600">${s.name}</td><td style="color:var(--muted);font-size:.72rem">${s.id}</td><td><input class="inp" style="width:80px;padding:5px 8px" value="${m}" type="number" min="0" max="20"></td><td>${tagHtml(g, m >= 16 ? 'teal' : m >= 14 ? 'gold' : 'rose')}</td></tr>` }).join('')}</tbody>
+    </table>
+  </div>
+</div>`;
+    }
+
+    /* ANNOUNCEMENTS */
+    function pageAnnounce() {
+      const announcements = window.DB_ANNOUNCEMENTS || [];
+      return `<div class="panel">
+  <div class="g2">
+    <div>
+      <div class="gcard" style="margin-bottom:12px">
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-bullhorn" style="margin-right:6px;color:#a78bfa"></i>Post Announcement</div></div>
+        <div class="frow"><div class="flbl">Title</div><input class="inp" id="ann-title" placeholder="Announcement title..."></div>
+        <div class="frow" style="margin-top:8px"><div class="flbl">Message</div><textarea class="inp" id="ann-body" placeholder="Full announcement text..." style="min-height:80px;resize:vertical"></textarea></div>
+        <div class="g3" style="margin-top:8px">
+          <div><div class="flbl">Target</div><select class="inp" id="ann-target"><option>All</option><option>CSE</option><option>IT</option><option>ME</option><option>UG</option><option>PG</option></select></div>
+          <div><div class="flbl">Urgency</div><select class="inp" id="ann-urgency"><option>Low</option><option>Medium</option><option selected>High</option></select></div>
+          <div><div class="flbl">Push Notify?</div><select class="inp" id="ann-notify"><option selected>Yes</option><option>No</option></select></div>
+        </div>
+        <div id="ann-err" style="color:#fb7185;font-size:.72rem;min-height:18px;margin-top:4px"></div>
+        <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+          <button class="btn btn-glass btn-sm" onclick="showToast('Draft saved')"><i class="fa-solid fa-floppy-disk" style="margin-right:4px"></i>Save Draft</button>
+          <button class="btn btn-admin btn-sm" id="ann-btn" onclick="postAnnouncement()"><i class="fa-solid fa-paper-plane" style="margin-right:4px"></i>Post & Notify</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="sh"><div class="sh-t"><i class="fa-solid fa-clock-rotate-left" style="margin-right:6px;color:var(--admin)"></i>Announcement History</div></div>
+      ${announcements.length ? announcements.map((a, i) => `<div class="gcard" style="margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+          <div style="display:flex;gap:6px;align-items:center">${tagHtml(a.urgency || 'Medium', a.urgency === 'High' ? 'rose' : a.urgency === 'Medium' ? 'gold' : 'teal')}${tagHtml(a.target || 'All', 'admin')}</div>
+          <span style="font-size:.63rem;color:var(--muted)">${new Date(a.created_at).toLocaleDateString()}</span>
+        </div>
+        <div style="font-weight:700;font-size:.86rem;margin-bottom:3px">${a.title}</div>
+        <div style="font-size:.72rem;color:var(--muted);line-height:1.5">${a.body.substring(0, 150)}${a.body.length > 150 ? '...' : ''}</div>
+        <div class="div"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:.66rem;color:var(--muted)">
+          <span><i class="fa-solid fa-eye" style="margin-right:4px"></i>${a.reads || 0} reads Â· ${a.author}</span>
+          <button class="btn btn-rose btn-xs" onclick="deleteAnnouncementAPI(${a.id})"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>`).join('') : `<div style="text-align:center;padding:20px;color:var(--muted);font-size:.75rem">No announcements yet</div>`}
+    </div>
+  </div>
+</div>`;
+    }
+    window.postAnnouncement = async function () {
+      const titleEl = document.getElementById('ann-title');
+      const bodyEl = document.getElementById('ann-body');
+      const errEl = document.getElementById('ann-err');
+      const t = titleEl?.value?.trim();
+      const b = bodyEl?.value?.trim();
+      const target = document.getElementById('ann-target')?.value || 'All';
+      const urgency = document.getElementById('ann-urgency')?.value || 'Medium';
+
+      if (!t || !b) {
+        if (errEl) errEl.textContent = 'Title and message required.';
+        [titleEl, bodyEl].forEach(e => { if (e && !e.value?.trim()) e.style.borderColor = '#fb7185'; });
+        return;
+      }
+      [titleEl, bodyEl].forEach(e => { if (e) e.style.borderColor = ''; });
+      if (errEl) errEl.textContent = '';
+
+      const btn = document.getElementById('ann-btn');
+      if (btn) { btn.disabled = true; btn.textContent = 'Posting...'; }
+      showLoader();
+      try {
+        const u = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+        const r = await fetch(`${API_BASE}/admin/announcements`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: t, body: b, target, urgency, author: u?.name || 'Admin' })
+        });
+        const d = await r.json();
+        if (d.ok) {
+          if (!window.DB_ANNOUNCEMENTS) window.DB_ANNOUNCEMENTS = [];
+          window.DB_ANNOUNCEMENTS.unshift({ id: d.id, title: t, body: b, target, urgency, author: u?.name || 'Admin', reads: 0, created_at: Date.now() });
+          titleEl.value = '';
+          bodyEl.value = '';
+          document.getElementById('page-content').innerHTML = pageAnnounce();
+          showToast('âœ… Announcement posted & notifications sent!');
+        } else {
+          if (errEl) errEl.textContent = d.message || 'Error posting announcement';
+        }
+      } catch (e) {
+        if (errEl) errEl.textContent = 'Server error: ' + e.message;
+      } finally {
+        hideLoader();
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane" style="margin-right:4px"></i>Post & Notify'; }
+      }
+    };
+    window.deleteAnnouncementAPI = async function (id) {
+      if (!confirm('Delete this announcement?')) return;
+      try {
+        await fetch(`${API_BASE}/admin/announcements/${id}`, { method: 'DELETE' });
+        const idx = (window.DB_ANNOUNCEMENTS || []).findIndex(a => a.id === id);
+        if (idx !== -1) window.DB_ANNOUNCEMENTS.splice(idx, 1);
+        document.getElementById('page-content').innerHTML = pageAnnounce();
+        showToast('Announcement removed.');
+      } catch (e) { showToast('Error deleting announcement', 'error'); }
+    };
+
+    /* NOTIFICATIONS */
+    function pageNotifications() {
+      const groups = ['All Students', 'All Faculty', 'CSE Students', 'IT Students', 'Year 3 â€“ All Depts', 'Any custom group'];
+      return `<div class="panel">
+  <div class="g2">
+    <div class="gcard">
+      <div class="sh"><div class="sh-t">Send Push Notification</div></div>
+      <div class="frow"><div class="flbl">Recipient Group</div><select class="inp">${groups.map(g => `<option>${g}</option>`).join('')}</select></div>
+      <div class="frow" style="margin-top:8px"><div class="flbl">Message (max 160 chars)</div><textarea class="inp" placeholder="Short push notification text..." maxlength="160" style="min-height:70px;resize:none"></textarea></div>
+      <div class="frow" style="margin-top:8px"><div class="flbl">Schedule</div>
+        <div style="display:flex;gap:8px"><button class="btn btn-admin" style="flex:1;justify-content:center" onclick="showToast('Push notification sent to 1,220 devices!')"><i class="fa-solid fa-paper-plane" style="margin-right:4px"></i>Send Now</button>
+        <button class="btn btn-glass" onclick="showToast('Notification scheduled')"><i class="fa-solid fa-clock" style="margin-right:4px"></i>Schedule</button></div>
+      </div>
+    </div>
+    <div class="gcard">
+      <div class="sh"><div class="sh-t">Recent Notifications</div></div>
+      ${[{ msg: 'ESE schedule released on portal.', group: 'All', sent: 'Mar 10', reach: 1240 }, { msg: 'Library closed today for maintenance.', group: 'All', sent: 'Mar 9', reach: 980 }, { msg: 'CSE placements â€” TCS shortlist out.', group: 'CSE Students', sent: 'Mar 8', reach: 312 }].map(n => `<div class="li">
+        <div style="width:32px;height:32px;border-radius:8px;background:rgba(99,102,241,.1);display:flex;align-items:center;justify-content:center;color:#a5b4fc;font-size:.8rem;flex-shrink:0"><i class="fa-solid fa-bell"></i></div>
+        <div style="flex:1"><div style="font-size:.78rem;font-weight:500">${n.msg}</div><div style="font-size:.63rem;color:var(--muted);margin-top:2px"><i class="fa-solid fa-users" style="margin-right:3px"></i>${n.group} &nbsp;Â·&nbsp; <i class="fa-solid fa-calendar" style="margin-right:3px"></i>${n.sent} &nbsp;Â·&nbsp; <i class="fa-solid fa-eye" style="margin-right:3px"></i>${n.reach}</div></div>
+      </div>`).join('')}
+    </div>
+  </div>
+</div>`;
+    }
+
+    /* EVENTS */
+    function pageEvents() {
+      return `<div class="panel">
+  <div class="gcard" style="margin-bottom:14px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-admin btn-sm" onclick="showAddEvent()"><i class="fa-solid fa-plus" style="margin-right:4px"></i>Create Event</button>
+      <button class="btn btn-glass btn-sm" onclick="showToast('Registration report exported')"><i class="fa-solid fa-file-export" style="margin-right:4px"></i>Export Registrations</button>
+    </div>
+  </div>
+  <div class="g2">${EVENTS_DATA.map((e, i) => `<div class="gcard">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+      <div><div style="font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700"><i class="fa-solid fa-calendar-check" style="margin-right:6px;color:var(--admin)"></i>${e.name}</div>
+      <div style="font-size:.68rem;color:var(--muted);margin-top:2px"><i class="fa-solid fa-calendar" style="margin-right:4px"></i>${e.date} &nbsp;Â·&nbsp; <i class="fa-solid fa-location-dot" style="margin-right:4px"></i>${e.venue}</div></div>
+      ${tagHtml(e.status, e.status === 'Closing' ? 'rose' : e.status === 'Open' ? 'teal' : 'white')}
+    </div>
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:.68rem;margin-bottom:4px"><span style="color:var(--muted)">Registrations</span><span style="font-weight:700;color:${e.reg / e.limit > 0.9 ? '#fb7185' : '#2dd4bf'}">${e.reg} / ${e.limit}</span></div>
+      <div class="pb"><div class="pf" style="width:${Math.round(e.reg / e.limit * 100)}%;background:${e.reg / e.limit > 0.9 ? 'var(--rose)' : '#0d9488'}"></div></div>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-glass btn-xs" onclick="showToast('Viewing ${e.reg} registrations for ${e.name}')"><i class="fa-solid fa-list" style="margin-right:3px"></i>Registrations</button>
+      <button class="btn btn-glass btn-xs" onclick="showToast('Editing ${e.name}')"><i class="fa-solid fa-pen" style="margin-right:3px"></i>Edit</button>
+      <button class="btn btn-rose btn-xs" onclick="showToast('Registrations closed for ${e.name}')"><i class="fa-solid fa-lock" style="margin-right:3px"></i>Close</button>
+    </div>
+  </div>`).join('')}</div>
+</div>`;
+    }
+    window.showAddEvent = function () {
+      modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
+        <div class="modal-t"><i class="fa-solid fa-calendar-plus" style="color:var(--admin);margin-right:8px"></i>Create Event</div>
+        <div class="frow"><div class="flbl">Event Name</div><input class="inp" placeholder="e.g. TechXcelerate 2026"></div>
+        <div class="g2"><div class="frow"><div class="flbl">Date</div><input class="inp" type="date"></div><div class="frow"><div class="flbl">Venue</div><input class="inp" placeholder="Block F"></div></div>
+        <div class="g2"><div class="frow"><div class="flbl">Category</div><select class="inp"><option>Technical</option><option>Cultural</option><option>Sports</option><option>Career</option><option>Academic</option></select></div><div class="frow"><div class="flbl">Reg. Limit</div><input class="inp" type="number" placeholder="500"></div></div>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <button class="btn btn-glass" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-admin" onclick="closeModal();showToast('Event created & published!')">Create</button>
+        </div>
+      </div></div>`);
+    };
+
+    /* REPORTS */
+    function pageReports() {
+      return `<div class="panel">
+  <div class="g3" style="margin-bottom:14px">
+    ${[{ l: 'Overall Avg Attendance', v: '79%', c: '#2dd4bf', ic: 'fa-chart-bar' }, { l: 'Defaulter Students', c: '#fb7185', v: STUDENTS.filter(s => s.att < 75).length, ic: 'fa-triangle-exclamation' }, { l: 'Faculty on Leave Today', v: FACULTY.filter(f => f.status === 'On Leave').length, c: 'var(--gold)', ic: 'fa-plane-departure' }].map(s => `<div class="stat"><div class="stat-ico" style="background:rgba(255,255,255,.05);color:${s.c}"><i class="fa-solid ${s.ic}"></i></div><div><div class="stat-n" style="color:${s.c}">${s.v}</div><div class="stat-l">${s.l}</div></div></div>`).join('')}
+  </div>
+  <div class="g2" style="margin-bottom:14px">
+    <div class="gcard">
+      <div class="sh"><div class="sh-t">Attendance by Department</div></div>
+      ${DEPTS.map(d => `<div style="margin-bottom:9px">
+        <div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:4px"><span style="font-weight:600">${d.code}</span><span style="color:${d.att >= 75 ? '#2dd4bf' : '#fb7185'};font-weight:700">${d.att}%</span></div>
+        <div class="pb"><div class="pf" style="width:${d.att}%;background:${d.att >= 75 ? '#0d9488' : 'var(--rose)'}"></div></div>
+        <div style="font-size:.62rem;color:var(--muted);margin-top:2px">${d.students} students</div>
+      </div>`).join('')}
+    </div>
+    <div class="gcard">
+      <div class="sh"><div class="sh-t">Defaulters Report (&lt;75%)</div></div>
+      ${STUDENTS.filter(s => s.att < 75).map(s => `<div class="li">
+        <div style="width:30px;height:30px;border-radius:8px;background:rgba(225,29,72,.1);display:flex;align-items:center;justify-content:center;color:#fb7185;font-size:.78rem"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div style="flex:1"><div style="font-size:.78rem;font-weight:600">${s.name}</div><div style="font-size:.64rem;color:var(--muted)">${s.dept} Â· Y${s.year} Â· ${s.id}</div></div>
+        <span style="font-weight:700;color:#fb7185;font-size:.82rem">${s.att}%</span>
+      </div>`).join('')}
+    </div>
+  </div>
+  <div class="gcard">
+    <div class="sh"><div class="sh-t">Export Reports</div></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      ${[['Attendance Report', 'fa-file-excel', 'Excel'], ['Marks Summary', 'fa-file-pdf', 'PDF'], ['Event Registrations', 'fa-file-csv', 'CSV'], ['Defaulters List', 'fa-file-pdf', 'PDF'], ['Faculty Leaves', 'fa-file-excel', 'Excel']].map(([name, ic, fmt]) => `<button class="btn btn-glass" style="flex:1;min-width:150px;justify-content:center" onclick="showToast('${name} downloaded as ${fmt}')"><i class="fa-solid ${ic}" style="margin-right:5px;color:var(--gold)"></i>${name}<span style="margin-left:5px;font-size:.6rem;opacity:.6">${fmt}</span></button>`).join('')}
+    </div>
+  </div>
+</div>`;
+    }
+
+    /* SETTINGS */
+    function pageSettings() {
+      return `<div class="panel">
+  <div class="g2">
+    <div>
+      <div class="gcard" style="margin-bottom:12px">
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-building" style="margin-right:6px;color:var(--admin)"></i>Departments</div><button class="btn btn-admin btn-xs" onclick="showToast('Add department')"><i class="fa-solid fa-plus"></i></button></div>
+        <table class="tbl"><thead><tr><th>Department</th><th>Code</th><th>HOD</th><th>Students</th><th></th></tr></thead>
+        <tbody>${DEPTS.map(d => `<tr><td style="font-weight:600">${d.name}</td><td>${tagHtml(d.code, 'admin')}</td><td style="color:var(--muted);font-size:.72rem">${d.hod}</td><td style="color:var(--muted)">${d.students}</td><td><button class="btn btn-glass btn-xs" onclick="showToast('Edit ${d.code}')"><i class="fa-solid fa-pen"></i></button></td></tr>`).join('')}</tbody>
+        </table>
+      </div>
+      <div class="gcard">
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-sliders" style="margin-right:6px;color:var(--admin)"></i>App Config</div></div>
+        ${[['Min. Attendance Threshold', '75%'], ['Current Semester', 'Semester 6 Â· 2025-26'], ['Academic Year Start', 'August 1, 2025'], ['Exam Season', 'May 5 â€“ May 20, 2026']].map(([k, v]) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+          <span style="font-size:.78rem;color:var(--muted)">${k}</span>
+          <div style="display:flex;gap:6px;align-items:center"><span style="font-size:.78rem;font-weight:600">${v}</span><button class="btn btn-glass btn-xs" onclick="showToast('Updated ${k}')"><i class="fa-solid fa-pen"></i></button></div>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div>
+      <div class="gcard" style="margin-bottom:12px">
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-shield-halved" style="margin-right:6px;color:var(--admin)"></i>Role Management</div></div>
+        <table class="tbl"><thead><tr><th>Role</th><th>Permissions</th><th>Count</th></tr></thead>
+        <tbody>${[{ r: 'Super Admin', p: 'Full access', c: 2, c2: 'admin' }, { r: 'HOD', p: 'Dept-level management', c: 5, c2: 'violet' }, { r: 'Faculty', p: 'Marks, attendance view', c: 66, c2: 'teal' }, { r: 'Student', p: 'Read-only portal', c: 1220, c2: 'white' }].map(x => `<tr><td>${tagHtml(x.r, x.c2)}</td><td style="color:var(--muted);font-size:.72rem">${x.p}</td><td style="font-weight:600">${x.c}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>
+      <div class="gcard">
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-scroll" style="margin-right:6px;color:var(--admin)"></i>Audit Log (Recent)</div></div>
+        ${[{ who: 'Dr. V. Patil', action: 'Posted ESE schedule announcement', when: 'Today 9:12 AM' }, { who: 'Prof. R. Sharma', action: 'Entered IA-3 marks for CSE301', when: 'Today 8:48 AM' }, { who: 'Admin', action: 'Approved leave for Prof. Gupta', when: 'Yesterday 4:30 PM' }, { who: 'Admin', action: 'Added 12 students to CSE Year 1', when: 'Mar 20, 11:00 AM' }].map(lg => `<div class="li">
+          <div style="width:30px;height:30px;border-radius:8px;background:rgba(99,102,241,.08);display:flex;align-items:center;justify-content:center;color:#a5b4fc;font-size:.75rem"><i class="fa-solid fa-scroll"></i></div>
+          <div style="flex:1"><div style="font-size:.76rem;font-weight:500">${lg.action}</div><div style="font-size:.63rem;color:var(--muted);margin-top:2px"><i class="fa-solid fa-user" style="margin-right:3px"></i>${lg.who} &nbsp;Â·&nbsp; ${lg.when}</div></div>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>
+</div>`;
+    }
+
+    /* â”€â”€ ADD / EDIT FACULTY â”€â”€ */
+    window.showAddFaculty = function () {
+      modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
+        <div class="modal-t"><i class="fa-solid fa-chalkboard-user" style="color:var(--admin);margin-right:8px"></i>Add Faculty</div>
+        <div class="g2"><div class="frow"><div class="flbl">Full Name</div><input class="inp" id="af-name" placeholder="e.g. Prof. R. Sharma"></div>
+        <div class="frow"><div class="flbl">Faculty ID</div><input class="inp" id="af-id" placeholder="T25S022093"></div></div>
+        <div class="g2"><div class="frow"><div class="flbl">Department</div><select class="inp" id="af-dept">${DEPTS.map(d => `<option value="${d.code}">${d.code}</option>`).join('')}</select></div>
+        <div class="frow"><div class="flbl">Designation</div><select class="inp" id="af-desg"><option>Assistant Professor</option><option>Associate Professor</option><option>Professor</option></select></div></div>
+        <div class="g2"><div class="frow"><div class="flbl">Email</div><input class="inp" id="af-email" placeholder="prof@uni.edu"></div>
+        <div class="frow"><div class="flbl">Phone</div><input class="inp" id="af-phone" placeholder="98765XXXXX"></div></div>
+        <div id="af-err" style="color:#fb7185;font-size:.72rem;min-height:18px"></div>
+        <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+          <button class="btn btn-glass" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-admin" id="af-btn" onclick="submitAddFaculty()"><i class="fa-solid fa-circle-check" style="margin-right:4px"></i>Add Faculty</button>
+        </div>
+      </div></div>`);
+    };
+    window.submitAddFaculty = async function () {
+      const id = document.getElementById('af-id')?.value?.trim();
+      const name = document.getElementById('af-name')?.value?.trim();
+      const dept = document.getElementById('af-dept')?.value;
+      const desg = document.getElementById('af-desg')?.value;
+      const email = document.getElementById('af-email')?.value?.trim();
+      const phone = document.getElementById('af-phone')?.value?.trim();
+      const errEl = document.getElementById('af-err');
+      if (!id || !name || !dept) { if (errEl) errEl.textContent = 'ID, Name & Dept required.'; return; }
+      const btn = document.getElementById('af-btn');
+      if (btn) { btn.disabled = true; btn.textContent = 'Adding...'; }
+      try {
+        const r = await fetch(`${API_BASE}/admin/add-teacher`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, name, department: dept, designation: desg, email, phone }) });
+        const d = await r.json();
+        if (d.ok) {
+          FACULTY.push({ id, name, dept, subjects: [desg], office: 'â€”', hours: 'â€”', rating: 4.8, leaves: 0, status: 'Active', email });
+          closeModal();
+          document.getElementById('page-content').innerHTML = pageFaculty();
+          showToast(`${name} added to faculty!`);
+        } else { if (errEl) errEl.textContent = d.message || 'Error'; if (btn) { btn.disabled = false; btn.innerHTML = 'Add Faculty'; } }
+      } catch (e) { if (errEl) errEl.textContent = 'Server error'; if (btn) btn.disabled = false; }
+    };
+    window.showEditFaculty = function (id) {
+      const f = FACULTY.find(x => x.id === id);
+      if (!f) return;
+      modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
+        <div class="modal-t"><i class="fa-solid fa-pen" style="color:var(--admin);margin-right:8px"></i>Edit Faculty â€” ${f.name}</div>
+        <div class="frow"><div class="flbl">Full Name</div><input class="inp" id="ef-name" value="${f.name}"></div>
+        <div class="g2"><div class="frow"><div class="flbl">Department</div><select class="inp" id="ef-dept">${DEPTS.map(d => `<option value="${d.code}" ${d.code === f.dept ? 'selected' : ''}>${d.code}</option>`).join('')}</select></div>
+        <div class="frow"><div class="flbl">Designation</div><select class="inp" id="ef-desg"><option ${f.subjects[0] === 'Assistant Professor' ? 'selected' : ''}>Assistant Professor</option><option ${f.subjects[0] === 'Associate Professor' ? 'selected' : ''}>Associate Professor</option><option ${f.subjects[0] === 'Professor' ? 'selected' : ''}>Professor</option></select></div></div>
+        <div class="g2"><div class="frow"><div class="flbl">Email</div><input class="inp" id="ef-email" value="${f.email || ''}"></div>
+        <div class="frow"><div class="flbl">Phone</div><input class="inp" id="ef-phone" value="${f.phone || ''}"></div></div>
+        <div id="ef-err" style="color:#fb7185;font-size:.72rem;min-height:18px"></div>
+        <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+          <button class="btn btn-glass" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-admin" id="ef-btn" onclick="submitEditFaculty('${id}')"><i class="fa-solid fa-floppy-disk" style="margin-right:4px"></i>Save</button>
+        </div>
+      </div></div>`);
+    };
+    window.submitEditFaculty = async function (id) {
+      const name = document.getElementById('ef-name')?.value?.trim();
+      const dept = document.getElementById('ef-dept')?.value;
+      const desg = document.getElementById('ef-desg')?.value;
+      const email = document.getElementById('ef-email')?.value?.trim();
+      const phone = document.getElementById('ef-phone')?.value?.trim();
+      const btn = document.getElementById('ef-btn');
+      if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+      try {
+        const r = await fetch(`${API_BASE}/admin/teacher/${encodeURIComponent(id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, department: dept, designation: desg, email, phone }) });
+        const d = await r.json();
+        if (d.ok) {
+          const idx = FACULTY.findIndex(f => f.id === id);
+          if (idx !== -1) FACULTY[idx] = { ...FACULTY[idx], name, dept, email, phone };
+          closeModal();
+          document.getElementById('page-content').innerHTML = pageFaculty();
+          showToast(`${name} updated!`);
+        } else { document.getElementById('ef-err').textContent = d.message || 'Update failed'; if (btn) { btn.disabled = false; } }
+      } catch (e) { document.getElementById('ef-err').textContent = 'Server error'; if (btn) btn.disabled = false; }
+    };
+    window.deleteFacultyAPI = async function (id, name) {
+      if (!confirm(`Remove ${name} from faculty?`)) return;
+      try {
+        await fetch(`${API_BASE}/admin/teacher/${encodeURIComponent(id)}`, { method: 'DELETE' });
+        const idx = FACULTY.findIndex(f => f.id === id);
+        if (idx !== -1) FACULTY.splice(idx, 1);
+        document.getElementById('page-content').innerHTML = pageFaculty();
+        showToast(`${name} removed.`);
+      } catch (e) { showToast('Server error', 'error'); }
+    };
+
+    /* â”€â”€ ADMIN CHAT PAGE â”€â”€ */
+    let adminChatContacts = [], adminActiveRoom = null, adminSocket = null;
+    function pageChats() {
+      // Trigger contact loading when the page is rendered
+      setTimeout(loadAdminContacts, 50);
+
+      return `<div class="panel"><div style="display:grid;grid-template-columns:240px 1fr;height:calc(100vh - 140px);border:1px solid var(--glass-border);border-radius:18px;overflow:hidden;background:var(--glass);backdrop-filter:blur(20px)">
+        <div style="border-right:1px solid var(--glass-border);overflow-y:auto">
+          <div style="padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.06);font-size:.62rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:1px">Contacts</div>
+          <div id="admin-contacts"><div style="padding:20px;text-align:center;color:var(--muted);font-size:.78rem"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column" id="admin-chat-main">
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);opacity:.4"><div style="text-align:center"><i class="fa-solid fa-comments" style="font-size:2rem;margin-bottom:8px;display:block"></i><div style="font-size:.8rem">Select a contact to start chatting</div></div></div>
+        </div>
+      </div></div>`;
+    }
+
+    async function loadAdminContacts() {
+      const u = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+      if (!u) return;
+      const el = document.getElementById('admin-contacts');
+      if (!el) return;
+
+      try {
+        const r = await fetch(`${API_BASE}/chat/contacts/${encodeURIComponent(u.id)}/Admin`);
+        const d = await r.json();
+        if (d.ok) {
+          adminChatContacts = d.contacts;
+          el.innerHTML = d.contacts.map(c => {
+            const roomId = [u.id, c.id].sort().join('_');
+            const isActive = adminActiveRoom === roomId;
+            return `<div class="li" style="padding:10px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);${isActive ? 'background:rgba(99,102,241,.12)' : ''}" onclick="loadAdminChat('${roomId}','${c.id}','${c.name}','${c.role}')">
+              <div style="width:30px;height:30px;border-radius:50%;background:rgba(99,102,241,.12);display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#a5b4fc;flex-shrink:0"><i class="fa-solid ${c.role === 'Teacher' ? 'fa-chalkboard-user' : 'fa-user-graduate'}"></i></div>
+              <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.name}</div><div style="font-size:.63rem;color:var(--muted)">${c.role} Â· ${c.role_label || 'Staff'}</div></div>
+            </div>`;
+          }).join('');
+        } else {
+          el.innerHTML = `<div style="padding:20px;text-align:center;color:var(--muted);font-size:.78rem">No contacts found</div>`;
+        }
+      } catch (e) {
+        el.innerHTML = `<div style="padding:20px;text-align:center;color:#fb7185;font-size:.78rem">Server connection failed</div>`;
+      }
+    }
+
+    window.loadAdminChat = async function (roomId, contactId, contactName, contactRole) {
+      adminActiveRoom = roomId;
+      const u = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+      const chatMain = document.getElementById('admin-chat-main');
+      if (!chatMain) return;
+
+      // Update sidebar active state
+      document.querySelectorAll('#admin-contacts .li').forEach(el => el.style.background = '');
+      const activeLi = Array.from(document.querySelectorAll('#admin-contacts .li')).find(el => el.getAttribute('onclick').includes(roomId));
+      if (activeLi) activeLi.style.background = 'rgba(99,102,241,.12)';
+
+      chatMain.innerHTML = `
+        <div style="padding:12px 16px;border-bottom:1px solid var(--glass-border);display:flex;align-items:center;gap:10px">
+          <div style="width:32px;height:32px;border-radius:50%;background:rgba(99,102,241,.12);display:flex;align-items:center;justify-content:center;color:#a5b4fc;font-size:.8rem"><i class="fa-solid ${contactRole === 'Teacher' ? 'fa-chalkboard-user' : 'fa-user-graduate'}"></i></div>
+          <div style="flex:1"><div style="font-weight:700;font-size:.84rem">${contactName}</div><div style="font-size:.62rem;color:var(--muted)">${contactRole}</div></div>
+          <button class="btn btn-glass btn-xs" onclick="adminActiveRoom=null;document.getElementById('page-content').innerHTML=pageChats()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px" id="admin-msgs"><div style="text-align:center;color:var(--muted);font-size:.75rem"><i class="fa-solid fa-spinner fa-spin"></i> Loading history...</div></div>
+        <div style="padding:10px 12px;border-top:1px solid var(--glass-border);display:flex;gap:8px">
+          <input class="inp" id="admin-msg-inp" style="flex:1" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendAdminMsg('${roomId}','${contactId}','${contactName}','${contactRole}')">
+          <button class="btn btn-admin btn-sm" onclick="sendAdminMsg('${roomId}','${contactId}','${contactName}','${contactRole}')"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>`;
+
+      // Load history
+      try {
+        const hr = await fetch(`${API_BASE}/chat/messages/${encodeURIComponent(roomId)}`);
+        const hd = await hr.json();
+        const msgsEl = document.getElementById('admin-msgs');
+        if (msgsEl) {
+          if (hd.ok && hd.messages.length) {
+            msgsEl.innerHTML = hd.messages.map(m => `<div style="display:flex;justify-content:${m.sender_id === u.id ? 'flex-end' : 'flex-start'}"><div style="max-width:75%;background:${m.sender_id === u.id ? 'rgba(99,102,241,.25)' : 'rgba(255,255,255,.07)'};border:1px solid ${m.sender_id === u.id ? 'rgba(99,102,241,.3)' : 'rgba(255,255,255,.1)'};border-radius:12px;padding:8px 12px;font-size:.78rem;line-height:1.5">${m.text}<div style="font-size:.58rem;color:rgba(255,255,255,.3);margin-top:2px">${m.sender_name}</div></div></div>`).join('');
+            msgsEl.scrollTop = msgsEl.scrollHeight;
+          } else {
+            msgsEl.innerHTML = `<div style="text-align:center;color:var(--muted);font-size:.75rem;margin-top:20px">No message history</div>`;
+          }
+        }
+      } catch (e) {
+        const msgsEl = document.getElementById('admin-msgs');
+        if (msgsEl) msgsEl.innerHTML = `<div style="text-align:center;color:var(--muted);font-size:.75rem;margin-top:20px">History unavailable (offline)</div>`;
+      }
+
+      // Setup socket
+      if (!adminSocket && typeof io !== 'undefined') {
+        try {
+          adminSocket = io('http://localhost:3001');
+          adminSocket.on('receive_message', data => {
+            if (data.room_id !== adminActiveRoom) return;
+            const u2 = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+            const msgsEl = document.getElementById('admin-msgs');
+            if (msgsEl) {
+              const isMe = data.sender_id === u2?.id;
+              const msgHtml = `<div style="display:flex;justify-content:${isMe ? 'flex-end' : 'flex-start'}"><div style="max-width:75%;background:${isMe ? 'rgba(99,102,241,.25)' : 'rgba(255,255,255,.07)'};border:1px solid ${isMe ? 'rgba(99,102,241,.3)' : 'rgba(255,255,255,.1)'};border-radius:12px;padding:8px 12px;font-size:.78rem;line-height:1.5">${data.text}<div style="font-size:.58rem;color:rgba(255,255,255,.3);margin-top:2px">${data.sender_name}</div></div></div>`;
+              if (msgsEl.innerHTML.includes('No message history')) msgsEl.innerHTML = '';
+              msgsEl.innerHTML += msgHtml;
+              msgsEl.scrollTop = msgsEl.scrollHeight;
+            }
+          });
+        } catch (e) { console.error('Socket error:', e); }
+      }
+      if (adminSocket) adminSocket.emit('join_room', roomId);
+    };
+
+    window.sendAdminMsg = function (roomId, contactId, contactName, contactRole) {
+      const inp = document.getElementById('admin-msg-inp');
+      const text = inp?.value?.trim();
+      if (!text) return;
+      const u = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+
+      if (adminSocket && adminSocket.connected) {
+        adminSocket.emit('send_message', { room_id: roomId, sender_id: u.id, sender_name: u.name, sender_role: 'Admin', text });
+        inp.value = '';
+      } else {
+        showToast('Chat server offline â€” message not sent', 'error');
+      }
+    };
+
+    /* â”€â”€ PAGES MAP â”€â”€ */
+    const PAGES = {
+      dashboard: pageDashboard, students: pageStudents, faculty: pageFaculty,
+      timetable: pageTimetable, exams: pageExams, calendar: pageCalendar, marks: pageMarks,
+      announce: pageAnnounce, notifications: pageNotifications, events: pageEvents,
+      chats: pageChats,
+      reports: pageReports, settings: pageSettings,
+    };
+
+    /* â”€â”€ CHALK BG (login style) â”€â”€ */
+    const board = document.getElementById('chalkboard');
+    const glow = document.getElementById('mouse-glow');
+    const icons = [];
+    const iconTypes = ['fa-code', 'fa-terminal', 'fa-microchip', 'fa-book', 'fa-graduation-cap', 'fa-flask', 'fa-atom', 'fa-calculator', 'fa-database', 'fa-network-wired', 'fa-chart-line', 'fa-brain', 'fa-shield-halved', 'fa-gear', 'fa-compass', 'fa-shapes'];
+    const rows = 12, cols = 14;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const icon = document.createElement('i');
+        icon.className = `fa-solid ${iconTypes[Math.floor(Math.random() * iconTypes.length)]} chalk-icon`;
+        icon.style.left = `${(c * (100 / cols)) + (Math.random() * 5)}%`;
+        icon.style.top = `${(r * (100 / rows)) + (Math.random() * 5)}%`;
+        icon.style.fontSize = `${18 + Math.random() * 20}px`;
+        icon.style.opacity = '0.4';
+        board.appendChild(icon);
+        icons.push({ el: icon, x: 0, y: 0, vx: 0, vy: 0 });
+      }
+    }
+    let mX = window.innerWidth / 2, mY = window.innerHeight / 2;
+    document.addEventListener('mousemove', e => { mX = e.clientX; mY = e.clientY; glow.style.left = `${mX}px`; glow.style.top = `${mY}px`; });
+    function animateChalk() {
+      icons.forEach(icon => {
+        const rect = icon.el.getBoundingClientRect();
+        const iX = rect.left + rect.width / 2, iY = rect.top + rect.height / 2;
+        const dx = mX - iX, dy = mY - iY, dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 200) {
+          const angle = Math.atan2(dy, dx), force = (200 - dist) / 200;
+          icon.vx -= Math.cos(angle) * force * 5; icon.vy -= Math.sin(angle) * force * 5;
+          icon.el.style.color = 'rgba(180,180,255,.95)'; icon.el.style.opacity = '1';
+          icon.el.style.filter = 'drop-shadow(0 0 12px rgba(99,102,241,.9))';
+        } else {
+          icon.el.style.color = 'rgba(255,255,255,.35)'; icon.el.style.opacity = '0.4';
+          icon.el.style.filter = 'drop-shadow(0 0 5px rgba(255,255,255,.1))';
+        }
+        icon.vx *= 0.9; icon.vy *= 0.9; icon.x += icon.vx; icon.y += icon.vy; icon.x *= 0.95; icon.y *= 0.95;
+        icon.el.style.transform = `translate(${icon.x}px,${icon.y}px)`;
+      });
+      requestAnimationFrame(animateChalk);
+    }
+    animateChalk();
+
+    /* â”€â”€ BACKEND CONFIG â”€â”€ */
+    const API_BASE = 'http://localhost:3001/api';
+
+    /* â”€â”€ AUTH GUARD & NAME INJECTION â”€â”€ */
+    (async function () {
+      const u = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+      if (!u || u.role !== 'Admin') { window.location.href = 'index.html'; return; }
+      const initials = u.name.slice(0, 2).toUpperCase();
+      document.getElementById('sb-av').textContent = initials;
+      document.getElementById('sb-name').textContent = u.name;
+      document.getElementById('tb-name').textContent = u.name;
+
+      /* Initialize badges */
+      initBadges();
+
+      /* Fetch live students + teachers + exams + calendar + announcements from DB */
+      try {
+        const [stuResp, tchrResp, statsResp, examResp, calResp, annResp] = await Promise.all([
+          fetch(`${API_BASE}/admin/students`),
+          fetch(`${API_BASE}/admin/teachers`),
+          fetch(`${API_BASE}/admin/stats`),
+          fetch(`${API_BASE}/admin/exams`),
+          fetch(`${API_BASE}/admin/calendar`),
+          fetch(`${API_BASE}/admin/announcements`)
+        ]);
+        const [stuData, tchrData, statsData, examData, calData, annData] = await Promise.all([
+          stuResp.json(), tchrResp.json(), statsResp.json(), examResp.json(), calResp.json(), annResp.json()
+        ]);
+
+        if (stuData.ok && stuData.students.length) {
+          STUDENTS.length = 0;
+          stuData.students.forEach(s => {
+            STUDENTS.push({
+              id: s.id, name: s.name, dept: s.department,
+              year: s.year, sec: s.section || 'A',
+              att: Math.round(Number(s.attendance) || 0),
+              status: 'Active',
+              email: s.email || `${s.id.toLowerCase()}@uni.edu`
+            });
+          });
+        }
+        if (tchrData.ok && tchrData.teachers.length) {
+          FACULTY.length = 0;
+          tchrData.teachers.forEach(t => {
+            FACULTY.push({
+              id: t.id, name: t.name, dept: t.department,
+              subjects: [t.designation], office: 'â€”', hours: 'â€”',
+              rating: 4.8, leaves: 0, status: 'Active',
+              email: t.email || `${t.id.toLowerCase()}@uni.edu`
+            });
+          });
+        }
+        if (examData.ok && examData.exams) {
+          window.DB_EXAMS = examData.exams;
+        }
+        if (calData.ok && calData.events) {
+          window.DB_CAL_EVENTS = calData.events;
+        }
+        if (annData.ok && annData.announcements) {
+          window.DB_ANNOUNCEMENTS = annData.announcements;
+        }
+      } catch (e) {
+        console.warn('Backend unavailable, using sample data:', e.message);
+      }
+
+      /* â”€â”€ Wire Add Student modal to API â”€â”€ */
+      window.addStudentToAPI = async function (id, name, dept, year, sec, email) {
+        try {
+          const r = await fetch(`${API_BASE}/admin/add-student`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, name, department: dept, year, section: sec, email })
+          });
+          const d = await r.json();
+          if (d.ok) {
+            STUDENTS.push({ id, name, dept, year: Number(year), sec, att: 0, status: 'Active', email });
+            closeModal();
+            showToast('Student enrolled & saved to database!');
+          } else {
+            showToast(d.message || 'Error adding student', 'error');
+          }
+        } catch (e) {
+          showToast('Server offline â€“ student not saved permanently', 'warn');
+          closeModal();
+        }
+      };
+
+      /* â”€â”€ Wire Delete Student to API â”€â”€ */
+      window.deleteStudentAPI = async function (id, name) {
+        if (!confirm(`Delete student ${name}?`)) return;
+        try {
+          await fetch(`${API_BASE}/admin/student/${encodeURIComponent(id)}`, { method: 'DELETE' });
+          const idx = STUDENTS.findIndex(s => s.id === id);
+          if (idx !== -1) STUDENTS.splice(idx, 1);
+          document.getElementById('page-content').innerHTML = pageStudents();
+          showToast(`${name} removed from database.`);
+        } catch (e) {
+          showToast('Could not connect to server', 'error');
+        }
+      };
+
+      /* â”€â”€ Wire Add Student modal to API â”€â”€ */
+      window.addStudentToAPI = async function (id, name, dept, year, sec, email, batch = '') {
+        const errEl = document.getElementById('add-err');
+        try {
+          const r = await fetch(`${API_BASE}/admin/add-student`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, name, department: dept, year, section: sec, email, batch })
+          });
+          const d = await r.json();
+          if (d.ok) {
+            STUDENTS.push({ id, name, dept, year: Number(year), sec, att: 0, status: 'Active', email });
+            closeModal();
+            document.getElementById('page-content').innerHTML = pageStudents();
+            showToast('Student enrolled & saved to database!');
+          } else {
+            if (errEl) errEl.textContent = d.message || 'Error adding student';
+            else showToast(d.message || 'Error adding student', 'error');
+          }
+        } catch (e) {
+          if (errEl) errEl.textContent = 'Server offline â€“ student not saved permanently';
+          else showToast('Server offline', 'warn');
+        }
+      };
+
+      /* â”€â”€ Wire Delete Student to API â”€â”€ */
+      window.deleteStudentAPI = async function (id, name) {
+        if (!confirm(`Delete student ${name}?`)) return;
+        try {
+          await fetch(`${API_BASE}/admin/student/${encodeURIComponent(id)}`, { method: 'DELETE' });
+          const idx = STUDENTS.findIndex(s => s.id === id);
+          if (idx !== -1) STUDENTS.splice(idx, 1);
+          document.getElementById('page-content').innerHTML = pageStudents();
+          showToast(`${name} removed from database.`);
+        } catch (e) {
+          showToast('Could not connect to server', 'error');
+        }
+      };
+
+      /* â”€â”€ Admin Chat via Socket.IO â”€â”€ */
+      window.openChatWith = async function (contactId, contactName, contactRole) {
+        // Navigate to chat page first
+        const chatNavEl = document.querySelector('[onclick*="chats"]');
+        if (chatNavEl) nav(chatNavEl, 'chats');
+        setTimeout(async () => {
+          const u = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+          if (!u) return;
+          const roomId = [u.id, contactId].sort().join('_');
+          await loadAdminChat(roomId, contactId, contactName, contactRole);
+        }, 200);
+      };
+
+      /* Load contacts for admin chat */
+      (async function loadAdminContacts() {
+        const u = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+        if (!u) return;
+        try {
+          const r = await fetch(`${API_BASE}/chat/contacts/${encodeURIComponent(u.id)}/Admin`);
+          const d = await r.json();
+          if (d.ok) {
+            adminChatContacts = d.contacts;
+            const el = document.getElementById('admin-contacts');
+            if (el) {
+              el.innerHTML = d.contacts.map(c => {
+                const roomId = [u.id, c.id].sort().join('_');
+                return `<div class="li" style="padding:10px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04)" onclick="loadAdminChat('${roomId}','${c.id}','${c.name}','${c.role}')">
+                  <div style="width:30px;height:30px;border-radius:50%;background:rgba(99,102,241,.12);display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#a5b4fc;flex-shrink:0"><i class="fa-solid ${c.role === 'Teacher' ? 'fa-chalkboard-user' : 'fa-user-graduate'}"></i></div>
+                  <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.name}</div><div style="font-size:.63rem;color:var(--muted)">${c.role} Â· ${c.role_label}</div></div>
+                </div>`;
+              }).join('');
+            }
+          }
+        } catch (e) { /* silently fail */ }
+      })();
+
+      window.loadAdminChat = async function (roomId, contactId, contactName, contactRole) {
+        adminActiveRoom = roomId;
+        const u = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+        const chatMain = document.getElementById('admin-chat-main');
+        if (!chatMain) return;
+        chatMain.innerHTML = `
+          <div style="padding:12px 16px;border-bottom:1px solid var(--glass-border);display:flex;align-items:center;gap:10px">
+            <div style="width:32px;height:32px;border-radius:50%;background:rgba(99,102,241,.12);display:flex;align-items:center;justify-content:center;color:#a5b4fc;font-size:.8rem"><i class="fa-solid ${contactRole === 'Teacher' ? 'fa-chalkboard-user' : 'fa-user-graduate'}"></i></div>
+            <div><div style="font-weight:700;font-size:.84rem">${contactName}</div><div style="font-size:.62rem;color:var(--muted)">${contactRole} Â· ${roomId}</div></div>
+          </div>
+          <div style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px" id="admin-msgs"><div style="text-align:center;color:var(--muted);font-size:.75rem"><i class="fa-solid fa-spinner fa-spin"></i></div></div>
+          <div style="padding:10px 12px;border-top:1px solid var(--glass-border);display:flex;gap:8px">
+            <input class="inp" id="admin-msg-inp" style="flex:1" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendAdminMsg('${roomId}','${contactId}','${contactName}','${contactRole}')">
+            <button class="btn btn-admin btn-sm" onclick="sendAdminMsg('${roomId}','${contactId}','${contactName}','${contactRole}')"><i class="fa-solid fa-paper-plane"></i></button>
+          </div>`;
+        // Load history
+        try {
+          const hr = await fetch(`${API_BASE}/chat/messages/${encodeURIComponent(roomId)}`);
+          const hd = await hr.json();
+          const msgsEl = document.getElementById('admin-msgs');
+          if (msgsEl && hd.ok) {
+            msgsEl.innerHTML = hd.messages.map(m => `<div style="display:flex;justify-content:${m.sender_id === u.id ? 'flex-end' : 'flex-start'}"><div style="max-width:75%;background:${m.sender_id === u.id ? 'rgba(99,102,241,.25)' : 'rgba(255,255,255,.07)'};border:1px solid ${m.sender_id === u.id ? 'rgba(99,102,241,.3)' : 'rgba(255,255,255,.1)'};border-radius:12px;padding:8px 12px;font-size:.78rem;line-height:1.5">${m.text}<div style="font-size:.58rem;color:rgba(255,255,255,.3);margin-top:2px">${m.sender_name}</div></div></div>`).join('');
+            msgsEl.scrollTop = msgsEl.scrollHeight;
+          }
+        } catch (e) { }
+        // Setup socket
+        if (!adminSocket) {
+          adminSocket = io('http://localhost:3001');
+          adminSocket.on('receive_message', data => {
+            if (data.room_id !== adminActiveRoom) return;
+            const u2 = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+            const msgsEl = document.getElementById('admin-msgs');
+            if (msgsEl) {
+              msgsEl.innerHTML += `<div style="display:flex;justify-content:${data.sender_id === u2?.id ? 'flex-end' : 'flex-start'}"><div style="max-width:75%;background:${data.sender_id === u2?.id ? 'rgba(99,102,241,.25)' : 'rgba(255,255,255,.07)'};border:1px solid ${data.sender_id === u2?.id ? 'rgba(99,102,241,.3)' : 'rgba(255,255,255,.1)'};border-radius:12px;padding:8px 12px;font-size:.78rem">${data.text}</div></div>`;
+              msgsEl.scrollTop = msgsEl.scrollHeight;
+            }
+          });
+        }
+        adminSocket.emit('join_room', roomId);
+      };
+
+      window.sendAdminMsg = function (roomId, contactId, contactName, contactRole) {
+        const inp = document.getElementById('admin-msg-inp');
+        const text = inp?.value?.trim();
+        if (!text || !adminSocket) return;
+        const u = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+        adminSocket.emit('send_message', { room_id: roomId, sender_id: u.id, sender_name: u.name, sender_role: 'Admin', text });
+        inp.value = '';
+      };
+
+      /* â”€â”€ Live stats refresh every 30s â”€â”€ */
+      setInterval(async () => {
+        try {
+          const r = await fetch(`${API_BASE}/admin/stats`);
+          const d = await r.json();
+          if (d.ok && d.stats) {/* stats updated â€” re-render if on dashboard would cause flicker, just store */ }
+        } catch (e) { }
+      }, 30000);
+
+      /* Render dashboard now */
+      document.getElementById('page-content').innerHTML = pageDashboard();
+    })();
+
+    function doLogout() { sessionStorage.removeItem('Uni_user'); window.location.href = 'index.html'; }
+
+    /* â”€â”€ GLOBAL SEARCH â”€â”€ */
+    function globalSearch(q) {
+      q = q.toLowerCase().trim();
+      if (!q) {
+        document.querySelectorAll('.li, tbody tr').forEach(el => el.style.display = '');
+        return;
+      }
+      document.querySelectorAll('.li').forEach(el => {
+        el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+      document.querySelectorAll('tbody tr').forEach(el => {
+        el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    }
+
+    /* â”€â”€ INIT â€“ handled by async auth guard above â”€â”€ */
+
+  </script>
+</body>
+
+</html>

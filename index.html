@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uni Portal | Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:wght@700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #05050a;
+            --admin: #6366f1;
+            --admin-light: #818cf8;
+            --glass-white: rgba(255, 255, 255, 0.15);
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-deep);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Inter', sans-serif;
+            color: white;
+        }
+
+        #chalkboard {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .chalk-icon {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.35);
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.1));
+            pointer-events: none;
+            will-change: transform, color, opacity;
+            transition: color 0.3s ease, opacity 0.3s ease;
+        }
+
+        .glass-card {
+            position: relative;
+            z-index: 10;
+            width: 440px;
+            padding: 48px;
+            text-align: center;
+            border-radius: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            backdrop-filter: blur(40px) brightness(1.1);
+            -webkit-backdrop-filter: blur(40px) brightness(1.1);
+            box-shadow: 0 40px 100px rgba(0, 0, 0, .9), 0 0 60px rgba(99, 102, 241, .08);
+        }
+
+        .brand-header {
+            font-family: 'Playfair Display', serif;
+            font-size: 38px;
+            font-weight: 800;
+            letter-spacing: 6px;
+            margin-bottom: 4px;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .brand-header span {
+            color: #a5b4fc;
+        }
+
+        .brand-sub {
+            font-size: 10px;
+            color: rgba(165, 180, 252, 0.6);
+            letter-spacing: 3.5px;
+            text-transform: uppercase;
+            margin-bottom: 32px;
+            font-weight: 600;
+        }
+
+        .role-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 32px;
+        }
+
+        .role-btn {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, .7);
+            padding: 13px 0;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 13px;
+            transition: 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .role-btn:hover {
+            background: rgba(99, 102, 241, 0.12);
+            border-color: rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+        }
+
+        .role-btn.active {
+            background: linear-gradient(135deg, #6366f1, #818cf8);
+            color: #fff;
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+        }
+
+        .input-box {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(165, 180, 252, .7);
+            font-weight: 700;
+            margin-left: 4px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 13px;
+            pointer-events: none;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px 18px 16px 42px;
+            margin-top: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 13px;
+            color: white;
+            outline: none;
+            box-sizing: border-box;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input:focus {
+            border-color: rgba(99, 102, 241, 0.6);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, .25);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #6366f1, #818cf8);
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 13px;
+            color: white;
+            font-weight: 800;
+            font-size: 15px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            transition: 0.3s;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
+        }
+
+        .login-btn:hover {
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            box-shadow: 0 12px 32px rgba(99, 102, 241, 0.55);
+            transform: translateY(-2px);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.7;
+            transform: none;
+            cursor: not-allowed;
+        }
+
+        #login-err {
+            margin-top: 14px;
+            font-size: 12px;
+            color: #fc8181;
+            display: none;
+            letter-spacing: .5px;
+            padding: 10px 14px;
+            background: rgba(252, 129, 129, 0.08);
+            border: 1px solid rgba(252, 129, 129, 0.2);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="chalkboard"></div>
+
+    <div class="glass-card" id="card">
+        <div class="brand-header">Un<span>i</span></div>
+        <div class="brand-sub">Student &amp; Staff Portal Â· 2025â€“26</div>
+
+        <div class="role-container">
+            <button class="role-btn active" id="role-student" onclick="setRole('Student', this)">
+                <i class="fa-solid fa-user-graduate" style="margin-right:5px"></i>Student
+            </button>
+            <button class="role-btn" id="role-teacher" onclick="setRole('Teacher', this)">
+                <i class="fa-solid fa-chalkboard-user" style="margin-right:5px"></i>Teacher
+            </button>
+            <button class="role-btn" id="role-admin" onclick="setRole('Admin', this)">
+                <i class="fa-solid fa-shield-halved" style="margin-right:5px"></i>Admin
+            </button>
+        </div>
+
+        <div class="input-box">
+            <label id="id-label">University ID (URN)</label>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-id-card"></i>
+                <input type="text" placeholder="Enter your ID" id="mainInput">
+            </div>
+        </div>
+
+        <div class="input-box">
+            <label>Password</label>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" id="pwInput">
+            </div>
+        </div>
+
+        <button class="login-btn" id="login-btn" onclick="doLogin()">
+            <i class="fa-solid fa-right-to-bracket" style="margin-right:8px"></i>Secure Login
+        </button>
+        <div id="login-err">
+            <i class="fa-solid fa-circle-exclamation" style="margin-right:6px"></i>
+            <span id="err-msg">Please enter your ID and password to continue.</span>
+        </div>
+    </div>
+
+    <script>
+        /* â”€â”€â”€â”€â”€ CONFIG â”€â”€â”€â”€â”€ */
+        const API_BASE = 'http://localhost:3001/api';
+        const PAGE_MAP = { Student: 'student.html', Teacher: 'teacher.html', Admin: 'admin.html' };
+
+        let currentRole = 'Student';
+
+        /* â”€â”€â”€â”€â”€ CHALKBOARD BG â”€â”€â”€â”€â”€ */
+        const board = document.getElementById('chalkboard');
+        const icons = [];
+        const iconTypes = [
+            'fa-flask', 'fa-calculator', 'fa-book-open', 'fa-atom',
+            'fa-database', 'fa-code', 'fa-microchip', 'fa-brain',
+            'fa-graduation-cap', 'fa-globe', 'fa-terminal', 'fa-shield-halved',
+            'fa-gear', 'fa-network-wired', 'fa-chart-line', 'fa-shapes'
+        ];
+
+        const rows = 12, cols = 14;
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                const icon = document.createElement('i');
+                icon.className = `fa-solid ${iconTypes[Math.floor(Math.random() * iconTypes.length)]} chalk-icon`;
+                icon.style.left = `${(c * (100 / cols)) + (Math.random() * 5)}%`;
+                icon.style.top = `${(r * (100 / rows)) + (Math.random() * 5)}%`;
+                icon.style.fontSize = `${18 + Math.random() * 20}px`;
+                icon.style.opacity = '0.4';
+                board.appendChild(icon);
+                icons.push({ el: icon, x: 0, y: 0, vx: 0, vy: 0 });
+            }
+        }
+
+        let mX = window.innerWidth / 2, mY = window.innerHeight / 2;
+        document.addEventListener('mousemove', e => { mX = e.clientX; mY = e.clientY; });
+
+        function animate() {
+            icons.forEach(icon => {
+                const rect = icon.el.getBoundingClientRect();
+                const icX = rect.left + rect.width / 2;
+                const icY = rect.top + rect.height / 2;
+                const dx = mX - icX, dy = mY - icY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < 200) {
+                    const angle = Math.atan2(dy, dx);
+                    const force = (200 - dist) / 200;
+                    icon.vx -= Math.cos(angle) * force * 5;
+                    icon.vy -= Math.sin(angle) * force * 5;
+                    icon.el.style.color = 'rgba(180, 180, 255, 0.95)';
+                    icon.el.style.opacity = '1';
+                    icon.el.style.filter = 'drop-shadow(0 0 12px rgba(99, 102, 241, 0.9))';
+                } else {
+                    icon.el.style.color = 'rgba(255, 255, 255, 0.35)';
+                    icon.el.style.opacity = '0.4';
+                    icon.el.style.filter = 'drop-shadow(0 0 5px rgba(255, 255, 255, 0.1))';
+                }
+                icon.vx *= 0.9; icon.vy *= 0.9;
+                icon.x += icon.vx; icon.y += icon.vy;
+                icon.x *= 0.95; icon.y *= 0.95;
+                icon.el.style.transform = `translate(${icon.x}px, ${icon.y}px)`;
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        /* â”€â”€â”€â”€â”€ ROLE TOGGLE â”€â”€â”€â”€â”€ */
+        function setRole(role, btn) {
+            currentRole = role;
+            document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const labels = { Student: 'University ID (URN)', Teacher: 'Teacher ID', Admin: 'Admin ID' };
+            document.getElementById('id-label').innerText = labels[role];
+        }
+
+        /* â”€â”€â”€â”€â”€ LOGIN â”€â”€â”€â”€â”€ */
+        function showError(msg) {
+            const err = document.getElementById('login-err');
+            document.getElementById('err-msg').textContent = msg;
+            err.style.display = 'block';
+            setTimeout(() => err.style.display = 'none', 3500);
+        }
+
+        async function doLogin() {
+            const id = document.getElementById('mainInput').value.trim();
+            const pw = document.getElementById('pwInput').value.trim();
+            if (!id || !pw) { showError('Please enter your ID and password to continue.'); return; }
+
+            const btn = document.getElementById('login-btn');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:8px"></i>Signing in...';
+            btn.disabled = true;
+
+            try {
+                const resp = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ role: currentRole, id, password: pw })
+                });
+                const data = await resp.json();
+
+                if (!data.ok) {
+                    showError(data.message || 'Invalid credentials. Please check your ID and password.');
+                    btn.innerHTML = '<i class="fa-solid fa-right-to-bracket" style="margin-right:8px"></i>Secure Login';
+                    btn.disabled = false;
+                    return;
+                }
+
+                /* Store session with full DB profile */
+                sessionStorage.setItem('Uni_user', JSON.stringify({
+                    role: data.role,
+                    id: data.user.id,
+                    name: data.user.name,
+                    ...data.user
+                }));
+
+                setTimeout(() => { window.location.href = PAGE_MAP[data.role]; }, 900);
+
+            } catch (err) {
+                showError('Cannot connect to server. Make sure the backend is running on port 3001.');
+                btn.innerHTML = '<i class="fa-solid fa-right-to-bracket" style="margin-right:8px"></i>Secure Login';
+                btn.disabled = false;
+            }
+        }
+
+        document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+    </script>
+</body>
+
+</html>
