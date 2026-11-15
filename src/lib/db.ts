@@ -3,7 +3,10 @@ import path from 'path';
 import bcrypt from 'bcryptjs';
 import initSqlJs, { Database } from 'sql.js';
 
-const DB_PATH = process.env.DATABASE_PATH || path.join(process.cwd(), 'Uni.db');
+const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const DEFAULT_DB_PATH = isServerless ? path.join('/tmp', 'Uni.db') : path.join(process.cwd(), 'Uni.db');
+const DB_PATH = process.env.DATABASE_PATH || DEFAULT_DB_PATH;
+
 let dbInstance: Database | null = null;
 let initPromise: Promise<Database> | null = null;
 
@@ -13,8 +16,32 @@ export function saveDb(): void {
     const data = dbInstance.export();
     fs.writeFileSync(DB_PATH, Buffer.from(data));
   } catch (err) {
-    console.error('Failed to save database:', err);
+    console.warn('Could not persist database to disk:', err);
   }
+}
+
+async function loadWasmBinary(): Promise<ArrayBuffer | undefined> {
+  const candidatePaths = [
+    path.join(process.cwd(), 'public', 'sql-wasm.wasm'),
+    path.join(process.cwd(), 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm'),
+    path.join(__dirname, 'sql-wasm.wasm'),
+    path.join(__dirname, '..', '..', 'public', 'sql-wasm.wasm'),
+    '/var/task/public/sql-wasm.wasm',
+    '/var/task/node_modules/sql.js/dist/sql-wasm.wasm',
+  ];
+
+  for (const p of candidatePaths) {
+    try {
+      if (fs.existsSync(p)) {
+        const buf = fs.readFileSync(p);
+        return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer;
+      }
+    } catch {
+      // continue to next candidate
+    }
+  }
+
+  return undefined;
 }
 
 export async function getDb(): Promise<Database> {
@@ -22,7 +49,16 @@ export async function getDb(): Promise<Database> {
   if (initPromise) return initPromise;
 
   initPromise = (async () => {
-    const SQL = await initSqlJs();
+    const wasmBinary = await loadWasmBinary();
+    const SQL = await initSqlJs({
+      locateFile: () => {
+        const publicPath = path.join(process.cwd(), 'public', 'sql-wasm.wasm');
+        if (fs.existsSync(publicPath)) return publicPath;
+        return 'https://sql.js.org/dist/sql-wasm.wasm';
+      },
+      wasmBinary,
+    });
+
     if (fs.existsSync(DB_PATH)) {
       try {
         const fileBuffer = fs.readFileSync(DB_PATH);

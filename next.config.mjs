@@ -2,6 +2,12 @@
 const nextConfig = {
   reactStrictMode: false,
   serverExternalPackages: ['sql.js'],
+  outputFileTracingIncludes: {
+    '/**': [
+      './node_modules/sql.js/dist/sql-wasm.wasm',
+      './public/sql-wasm.wasm',
+    ],
+  },
   async redirects() {
     return [
       {
