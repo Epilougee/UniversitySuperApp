@@ -69,20 +69,23 @@
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      overflow: hidden
+      overflow: hidden;
+      contain: strict;
+      transform: translateZ(0);
     }
 
     #mouse-glow {
       position: fixed;
       width: 500px;
       height: 500px;
-      background: radial-gradient(circle, rgba(99, 102, 241, .1) 0%, transparent 70%);
+      top: 0;
+      left: 0;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
       border-radius: 50%;
       pointer-events: none;
       z-index: 1;
-      transform: translate(-50%, -50%);
       mix-blend-mode: screen;
-      transition: left .05s, top .05s
+      will-change: transform;
     }
 
     .chalk-icon {
