@@ -363,7 +363,7 @@
       transition: transform .2s
     }
 
-    /* â”€â”€ NOTIFICATION DROPDOWN â”€â”€ */
+    /* ── NOTIFICATION DROPDOWN ── */
     .notif-panel {
       position: fixed;
       top: 58px;
@@ -962,7 +962,7 @@
     <aside class="sidebar">
       <div class="sb-head">
         <div class="sb-logo">Un<span>i</span></div>
-        <div class="sb-uni">Teacher Portal Â· 2025â€“26</div>
+        <div class="sb-uni">Teacher Portal · 2025–26</div>
         <div class="sb-badge"><i class="fa-solid fa-chalkboard-user"></i> Faculty</div>
       </div>
       <div class="sb-profile">
@@ -1032,7 +1032,7 @@
       <div class="page" id="page-content"></div>
     </div>
 
-    <!-- â”€â”€â”€ NOTIFICATION PANEL â”€â”€â”€ -->
+    <!-- ─── NOTIFICATION PANEL ─── -->
     <div class="notif-panel" id="notif-panel" onclick="event.stopPropagation()">
       <div class="notif-hdr">
         <span class="notif-title"><i class="fa-solid fa-bell"
@@ -1086,23 +1086,23 @@
       { id: 4, title: 'Dynamic Programming', sub: 'DSA', sec: '3A', due: 'Mar 30', total: 31, submitted: 3, evaluated: 0, maxMarks: 20 },
     ];
     const ANNOUNCEMENTS_T = [
-      { id: 1, title: 'IA-3 Syllabus Announced', body: 'Unit 4 & 5 â€” Graphs and Heaps. Reference CLRS Chapter 22-24.', target: '3A & 3B', date: 'Mar 10', reads: 58 },
+      { id: 1, title: 'IA-3 Syllabus Announced', body: 'Unit 4 & 5 — Graphs and Heaps. Reference CLRS Chapter 22-24.', target: '3A & 3B', date: 'Mar 10', reads: 58 },
       { id: 2, title: 'Lab Session Rescheduled', body: 'Lab on Mar 14 shifted to Mar 16, 11AM. Same lab room.', target: '3B', date: 'Mar 9', reads: 30 },
     ];
     const LEAVES_T = [
-      { id: 1, from: 'Mar 22', to: 'Mar 22', reason: 'Academic Conference â€” NIT Pune', sub: 'Prof. S. Kulkarni', status: 'Pending' },
+      { id: 1, from: 'Mar 22', to: 'Mar 22', reason: 'Academic Conference — NIT Pune', sub: 'Prof. S. Kulkarni', status: 'Pending' },
       { id: 2, from: 'Mar 5', to: 'Mar 6', reason: 'Medical', sub: 'Prof. A. Joshi', status: 'Approved' },
     ];
     const CHATS_T = [
-      { id: 1, name: 'Aryan Deshmukh', role: 'Student Â· 3A', last: 'Sir, can I get an extension?', time: '10:14 AM', unread: 1, msgs: [{ me: false, text: "Sir, can I get an extension on the graph assignment?" }, { me: true, text: "I'll consider it. Submit by tomorrow evening." }, { me: false, text: "Thank you sir!" }] },
-      { id: 2, name: 'Pooja Singh', role: 'Student Â· 3B', last: 'Notes uploaded?', time: '9:48 AM', unread: 2, msgs: [{ me: false, text: "Sir, are the Unit 5 notes uploaded?" }, { me: true, text: "Will upload by 5 PM today." }, { me: false, text: "Ok sir, thanks!" }] },
-      { id: 3, name: 'Prof. S. Kulkarni', role: 'Faculty Â· CN', last: 'Substitution tomorrow?', time: '9:20 AM', unread: 0, msgs: [{ me: false, text: "Can you take my 11 AM class tomorrow?" }, { me: true, text: "Sure, no problem." }] },
+      { id: 1, name: 'Aryan Deshmukh', role: 'Student · 3A', last: 'Sir, can I get an extension?', time: '10:14 AM', unread: 1, msgs: [{ me: false, text: "Sir, can I get an extension on the graph assignment?" }, { me: true, text: "I'll consider it. Submit by tomorrow evening." }, { me: false, text: "Thank you sir!" }] },
+      { id: 2, name: 'Pooja Singh', role: 'Student · 3B', last: 'Notes uploaded?', time: '9:48 AM', unread: 2, msgs: [{ me: false, text: "Sir, are the Unit 5 notes uploaded?" }, { me: true, text: "Will upload by 5 PM today." }, { me: false, text: "Ok sir, thanks!" }] },
+      { id: 3, name: 'Prof. S. Kulkarni', role: 'Faculty · CN', last: 'Substitution tomorrow?', time: '9:20 AM', unread: 0, msgs: [{ me: false, text: "Can you take my 11 AM class tomorrow?" }, { me: true, text: "Sure, no problem." }] },
     ];
 
     /* UTILS */
     function showToast(msg, type = 'success') { const t = document.getElementById('toast'); const clr = type === 'error' ? '#fb7185' : type === 'warn' ? 'var(--gold)' : '#34d399'; const ic = type === 'error' ? 'fa-circle-xmark' : type === 'warn' ? 'fa-triangle-exclamation' : 'fa-circle-check'; t.innerHTML = `<i class="fa-solid ${ic}" style="color:${clr};font-size:.9rem"></i> ${msg}`; t.style.display = 'flex'; clearTimeout(t._t); t._t = setTimeout(() => t.style.display = 'none', 2800); }
 
-    /* â”€â”€ MODAL & CLOSE MODAL â”€â”€ */
+    /* ── MODAL & CLOSE MODAL ── */
     window.modal = function (html) {
       let container = document.getElementById('modal-container');
       if (!container) {
@@ -1123,7 +1123,7 @@
     function showLoader() { const l = document.getElementById('global-loader'); if (l) l.classList.remove('hidden'); }
     function hideLoader() { const l = document.getElementById('global-loader'); if (l) l.classList.add('hidden'); }
 
-    /* â”€â”€ BADGE MANAGEMENT SYSTEM FOR TEACHER â”€â”€ */
+    /* ── BADGE MANAGEMENT SYSTEM FOR TEACHER ── */
     const BADGE_STATE = {
       attendance: 2,
       assignments: 4,
@@ -1210,19 +1210,19 @@
   </div>
   <div class="g2" style="margin-bottom:14px">
     <div class="gcard">
-      <div class="sh"><div class="sh-t"><i class="fa-solid fa-calendar-day" style="margin-right:6px;color:var(--teal)"></i>Today's Schedule â€” Tue, Mar 25</div><span style="font-size:.68rem;color:var(--muted)">${done} done Â· ${classesToday - done} pending</span></div>
+      <div class="sh"><div class="sh-t"><i class="fa-solid fa-calendar-day" style="margin-right:6px;color:var(--teal)"></i>Today's Schedule — Tue, Mar 25</div><span style="font-size:.68rem;color:var(--muted)">${done} done · ${classesToday - done} pending</span></div>
       ${SCHEDULE.map(s => s.type === 'Free' ? `<div class="li" style="opacity:.4"><div style="width:50px;font-size:.68rem;color:var(--muted2);flex-shrink:0">${s.time}</div><div style="width:24px;height:24px;border-radius:7px;border:1px dashed rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--muted2)"><i class="fa-solid fa-coffee"></i></div><span style="font-size:.72rem;color:var(--muted2)">Free Slot</span></div>` :
-        `<div class="li"><div style="width:50px;font-size:.68rem;color:var(--muted2);flex-shrink:0">${s.time}</div><div style="width:24px;height:24px;border-radius:7px;background:${s.done ? 'rgba(13,148,136,.15)' : 'rgba(99,102,241,.12)'};display:flex;align-items:center;justify-content:center;font-size:.7rem;color:${s.done ? '#2dd4bf' : '#a5b4fc'}"><i class="fa-solid ${s.type === 'Lab' ? 'fa-flask' : 'fa-chalkboard'}"></i></div><div style="flex:1"><div style="font-size:.76rem;font-weight:600">${s.sub} <span style="font-size:.65rem;font-weight:400;color:var(--muted)">Â· Sec ${s.sec}</span></div><div style="font-size:.63rem;color:var(--muted)">${s.room}</div></div>${s.done ? tagHtml('Done', 'teal') : `<button class="btn btn-admin btn-xs" onclick="nav(document.querySelector('[onclick*=attendance]'),\'attendance\')">Mark Att.</button>`}</div>`).join('')}
+        `<div class="li"><div style="width:50px;font-size:.68rem;color:var(--muted2);flex-shrink:0">${s.time}</div><div style="width:24px;height:24px;border-radius:7px;background:${s.done ? 'rgba(13,148,136,.15)' : 'rgba(99,102,241,.12)'};display:flex;align-items:center;justify-content:center;font-size:.7rem;color:${s.done ? '#2dd4bf' : '#a5b4fc'}"><i class="fa-solid ${s.type === 'Lab' ? 'fa-flask' : 'fa-chalkboard'}"></i></div><div style="flex:1"><div style="font-size:.76rem;font-weight:600">${s.sub} <span style="font-size:.65rem;font-weight:400;color:var(--muted)">· Sec ${s.sec}</span></div><div style="font-size:.63rem;color:var(--muted)">${s.room}</div></div>${s.done ? tagHtml('Done', 'teal') : `<button class="btn btn-admin btn-xs" onclick="nav(document.querySelector('[onclick*=attendance]'),\'attendance\')">Mark Att.</button>`}</div>`).join('')}
     </div>
     <div style="display:flex;flex-direction:column;gap:12px">
       <div class="gcard">
         <div class="sh"><div class="sh-t"><i class="fa-solid fa-list-check" style="margin-right:6px;color:var(--rose)"></i>Pending Tasks</div></div>
-        ${ASSIGNMENTS.filter(a => a.evaluated < a.submitted).map(a => `<div class="li"><div style="width:30px;height:30px;border-radius:8px;background:rgba(232,160,32,.1);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:.8rem;flex-shrink:0"><i class="fa-solid fa-pen-ruler"></i></div><div style="flex:1"><div style="font-size:.76rem;font-weight:600">${a.title}</div><div style="font-size:.63rem;color:var(--muted)">${a.submitted - a.evaluated} submissions to evaluate Â· ${a.sub} ${a.sec}</div></div><button class="btn btn-teal btn-xs" onclick="nav(document.querySelector('[onclick*=assignments]'),\'assignments\')">Evaluate</button></div>`).join('')}
+        ${ASSIGNMENTS.filter(a => a.evaluated < a.submitted).map(a => `<div class="li"><div style="width:30px;height:30px;border-radius:8px;background:rgba(232,160,32,.1);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:.8rem;flex-shrink:0"><i class="fa-solid fa-pen-ruler"></i></div><div style="flex:1"><div style="font-size:.76rem;font-weight:600">${a.title}</div><div style="font-size:.63rem;color:var(--muted)">${a.submitted - a.evaluated} submissions to evaluate · ${a.sub} ${a.sec}</div></div><button class="btn btn-teal btn-xs" onclick="nav(document.querySelector('[onclick*=assignments]'),\'assignments\')">Evaluate</button></div>`).join('')}
         ${defaulters > 0 ? `<div class="li"><div style="width:30px;height:30px;border-radius:8px;background:rgba(225,29,72,.1);display:flex;align-items:center;justify-content:center;color:#fb7185;font-size:.8rem;flex-shrink:0"><i class="fa-solid fa-triangle-exclamation"></i></div><div style="flex:1"><div style="font-size:.76rem;font-weight:600">${defaulters} Attendance Defaulters</div><div style="font-size:.63rem;color:var(--muted)">Students below 75% threshold</div></div></div>` : ''}
       </div>
       <div class="gcard">
         <div class="sh"><div class="sh-t"><i class="fa-solid fa-bell" style="margin-right:6px;color:var(--admin)"></i>Recent Notifications</div></div>
-        ${[{ txt: 'IA-3 schedule released â€” May 11', ic: 'fa-calendar', c: '#a5b4fc' }, { txt: 'Submit marks by April 5th', ic: 'fa-clock', c: 'var(--gold)' }, { txt: 'Faculty meeting Friday 4 PM', ic: 'fa-users', c: '#2dd4bf' }].map(n => `<div class="li"><div style="width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;color:${n.c};font-size:.75rem"><i class="fa-solid ${n.ic}"></i></div><div style="font-size:.76rem">${n.txt}</div></div>`).join('')}
+        ${[{ txt: 'IA-3 schedule released — May 11', ic: 'fa-calendar', c: '#a5b4fc' }, { txt: 'Submit marks by April 5th', ic: 'fa-clock', c: 'var(--gold)' }, { txt: 'Faculty meeting Friday 4 PM', ic: 'fa-users', c: '#2dd4bf' }].map(n => `<div class="li"><div style="width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;color:${n.c};font-size:.75rem"><i class="fa-solid ${n.ic}"></i></div><div style="font-size:.76rem">${n.txt}</div></div>`).join('')}
       </div>
     </div>
   </div>
@@ -1270,10 +1270,10 @@
     </div>
     <div>
       <div class="gcard" style="margin-bottom:12px">
-        <div class="sh"><div class="sh-t"><i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;color:#fb7185"></i>Defaulters â€” Below 75%</div></div>
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;color:#fb7185"></i>Defaulters — Below 75%</div></div>
         ${defaulters.map(s => `<div class="li">
           <div style="width:30px;height:30px;border-radius:8px;background:rgba(225,29,72,.1);display:flex;align-items:center;justify-content:center;color:#fb7185;font-size:.78rem;flex-shrink:0"><i class="fa-solid fa-triangle-exclamation"></i></div>
-          <div style="flex:1"><div style="font-size:.78rem;font-weight:600">${s.name}</div><div style="font-size:.63rem;color:var(--muted)">${s.id} Â· Sec ${s.sec}</div></div>
+          <div style="flex:1"><div style="font-size:.78rem;font-weight:600">${s.name}</div><div style="font-size:.63rem;color:var(--muted)">${s.id} · Sec ${s.sec}</div></div>
           <span style="font-weight:700;color:#fb7185">${s.att}%</span>
         </div>`).join('')}
       </div>
@@ -1284,7 +1284,7 @@
             <div style="font-size:.58rem;color:var(--muted2)">${h.date.split(' ')[0]}</div>
             <div style="font-size:.78rem;font-weight:700;color:#a5b4fc">${h.date.split(' ')[1]}</div>
           </div>
-          <div style="flex:1"><div style="font-size:.76rem;font-weight:600">${h.sub} Â· Sec ${h.sec}</div><div style="font-size:.64rem;color:var(--muted)">${h.present}/${h.total} present</div></div>
+          <div style="flex:1"><div style="font-size:.76rem;font-weight:600">${h.sub} · Sec ${h.sec}</div><div style="font-size:.64rem;color:var(--muted)">${h.present}/${h.total} present</div></div>
           <button class="btn btn-glass btn-xs" onclick="showToast('Edit attendance for ${h.date}')"><i class="fa-solid fa-pen"></i></button>
         </div>`).join('')}
       </div>
@@ -1301,7 +1301,7 @@
     <div class="stat"><div class="stat-ico" style="background:rgba(99,102,241,.15);color:#a5b4fc"><i class="fa-solid fa-users"></i></div><div><div class="stat-n" style="color:#a5b4fc">${MY_STUDENTS.length}</div><div class="stat-l">Total Students</div></div></div>
     <div class="stat"><div class="stat-ico" style="background:rgba(13,148,136,.15);color:#2dd4bf"><i class="fa-solid fa-chart-bar"></i></div><div><div class="stat-n" style="color:#2dd4bf">${Math.round(MY_STUDENTS.reduce((a, s) => a + s.att, 0) / MY_STUDENTS.length)}%</div><div class="stat-l">Avg Attendance</div></div></div>
     <div class="stat"><div class="stat-ico" style="background:rgba(225,29,72,.15);color:#fb7185"><i class="fa-solid fa-triangle-exclamation"></i></div><div><div class="stat-n" style="color:#fb7185">${MY_STUDENTS.filter(s => s.att < 75).length}</div><div class="stat-l">Defaulters</div></div></div>
-    <div class="stat"><div class="stat-ico" style="background:rgba(16,185,129,.15);color:#34d399"><i class="fa-solid fa-star"></i></div><div><div class="stat-n" style="color:#34d399">${MY_STUDENTS.filter(s => s.att >= 85).length}</div><div class="stat-l">Excellent â‰¥85%</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(16,185,129,.15);color:#34d399"><i class="fa-solid fa-star"></i></div><div><div class="stat-n" style="color:#34d399">${MY_STUDENTS.filter(s => s.att >= 85).length}</div><div class="stat-l">Excellent ≥85%</div></div></div>
   </div>
   <div class="g2" style="margin-bottom:14px">
     <div class="gcard">
@@ -1326,8 +1326,8 @@
       <div style="margin-bottom:10px">
         <div class="flbl">Select Class</div>
         <select class="inp" id="marks-class-sel" style="width:100%" onchange="loadClassStudents()">
-          <option value="">â€” Choose a class â€”</option>
-          ${SUBJECTS.map((s, i) => `<option value="${i}">${s.code} â€” ${s.name}</option>`).join('')}
+          <option value="">— Choose a class —</option>
+          ${SUBJECTS.map((s, i) => `<option value="${i}">${s.code} — ${s.name}</option>`).join('')}
         </select>
       </div>
       <div style="margin-bottom:10px">
@@ -1346,7 +1346,7 @@
     <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
       <div style="position:relative;flex:1;min-width:160px"><i class="fa-solid fa-magnifying-glass" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted2);font-size:.72rem;pointer-events:none"></i><input class="inp" placeholder="Search student..." style="padding-left:30px" id="stu-q" oninput="filterMyStudents()"></div>
       <select class="inp" style="width:110px" id="stu-sec" onchange="filterMyStudents()"><option value="all">All Sections</option><option value="3A">Sec 3A</option><option value="3B">Sec 3B</option></select>
-      <select class="inp" style="width:140px" id="stu-filter" onchange="filterMyStudents()"><option value="all">All Students</option><option value="def">Defaulters (&lt;75%)</option><option value="exc">Excellent (â‰¥85%)</option></select>
+      <select class="inp" style="width:140px" id="stu-filter" onchange="filterMyStudents()"><option value="all">All Students</option><option value="def">Defaulters (&lt;75%)</option><option value="exc">Excellent (≥85%)</option></select>
     </div>
     <div style="overflow-x:auto">
       <table class="tbl"><thead><tr><th>Student</th><th>Section</th><th>Attendance</th><th>IA-1</th><th>IA-2</th><th>CGPA</th><th>Status</th><th>Actions</th></tr></thead>
@@ -1396,13 +1396,13 @@
           if (!id && idEl) idEl.style.borderColor = '#fb7185';
           if (!name && nameEl) nameEl.style.borderColor = '#fb7185';
           if (!email && emailEl) emailEl.style.borderColor = '#fb7185';
-          showToast('âŒ ID, Name, and Email required', 'error');
+          showToast('❌ ID, Name, and Email required', 'error');
           return;
         }
 
         if (!email.includes('@')) {
           emailEl.style.borderColor = '#fb7185';
-          showToast('âŒ Invalid email address', 'error');
+          showToast('❌ Invalid email address', 'error');
           return;
         }
 
@@ -1417,13 +1417,13 @@
         const d = await r.json();
         if (d.ok) {
           MY_STUDENTS.push({ id, name, sec: section, att: 0, marks: { ia1: 0, ia2: 0, ia3: 0 }, cgpa: 0, status: 'Active', email, phone });
-          showToast(`âœ… ${name} added successfully!`);
+          showToast(`✅ ${name} added successfully!`);
           clearStudentForm();
           document.getElementById('page-content').innerHTML = pageStudents();
         } else {
-          showToast('âŒ ' + (d.message || 'Error adding student'), 'error');
+          showToast('❌ ' + (d.message || 'Error adding student'), 'error');
         }
-      } catch (e) { showToast('âŒ Server error: ' + e.message, 'error'); } finally {
+      } catch (e) { showToast('❌ Server error: ' + e.message, 'error'); } finally {
         const btn = document.querySelector('[onclick*="addNewStudent"]');
         if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-user-plus" style="margin-right:4px"></i>Add Student'; }
       }
@@ -1434,7 +1434,7 @@
       if (!classIdx) { showToast('Please select a class', 'error'); return; }
       const subj = SUBJECTS[classIdx];
       const type = document.getElementById('marks-type-sel').value;
-      const html = `<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-pen" style="color:var(--admin);margin-right:8px"></i>Enter Marks â€” ${subj.name} / ${type}</div><table class="tbl" style="margin-bottom:12px"><thead><tr><th>Student</th><th>Marks (max 20)</th></tr></thead><tbody>${MY_STUDENTS.map(s => `<tr><td style="font-weight:600;font-size:.8rem">${s.name}</td><td><input class="inp" style="width:80px;padding:5px 8px" type="number" min="0" max="20" placeholder="â€”" data-sid="${s.id}"></td></tr>`).join('')}</tbody></table><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Cancel</button><button class="btn btn-teal" onclick="window.saveMarks('${classIdx}','${type}')">Save Marks</button></div></div></div>`;
+      const html = `<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-pen" style="color:var(--admin);margin-right:8px"></i>Enter Marks — ${subj.name} / ${type}</div><table class="tbl" style="margin-bottom:12px"><thead><tr><th>Student</th><th>Marks (max 20)</th></tr></thead><tbody>${MY_STUDENTS.map(s => `<tr><td style="font-weight:600;font-size:.8rem">${s.name}</td><td><input class="inp" style="width:80px;padding:5px 8px" type="number" min="0" max="20" placeholder="—" data-sid="${s.id}"></td></tr>`).join('')}</tbody></table><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Cancel</button><button class="btn btn-teal" onclick="window.saveMarks('${classIdx}','${type}')">Save Marks</button></div></div></div>`;
       modal(html);
     };
 
@@ -1447,7 +1447,7 @@
           const val = parseInt(inp.value) || 0;
           if (val > 0) entries.push({ student_id: inp.dataset.sid, obtained: val });
         });
-        if (entries.length === 0) { showToast('âš ï¸ Enter at least one mark', 'error'); return; }
+        if (entries.length === 0) { showToast('⚠️ Enter at least one mark', 'error'); return; }
 
         const btn = document.querySelector('.modal .btn-teal');
         if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:4px"></i>Saving...'; }
@@ -1467,18 +1467,18 @@
         const d = await r.json();
         if (d.ok) {
           closeModal();
-          showToast('âœ… Marks saved & students notified!');
+          showToast('✅ Marks saved & students notified!');
         } else {
-          showToast('âŒ ' + (d.message || 'Error saving marks'), 'error');
+          showToast('❌ ' + (d.message || 'Error saving marks'), 'error');
         }
-      } catch (e) { showToast('âŒ Server error: ' + e.message, 'error'); } finally {
+      } catch (e) { showToast('❌ Server error: ' + e.message, 'error'); } finally {
         const btn = document.querySelector('.modal .btn-teal');
         if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-check" style="margin-right:4px"></i>Save Marks'; }
       }
     };
 
-    window.showStudentProfile = function (id) { const s = MY_STUDENTS.find(x => x.id === id); if (!s) return; modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-user-graduate" style="color:var(--admin);margin-right:8px"></i>${s.name}</div><div style="display:flex;gap:16px;margin-bottom:14px"><div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--admin),#818cf8);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800">${s.name.split(' ').map(x => x[0]).join('')}</div><div><div style="font-weight:700">${s.name}</div><div style="font-size:.72rem;color:var(--muted)">${s.id} Â· Section ${s.sec}</div></div></div><div class="g2" style="margin-bottom:12px"><div class="gcard"><div style="font-size:.65rem;color:var(--muted);margin-bottom:4px">Attendance</div><div style="font-size:1.5rem;font-weight:800;color:${s.att >= 75 ? '#2dd4bf' : '#fb7185'}">${s.att}%</div></div><div class="gcard"><div style="font-size:.65rem;color:var(--muted);margin-bottom:4px">IA Avg</div><div style="font-size:1.5rem;font-weight:800;color:#a5b4fc">${((s.marks.ia1 + s.marks.ia2) / 2).toFixed(1)}/20</div></div><div class="gcard"><div style="font-size:.65rem;color:var(--muted);margin-bottom:4px">CGPA</div><div style="font-size:1.5rem;font-weight:800;color:#2dd4bf">${(s.cgpa || 7.5).toFixed(1)}</div></div></div><div style="margin-bottom:12px"><div class="sh-t" style="font-size:.78rem;margin-bottom:8px">Contact Info</div><div style="display:flex;flex-direction:column;gap:6px;font-size:.76rem;color:var(--muted)"><div><i class="fa-solid fa-envelope" style="margin-right:6px;color:#a5b4fc"></i>${s.email || 'â€”'}</div><div><i class="fa-solid fa-phone" style="margin-right:6px;color:#2dd4bf"></i>${s.phone || 'â€”'}</div></div></div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Close</button><button class="btn btn-teal" onclick="closeModal();showToast('Message sent to ${s.name}')"><i class="fa-solid fa-comment" style="margin-right:4px"></i>Message</button></div></div></div>`); };
-    window.showStudentMarks = function (id) { const s = MY_STUDENTS.find(x => x.id === id); if (!s) return; const avgIA = ((s.marks.ia1 || 0) + (s.marks.ia2 || 0)) / 2; modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-chart-bar" style="color:var(--admin);margin-right:8px"></i>Marks â€” ${s.name}</div><div class="g2" style="margin-bottom:12px"><div class="gcard"><div style="font-size:.65rem;color:var(--muted);margin-bottom:4px">IA-1</div><div style="font-size:1.4rem;font-weight:800;color:#a5b4fc">${s.marks.ia1 || 'â€”'}/20</div></div><div class="gcard"><div style="font-size:.65rem;color:var(--muted);margin-bottom:4px">IA-2</div><div style="font-size:1.4rem;font-weight:800;color:#2dd4bf">${s.marks.ia2 || 'â€”'}/20</div></div><div class="gcard"><div style="font-size:.65rem;color:var(--muted);margin-bottom:4px">Average</div><div style="font-size:1.4rem;font-weight:800;color:var(--gold)">${isNaN(avgIA) ? 'â€”' : avgIA.toFixed(1)}/20</div></div></div><div style="margin-bottom:12px"><div class="sh-t" style="font-size:.78rem;margin-bottom:8px;display:flex;justify-content:space-between"><span>Update Marks</span></div><div class="g2"><div class="frow"><div class="flbl">IA-1 (max 20)</div><input class="inp" type="number" min="0" max="20" id="mark-ia1" value="${s.marks.ia1 || 0}"></div><div class="frow"><div class="flbl">IA-2 (max 20)</div><input class="inp" type="number" min="0" max="20" id="mark-ia2" value="${s.marks.ia2 || 0}"></div></div></div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Cancel</button><button class="btn btn-teal" onclick="updateStudentMarks('${s.id}');closeModal();showToast('Marks updated!')">Save</button></div></div></div>`); };
+    window.showStudentProfile = function (id) { const s = MY_STUDENTS.find(x => x.id === id); if (!s) return; modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-user-graduate" style="color:var(--admin);margin-right:8px"></i>${s.name}</div><div style="display:flex;gap:16px;margin-bottom:14px"><div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--admin),#818cf8);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800">${s.name.split(' ').map(x => x[0]).join('')}</div><div><div style="font-weight:700">${s.name}</div><div style="font-size:.72rem;color:var(--muted)">${s.id} · Section ${s.sec}</div></div></div><div class="g2" style="margin-bottom:12px"><div class="gcard"><div style="font-size:.65rem;color:var(--muted);margin-bottom:4px">Attendance</div><div style="font-size:1.5rem;font-weight:800;color:${s.att >= 75 ? '#2dd4bf' : '#fb7185'}">${s.att}%</div></div><div class="gcard"><div style="font-size:.65rem;color:var(--muted);margin-bottom:4px">IA Avg</div><div style="font-size:1.5rem;font-weight:800;color:#a5b4fc">${((s.marks.ia1 + s.marks.ia2) / 2).toFixed(1)}/20</div></div><div class="gcard"><div style="font-size:.65rem;color:var(--muted);margin-bottom:4px">CGPA</div><div style="font-size:1.5rem;font-weight:800;color:#2dd4bf">${(s.cgpa || 7.5).toFixed(1)}</div></div></div><div style="margin-bottom:12px"><div class="sh-t" style="font-size:.78rem;margin-bottom:8px">Contact Info</div><div style="display:flex;flex-direction:column;gap:6px;font-size:.76rem;color:var(--muted)"><div><i class="fa-solid fa-envelope" style="margin-right:6px;color:#a5b4fc"></i>${s.email || '—'}</div><div><i class="fa-solid fa-phone" style="margin-right:6px;color:#2dd4bf"></i>${s.phone || '—'}</div></div></div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Close</button><button class="btn btn-teal" onclick="closeModal();showToast('Message sent to ${s.name}')"><i class="fa-solid fa-comment" style="margin-right:4px"></i>Message</button></div></div></div>`); };
+    window.showStudentMarks = function (id) { const s = MY_STUDENTS.find(x => x.id === id); if (!s) return; const avgIA = ((s.marks.ia1 || 0) + (s.marks.ia2 || 0)) / 2; modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-chart-bar" style="color:var(--admin);margin-right:8px"></i>Marks — ${s.name}</div><div class="g2" style="margin-bottom:12px"><div class="gcard"><div style="font-size:.65rem;color:var(--muted);margin-bottom:4px">IA-1</div><div style="font-size:1.4rem;font-weight:800;color:#a5b4fc">${s.marks.ia1 || '—'}/20</div></div><div class="gcard"><div style="font-size:.65rem;color:var(--muted);margin-bottom:4px">IA-2</div><div style="font-size:1.4rem;font-weight:800;color:#2dd4bf">${s.marks.ia2 || '—'}/20</div></div><div class="gcard"><div style="font-size:.65rem;color:var(--muted);margin-bottom:4px">Average</div><div style="font-size:1.4rem;font-weight:800;color:var(--gold)">${isNaN(avgIA) ? '—' : avgIA.toFixed(1)}/20</div></div></div><div style="margin-bottom:12px"><div class="sh-t" style="font-size:.78rem;margin-bottom:8px;display:flex;justify-content:space-between"><span>Update Marks</span></div><div class="g2"><div class="frow"><div class="flbl">IA-1 (max 20)</div><input class="inp" type="number" min="0" max="20" id="mark-ia1" value="${s.marks.ia1 || 0}"></div><div class="frow"><div class="flbl">IA-2 (max 20)</div><input class="inp" type="number" min="0" max="20" id="mark-ia2" value="${s.marks.ia2 || 0}"></div></div></div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Cancel</button><button class="btn btn-teal" onclick="updateStudentMarks('${s.id}');closeModal();showToast('Marks updated!')">Save</button></div></div></div>`); };
     window.updateStudentMarks = function (id) { const s = MY_STUDENTS.find(x => x.id === id); if (!s) return; s.marks.ia1 = parseInt(document.getElementById('mark-ia1').value) || 0; s.marks.ia2 = parseInt(document.getElementById('mark-ia2').value) || 0; const total = s.marks.ia1 + s.marks.ia2; s.cgpa = total >= 36 ? 9.5 : total >= 32 ? 8.5 : total >= 28 ? 7.5 : total >= 24 ? 6.5 : 5.5; };
 
     /* TIMETABLE */
@@ -1489,7 +1489,7 @@
       return `<div class="panel">
   <div class="gcard" style="margin-bottom:14px">
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <div class="sh-t" style="flex:1">Personal Timetable â€” Prof. R. Sharma</div>
+      <div class="sh-t" style="flex:1">Personal Timetable — Prof. R. Sharma</div>
       <button class="btn btn-glass btn-sm" onclick="showToast('Timetable exported as PDF')"><i class="fa-solid fa-file-pdf" style="margin-right:4px"></i>Export</button>
       <button class="btn btn-glass btn-sm" onclick="showChangReq()"><i class="fa-solid fa-rotate" style="margin-right:4px"></i>Request Change</button>
     </div>
@@ -1502,33 +1502,33 @@
   </div>
   <div class="gcard">
     <div class="sh"><div class="sh-t">Upcoming Classes (Next 3 Days)</div></div>
-    ${SCHEDULE.filter(s => s.sub).map(s => `<div class="li"><div style="width:32px;height:32px;border-radius:8px;background:rgba(99,102,241,.1);display:flex;align-items:center;justify-content:center;color:#a5b4fc;font-size:.8rem;flex-shrink:0"><i class="fa-solid ${s.type === 'Lab' ? 'fa-flask' : 'fa-chalkboard'}"></i></div><div style="flex:1"><div style="font-size:.78rem;font-weight:600">${s.sub} <span style="font-size:.65rem;font-weight:400;color:var(--muted)">Â· Sec ${s.sec}</span></div><div style="font-size:.63rem;color:var(--muted)">${s.time} Â· ${s.room}</div></div>${tagHtml(s.type, s.type === 'Lab' ? 'violet' : 'admin')}</div>`).join('')}
+    ${SCHEDULE.filter(s => s.sub).map(s => `<div class="li"><div style="width:32px;height:32px;border-radius:8px;background:rgba(99,102,241,.1);display:flex;align-items:center;justify-content:center;color:#a5b4fc;font-size:.8rem;flex-shrink:0"><i class="fa-solid ${s.type === 'Lab' ? 'fa-flask' : 'fa-chalkboard'}"></i></div><div style="flex:1"><div style="font-size:.78rem;font-weight:600">${s.sub} <span style="font-size:.65rem;font-weight:400;color:var(--muted)">· Sec ${s.sec}</span></div><div style="font-size:.63rem;color:var(--muted)">${s.time} · ${s.room}</div></div>${tagHtml(s.type, s.type === 'Lab' ? 'violet' : 'admin')}</div>`).join('')}
   </div>
 </div>`;
     }
-    window.showChangReq = function () { modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-rotate" style="color:var(--admin);margin-right:8px"></i>Request Timetable Change</div><div class="frow"><div class="flbl">Current Slot</div><input class="inp" placeholder="e.g. Mon 9AM â€” DSA 3A"></div><div class="frow"><div class="flbl">Reason</div><textarea class="inp" placeholder="Reason for change..." style="min-height:60px;resize:none"></textarea></div><div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Cancel</button><button class="btn btn-admin" onclick="closeModal();showToast('Timetable change request submitted!')">Submit Request</button></div></div></div>`); };
+    window.showChangReq = function () { modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-rotate" style="color:var(--admin);margin-right:8px"></i>Request Timetable Change</div><div class="frow"><div class="flbl">Current Slot</div><input class="inp" placeholder="e.g. Mon 9AM — DSA 3A"></div><div class="frow"><div class="flbl">Reason</div><textarea class="inp" placeholder="Reason for change..." style="min-height:60px;resize:none"></textarea></div><div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Cancel</button><button class="btn btn-admin" onclick="closeModal();showToast('Timetable change request submitted!')">Submit Request</button></div></div></div>`); };
 
     /* MATERIALS */
     const MATERIALS = [
-      { title: 'Unit 4 â€” Graph Algorithms', sub: 'DSA', type: 'PDF', size: '5.1 MB', date: 'Mar 8', downloads: 42, icon: 'fa-file-pdf', c: '#fb7185' },
-      { title: 'Unit 3 â€” Heaps & Priority Queues', sub: 'DSA', type: 'PDF', size: '3.8 MB', date: 'Mar 2', downloads: 58, icon: 'fa-file-pdf', c: '#fb7185' },
+      { title: 'Unit 4 — Graph Algorithms', sub: 'DSA', type: 'PDF', size: '5.1 MB', date: 'Mar 8', downloads: 42, icon: 'fa-file-pdf', c: '#fb7185' },
+      { title: 'Unit 3 — Heaps & Priority Queues', sub: 'DSA', type: 'PDF', size: '3.8 MB', date: 'Mar 2', downloads: 58, icon: 'fa-file-pdf', c: '#fb7185' },
       { title: 'Greedy Algorithms Lecture Recording', sub: 'Algo', type: 'Video', size: '420 MB', date: 'Feb 28', downloads: 34, icon: 'fa-file-video', c: '#a5b4fc' },
-      { title: 'Practice Problems â€” Sorting', sub: 'DSA', type: 'PDF', size: '1.2 MB', date: 'Feb 25', downloads: 71, icon: 'fa-file-pdf', c: '#fb7185' },
+      { title: 'Practice Problems — Sorting', sub: 'DSA', type: 'PDF', size: '1.2 MB', date: 'Feb 25', downloads: 71, icon: 'fa-file-pdf', c: '#fb7185' },
     ];
     function pageMaterials() {
       return `<div class="panel">
   <div class="gcard" style="margin-bottom:14px">
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
           <div class="sh-t" style="flex:1"><i class="fa-solid fa-folder-open" style="margin-right:6px;color:var(--teal)"></i>Upload Material</div>
-      <select class="inp" style="width:160px">${SUBJECTS.map(s => `<option>${s.code} â€” ${s.name.slice(0, 18)}</option>`).join('')}</select>
+      <select class="inp" style="width:160px">${SUBJECTS.map(s => `<option>${s.code} — ${s.name.slice(0, 18)}</option>`).join('')}</select>
       <button class="btn btn-teal btn-sm" onclick="showUploadMat()"><i class="fa-solid fa-upload" style="margin-right:4px"></i>Upload File</button>
       <button class="btn btn-glass btn-sm" onclick="showUploadMat()"><i class="fa-solid fa-link" style="margin-right:4px"></i>Add Link</button>
     </div>
   </div>
-  <div class="g2">${MATERIALS.map(m => `<div class="gcard"><div style="display:flex;gap:12px;align-items:center;margin-bottom:10px"><div style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:${m.c}"><i class="fa-solid ${m.icon}"></i></div><div style="flex:1"><div style="font-weight:700;font-size:.84rem">${m.title}</div><div style="font-size:.65rem;color:var(--muted);margin-top:2px">${m.sub} Â· ${m.type} Â· ${m.size}</div></div></div><div style="display:flex;justify-content:space-between;align-items:center;font-size:.68rem;color:var(--muted)"><span><i class="fa-solid fa-download" style="margin-right:3px"></i>${m.downloads} downloads Â· ${m.date}</span><div style="display:flex;gap:4px"><button class="btn btn-glass btn-xs" onclick="showToast('Link copied!')"><i class="fa-solid fa-share"></i></button><button class="btn btn-rose btn-xs" onclick="showToast('Material removed')"><i class="fa-solid fa-trash"></i></button></div></span></div></div>`).join('')}</div>
+  <div class="g2">${MATERIALS.map(m => `<div class="gcard"><div style="display:flex;gap:12px;align-items:center;margin-bottom:10px"><div style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:${m.c}"><i class="fa-solid ${m.icon}"></i></div><div style="flex:1"><div style="font-weight:700;font-size:.84rem">${m.title}</div><div style="font-size:.65rem;color:var(--muted);margin-top:2px">${m.sub} · ${m.type} · ${m.size}</div></div></div><div style="display:flex;justify-content:space-between;align-items:center;font-size:.68rem;color:var(--muted)"><span><i class="fa-solid fa-download" style="margin-right:3px"></i>${m.downloads} downloads · ${m.date}</span><div style="display:flex;gap:4px"><button class="btn btn-glass btn-xs" onclick="showToast('Link copied!')"><i class="fa-solid fa-share"></i></button><button class="btn btn-rose btn-xs" onclick="showToast('Material removed')"><i class="fa-solid fa-trash"></i></button></div></span></div></div>`).join('')}</div>
 </div>`;
     }
-    window.showUploadMat = function () { modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-upload" style="color:var(--admin);margin-right:8px"></i>Upload Study Material</div><div class="frow"><div class="flbl">Title</div><input class="inp" placeholder="e.g. Unit 5 â€” Dynamic Programming"></div><div class="g2"><div class="frow"><div class="flbl">Subject</div><select class="inp">${SUBJECTS.map(s => `<option>${s.code}</option>`).join('')}</select></div><div class="frow"><div class="flbl">Type</div><select class="inp"><option>PDF</option><option>Video</option><option>Link</option><option>Image</option></select></div></div><div class="frow"><div class="flbl">File / URL</div><input class="inp" placeholder="Drag & drop or paste link..."></div><div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Cancel</button><button class="btn btn-teal" onclick="closeModal();showToast('Material uploaded & shared!')"><i class="fa-solid fa-upload" style="margin-right:4px"></i>Upload</button></div></div></div>`); };
+    window.showUploadMat = function () { modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-upload" style="color:var(--admin);margin-right:8px"></i>Upload Study Material</div><div class="frow"><div class="flbl">Title</div><input class="inp" placeholder="e.g. Unit 5 — Dynamic Programming"></div><div class="g2"><div class="frow"><div class="flbl">Subject</div><select class="inp">${SUBJECTS.map(s => `<option>${s.code}</option>`).join('')}</select></div><div class="frow"><div class="flbl">Type</div><select class="inp"><option>PDF</option><option>Video</option><option>Link</option><option>Image</option></select></div></div><div class="frow"><div class="flbl">File / URL</div><input class="inp" placeholder="Drag & drop or paste link..."></div><div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Cancel</button><button class="btn btn-teal" onclick="closeModal();showToast('Material uploaded & shared!')"><i class="fa-solid fa-upload" style="margin-right:4px"></i>Upload</button></div></div></div>`); };
 
     /* ASSIGNMENTS */
     function pageAssignments() {
@@ -1539,11 +1539,11 @@
       <button class="btn btn-teal btn-sm" onclick="showCreateAssign()"><i class="fa-solid fa-plus" style="margin-right:4px"></i>New Assignment</button>
     </div>
   </div>
-  <div class="g2">${ASSIGNMENTS.map(a => `<div class="gcard"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div><div style="font-weight:700;font-size:.9rem">${a.title}</div><div style="font-size:.66rem;color:var(--muted);margin-top:2px">${a.sub} Â· Sec ${a.sec} Â· Due ${a.due}</div></div>${tagHtml(a.evaluated === a.submitted ? 'Evaluated' : a.submitted > 0 ? 'In Review' : 'Waiting', a.evaluated === a.submitted && a.submitted > 0 ? 'teal' : 'gold')}</div><div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:.68rem;margin-bottom:4px"><span style="color:var(--muted)">Submissions</span><span style="font-weight:700;color:${a.submitted / a.total < 0.5 ? '#fb7185' : '#2dd4bf'}">${a.submitted}/${a.total}</span></div><div class="pb"><div class="pf" style="width:${Math.round(a.submitted / a.total * 100)}%;background:${a.submitted / a.total < 0.5 ? 'var(--rose)' : '#0d9488'}"></div></div></div><div style="display:flex;gap:6px"><button class="btn btn-glass btn-xs" onclick="showEvaluate(${a.id})"><i class="fa-solid fa-pen" style="margin-right:3px"></i>Evaluate</button><button class="btn btn-glass btn-xs" onclick="showToast('${a.submitted} submissions downloaded')"><i class="fa-solid fa-download" style="margin-right:3px"></i>Download All</button></div></div>`).join('')}</div>
+  <div class="g2">${ASSIGNMENTS.map(a => `<div class="gcard"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div><div style="font-weight:700;font-size:.9rem">${a.title}</div><div style="font-size:.66rem;color:var(--muted);margin-top:2px">${a.sub} · Sec ${a.sec} · Due ${a.due}</div></div>${tagHtml(a.evaluated === a.submitted ? 'Evaluated' : a.submitted > 0 ? 'In Review' : 'Waiting', a.evaluated === a.submitted && a.submitted > 0 ? 'teal' : 'gold')}</div><div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:.68rem;margin-bottom:4px"><span style="color:var(--muted)">Submissions</span><span style="font-weight:700;color:${a.submitted / a.total < 0.5 ? '#fb7185' : '#2dd4bf'}">${a.submitted}/${a.total}</span></div><div class="pb"><div class="pf" style="width:${Math.round(a.submitted / a.total * 100)}%;background:${a.submitted / a.total < 0.5 ? 'var(--rose)' : '#0d9488'}"></div></div></div><div style="display:flex;gap:6px"><button class="btn btn-glass btn-xs" onclick="showEvaluate(${a.id})"><i class="fa-solid fa-pen" style="margin-right:3px"></i>Evaluate</button><button class="btn btn-glass btn-xs" onclick="showToast('${a.submitted} submissions downloaded')"><i class="fa-solid fa-download" style="margin-right:3px"></i>Download All</button></div></div>`).join('')}</div>
 </div>`;
     }
     window.showCreateAssign = function () { modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-plus" style="color:var(--admin);margin-right:8px"></i>Create Assignment</div><div class="frow"><div class="flbl">Title</div><input class="inp" placeholder="Assignment title..."></div><div class="g2"><div class="frow"><div class="flbl">Subject</div><select class="inp">${SUBJECTS.map(s => `<option>${s.code}</option>`).join('')}</select></div><div class="frow"><div class="flbl">Section</div><select class="inp"><option>3A</option><option>3B</option><option>4A</option></select></div></div><div class="g2"><div class="frow"><div class="flbl">Due Date</div><input class="inp" type="date"></div><div class="frow"><div class="flbl">Max Marks</div><input class="inp" type="number" placeholder="20"></div></div><div class="frow"><div class="flbl">Instructions</div><textarea class="inp" placeholder="Assignment instructions..." style="min-height:60px;resize:none"></textarea></div><div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Cancel</button><button class="btn btn-teal" onclick="closeModal();showToast('Assignment created & notified to students!')"><i class="fa-solid fa-paper-plane" style="margin-right:4px"></i>Publish</button></div></div></div>`); };
-    window.showEvaluate = function (id) { const a = ASSIGNMENTS.find(x => x.id === id); modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-pen" style="color:var(--admin);margin-right:8px"></i>Evaluate â€” ${a.title}</div><table class="tbl"><thead><tr><th>Student</th><th>Marks (/20)</th><th>Feedback</th></tr></thead><tbody>${MY_STUDENTS.filter(s => s.sec === a.sec).slice(0, 5).map(s => `<tr><td style="font-weight:600">${s.name}</td><td><input class="inp" style="width:70px;padding:5px 8px" type="number" min="0" max="${a.maxMarks}" placeholder="â€”"></td><td><input class="inp" placeholder="Quick feedback..."></td></tr>`).join('')}</tbody></table><div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Cancel</button><button class="btn btn-teal" onclick="closeModal();showToast('Marks saved & students notified!')">Save Marks</button></div></div></div>`); };
+    window.showEvaluate = function (id) { const a = ASSIGNMENTS.find(x => x.id === id); modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-pen" style="color:var(--admin);margin-right:8px"></i>Evaluate — ${a.title}</div><table class="tbl"><thead><tr><th>Student</th><th>Marks (/20)</th><th>Feedback</th></tr></thead><tbody>${MY_STUDENTS.filter(s => s.sec === a.sec).slice(0, 5).map(s => `<tr><td style="font-weight:600">${s.name}</td><td><input class="inp" style="width:70px;padding:5px 8px" type="number" min="0" max="${a.maxMarks}" placeholder="—"></td><td><input class="inp" placeholder="Quick feedback..."></td></tr>`).join('')}</tbody></table><div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Cancel</button><button class="btn btn-teal" onclick="closeModal();showToast('Marks saved & students notified!')">Save Marks</button></div></div></div>`); };
 
     /* MARKS */
     function pageMarks() {
@@ -1559,9 +1559,9 @@
   </div>
   <div class="g2">
     <div class="gcard">
-      <div class="sh"><div class="sh-t"><i class="fa-solid fa-pen-ruler" style="margin-right:6px;color:#a5b4fc"></i>Marks Entry â€” IA-3</div><span style="font-size:.68rem;color:var(--muted)">Max: 20</span></div>
+      <div class="sh"><div class="sh-t"><i class="fa-solid fa-pen-ruler" style="margin-right:6px;color:#a5b4fc"></i>Marks Entry — IA-3</div><span style="font-size:.68rem;color:var(--muted)">Max: 20</span></div>
       <table class="tbl"><thead><tr><th>Student</th><th>IA-1</th><th>IA-2</th><th>IA-3</th></tr></thead>
-      <tbody>${MY_STUDENTS.filter(s => s.sec === '3A').map(s => `<tr><td style="font-weight:600;font-size:.8rem">${s.name}</td><td style="color:var(--muted)">${s.marks.ia1}</td><td style="color:var(--muted)">${s.marks.ia2}</td><td><input class="inp" style="width:70px;padding:5px 8px" type="number" min="0" max="20" placeholder="â€”"></td></tr>`).join('')}</tbody></table>
+      <tbody>${MY_STUDENTS.filter(s => s.sec === '3A').map(s => `<tr><td style="font-weight:600;font-size:.8rem">${s.name}</td><td style="color:var(--muted)">${s.marks.ia1}</td><td style="color:var(--muted)">${s.marks.ia2}</td><td><input class="inp" style="width:70px;padding:5px 8px" type="number" min="0" max="20" placeholder="—"></td></tr>`).join('')}</tbody></table>
     </div>
     <div class="gcard">
       <div class="sh"><div class="sh-t"><i class="fa-solid fa-book" style="margin-right:6px;color:#2dd4bf"></i>Gradebook Summary</div></div>
@@ -1601,7 +1601,7 @@
         if (!t || !b) {
           if (!t && tEl) tEl.style.borderColor = '#fb7185';
           if (!b && bEl) bEl.style.borderColor = '#fb7185';
-          showToast('âŒ Title and message required', 'error');
+          showToast('❌ Title and message required', 'error');
           return;
         }
 
@@ -1625,12 +1625,12 @@
           document.getElementById('ann-b').value = '';
           tEl.style.borderColor = '';
           bEl.style.borderColor = '';
-          showToast('âœ… Announcement posted & all students notified!');
+          showToast('✅ Announcement posted & all students notified!');
           document.getElementById('page-content').innerHTML = pageAnnounce();
         } else {
-          showToast('âŒ ' + (d.message || 'Error posting'), 'error');
+          showToast('❌ ' + (d.message || 'Error posting'), 'error');
         }
-      } catch (e) { showToast('âŒ Server error: ' + e.message, 'error'); } finally {
+      } catch (e) { showToast('❌ Server error: ' + e.message, 'error'); } finally {
         const btn = document.querySelector('[onclick*="postAnnouncement"]');
         if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane" style="margin-right:4px"></i>Post'; }
       }
@@ -1773,7 +1773,7 @@
         });
         const createData = await createResp.json();
         if (createData.ok) {
-          showToast('âœ“ Chat opened successfully');
+          showToast('✓ Chat opened successfully');
           // Add to CHATS_T if not already there
           if (!CHATS_T.find(x => x.id === contact.id)) {
             CHATS_T.unshift({
@@ -1815,7 +1815,7 @@
     </div>
     <div class="gcard">
       <div class="sh"><div class="sh-t"><i class="fa-solid fa-clock-rotate-left" style="margin-right:6px;color:var(--teal)"></i>Leave History</div></div>
-      ${LEAVES_T.map(l => `<div class="gcard" style="margin-bottom:8px;padding:12px 14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-weight:600">${l.reason}</span>${tagHtml(l.status, l.status === 'Approved' ? 'teal' : l.status === 'Rejected' ? 'rose' : 'gold')}</div><div style="font-size:.68rem;color:var(--muted);margin-bottom:4px"><i class="fa-solid fa-calendar" style="margin-right:4px"></i>${l.from} â†’ ${l.to}</div><div style="font-size:.65rem;color:rgba(255,255,255,.3)">Substitute: ${l.sub}</div></div>`).join('')}
+      ${LEAVES_T.map(l => `<div class="gcard" style="margin-bottom:8px;padding:12px 14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-weight:600">${l.reason}</span>${tagHtml(l.status, l.status === 'Approved' ? 'teal' : l.status === 'Rejected' ? 'rose' : 'gold')}</div><div style="font-size:.68rem;color:var(--muted);margin-bottom:4px"><i class="fa-solid fa-calendar" style="margin-right:4px"></i>${l.from} → ${l.to}</div><div style="font-size:.65rem;color:rgba(255,255,255,.3)">Substitute: ${l.sub}</div></div>`).join('')}
     </div>
   </div>
 </div>`;
@@ -1823,11 +1823,11 @@
 
     /* PERFORMANCE */
     function pagePerformance() {
-      const subjects_att = [{ sub: 'DSA Â· 3A', att: 81 }, { sub: 'DSA Â· 3B', att: 74 }, { sub: 'Algo Â· 3A', att: 86 }, { sub: 'Adv Algo Â· 4A', att: 79 }];
+      const subjects_att = [{ sub: 'DSA · 3A', att: 81 }, { sub: 'DSA · 3B', att: 74 }, { sub: 'Algo · 3A', att: 86 }, { sub: 'Adv Algo · 4A', att: 79 }];
       return `<div class="panel">
   <div class="g3" style="margin-bottom:14px">
     <div class="stat"><div class="stat-ico" style="background:rgba(99,102,241,.15);color:#a5b4fc"><i class="fa-solid fa-chart-bar"></i></div><div><div class="stat-n" style="color:#a5b4fc">${Math.round(MY_STUDENTS.reduce((a, s) => a + (s.marks.ia1 + s.marks.ia2) / 2, 0) / MY_STUDENTS.length).toFixed(1)}/20</div><div class="stat-l">Avg IA Marks</div></div></div>
-    <div class="stat"><div class="stat-ico" style="background:rgba(13,148,136,.15);color:#2dd4bf"><i class="fa-solid fa-circle-check"></i></div><div><div class="stat-n" style="color:#2dd4bf">${MY_STUDENTS.filter(s => (s.marks.ia1 + s.marks.ia2) / 2 >= 14).length}</div><div class="stat-l">Students â‰¥70%</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(13,148,136,.15);color:#2dd4bf"><i class="fa-solid fa-circle-check"></i></div><div><div class="stat-n" style="color:#2dd4bf">${MY_STUDENTS.filter(s => (s.marks.ia1 + s.marks.ia2) / 2 >= 14).length}</div><div class="stat-l">Students ≥70%</div></div></div>
     <div class="stat"><div class="stat-ico" style="background:rgba(124,58,237,.15);color:#a78bfa"><i class="fa-solid fa-star"></i></div><div><div class="stat-n" style="color:#a78bfa">4.8</div><div class="stat-l">Student Rating</div></div></div>
   </div>
   <div class="g2" style="margin-bottom:14px">
@@ -1836,7 +1836,7 @@
       ${subjects_att.map(s => `<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:4px"><span style="font-weight:600">${s.sub}</span><span style="color:${s.att >= 75 ? '#2dd4bf' : '#fb7185'};font-weight:700">${s.att}%</span></div><div class="pb"><div class="pf" style="width:${s.att}%;background:${s.att >= 75 ? '#0d9488' : 'var(--rose)'}"></div></div></div>`).join('')}
     </div>
     <div class="gcard">
-      <div class="sh"><div class="sh-t"><i class="fa-solid fa-trophy" style="margin-right:6px;color:var(--gold)"></i>Top Performers â€” IA Average</div></div>
+      <div class="sh"><div class="sh-t"><i class="fa-solid fa-trophy" style="margin-right:6px;color:var(--gold)"></i>Top Performers — IA Average</div></div>
       ${[...MY_STUDENTS].sort((a, b) => (b.marks.ia1 + b.marks.ia2) - (a.marks.ia1 + a.marks.ia2)).slice(0, 5).map((s, i) => `<div class="li"><div style="width:22px;height:22px;border-radius:50%;background:${i === 0 ? 'rgba(232,160,32,.2)' : i === 1 ? 'rgba(255,255,255,.1)' : i === 2 ? 'rgba(205,127,50,.15)' : 'rgba(255,255,255,.05)'};display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;color:${i === 0 ? 'var(--gold)' : i === 1 ? '#e2e8f0' : i === 2 ? '#cd7f32' : 'var(--muted)'}">${i + 1}</div><div style="flex:1;font-size:.78rem;font-weight:600">${s.name}</div><span style="font-weight:700;color:#2dd4bf">${((s.marks.ia1 + s.marks.ia2) / 2).toFixed(1)}/20</span></div>`).join('')}
     </div>
   </div>
@@ -1850,20 +1850,20 @@
     <div class="gcard" style="margin-bottom:12px">
       <div style="display:flex;gap:16px;align-items:center;margin-bottom:16px">
         <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#0d9488,#2dd4bf);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:800">RS</div>
-        <div><div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700">Prof. R. Sharma</div><div style="font-size:.72rem;color:var(--muted)">Faculty Â· Computer Science & Engineering</div></div>
+        <div><div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700">Prof. R. Sharma</div><div style="font-size:.72rem;color:var(--muted)">Faculty · Computer Science & Engineering</div></div>
       </div>
       <div class="sh"><div class="sh-t"><i class="fa-solid fa-user-gear" style="margin-right:6px;color:var(--teal)"></i>Profile Details</div><button class="btn btn-glass btn-xs" onclick="showToast('Edit mode enabled')"><i class="fa-solid fa-pen"></i></button></div>
       ${[['Employee ID', 'FAC001'], ['Department', 'CSE'], ['Designation', 'Assistant Professor'], ['Email', 'r.sharma@uni.edu'], ['Phone', '+91 98765 43210'], ['Office', 'Block B, Room 204']].map(([k, v]) => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.78rem"><span style="color:var(--muted)">${k}</span><span style="font-weight:600">${v}</span></div>`).join('')}
     </div>
     <div class="gcard">
       <div class="sh"><div class="sh-t"><i class="fa-solid fa-book" style="margin-right:6px;color:var(--teal)"></i>Subjects Assigned</div></div>
-      ${SUBJECTS.map(s => `<div class="li"><div style="width:30px;height:30px;border-radius:8px;background:rgba(99,102,241,.1);display:flex;align-items:center;justify-content:center;color:#a5b4fc;font-size:.78rem"><i class="fa-solid fa-book"></i></div><div style="flex:1"><div style="font-size:.78rem;font-weight:600">${s.name}</div><div style="font-size:.63rem;color:var(--muted)">${s.code} Â· ${s.students} students</div></div></div>`).join('')}
+      ${SUBJECTS.map(s => `<div class="li"><div style="width:30px;height:30px;border-radius:8px;background:rgba(99,102,241,.1);display:flex;align-items:center;justify-content:center;color:#a5b4fc;font-size:.78rem"><i class="fa-solid fa-book"></i></div><div style="flex:1"><div style="font-size:.78rem;font-weight:600">${s.name}</div><div style="font-size:.63rem;color:var(--muted)">${s.code} · ${s.students} students</div></div></div>`).join('')}
     </div>
   </div>
   <div>
     <div class="gcard" style="margin-bottom:12px">
       <div class="sh"><div class="sh-t"><i class="fa-solid fa-clock" style="margin-right:6px;color:var(--teal)"></i>Office Hours</div><button class="btn btn-glass btn-xs" onclick="showToast('Office hours updated')"><i class="fa-solid fa-pen"></i></button></div>
-      ${[['Monday', '3:00 PM â€“ 5:00 PM'], ['Wednesday', '3:00 PM â€“ 5:00 PM'], ['Friday', '10:00 AM â€“ 12:00 PM']].map(([d, h]) => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.78rem"><span style="color:var(--muted)">${d}</span><span style="font-weight:600;color:#2dd4bf">${h}</span></div>`).join('')}
+      ${[['Monday', '3:00 PM – 5:00 PM'], ['Wednesday', '3:00 PM – 5:00 PM'], ['Friday', '10:00 AM – 12:00 PM']].map(([d, h]) => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.78rem"><span style="color:var(--muted)">${d}</span><span style="font-weight:600;color:#2dd4bf">${h}</span></div>`).join('')}
     </div>
     <div class="gcard">
       <div class="sh"><div class="sh-t"><i class="fa-solid fa-bell-concierge" style="margin-right:6px;color:var(--teal)"></i>Notification Preferences</div></div>
@@ -1917,10 +1917,10 @@
     }
     animateChalk();
 
-    /* â”€â”€ BACKEND CONFIG â”€â”€ */
+    /* ── BACKEND CONFIG ── */
     const API_BASE = '/api';
 
-    /* â”€â”€ NOTIFICATIONS SYSTEM â”€â”€ */
+    /* ── NOTIFICATIONS SYSTEM ── */
     let NOTIFICATIONS = [];
     let _tchrUser = null;
 
@@ -2173,7 +2173,7 @@
             id: 900 + i,
             contactId: c.id,
             name: c.name,
-            role: `${c.role} Â· ${c.role_label}`,
+            role: `${c.role} · ${c.role_label}`,
             last: 'Start chatting...',
             time: '',
             unread: 0,
@@ -2237,7 +2237,7 @@
           const msgsEl = document.getElementById('msgs');
           if (msgsEl && c.msgs?.length) {
             msgsEl.innerHTML = c.msgs.map(m => `<div style="display:flex;justify-content:${m.me ? 'flex-end' : 'flex-start'}"><div style="max-width:75%;background:${m.me ? 'rgba(99,102,241,.25)' : 'rgba(255,255,255,.07)'};border:1px solid ${m.me ? 'rgba(99,102,241,.3)' : 'rgba(255,255,255,.1)'};border-radius:12px;padding:8px 12px;font-size:.78rem">${m.text}</div></div>`).join('');
-            showToast('âŒ Could not load message history', 'error');
+            showToast('❌ Could not load message history', 'error');
           }
         }
       };
@@ -2248,7 +2248,7 @@
 
     function doLogout() { sessionStorage.removeItem('Uni_user'); window.top.location.href = '/'; }
 
-    /* â”€â”€ GLOBAL SEARCH â”€â”€ */
+    /* ── GLOBAL SEARCH ── */
     function globalSearch(q) {
       q = q.toLowerCase().trim();
       if (!q) {
@@ -2263,7 +2263,7 @@
       });
     }
 
-    /* INIT â€“ dashboard rendered by async auth above */
+    /* INIT – dashboard rendered by async auth above */
   </script>
 </body>
 

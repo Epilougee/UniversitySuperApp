@@ -799,7 +799,7 @@
       font-weight: 600
     }
 
-    /* â”€â”€ NOTIFICATION DROPDOWN â”€â”€ */
+    /* ── NOTIFICATION DROPDOWN ── */
     .notif-panel {
       position: fixed;
       top: 58px;
@@ -935,7 +935,7 @@
     <aside class="sidebar">
       <div class="sb-head">
         <div class="sb-logo">Un<span>i</span></div>
-        <div class="sb-uni">Admin Control Panel Â· 2025â€“26</div>
+        <div class="sb-uni">Admin Control Panel · 2025–26</div>
         <div class="sb-badge"><i class="fa-solid fa-shield-halved"></i> Super Admin</div>
       </div>
       <div class="sb-profile">
@@ -1073,7 +1073,7 @@
   </div>
 
   <script>
-    /* â”€â”€ DATA â”€â”€ */
+    /* ── DATA ── */
     const DEPTS = [
       { name: 'Computer Science & Eng.', code: 'CSE', hod: 'Dr. A. Kulkarni', students: 320, faculty: 18, att: 81 },
       { name: 'Information Technology', code: 'IT', hod: 'Dr. S. Mehta', students: 280, faculty: 15, att: 78 },
@@ -1099,8 +1099,8 @@
       { id: 'FAC005', name: 'Prof. P. Rao', dept: 'IT', subjects: ['Software Engineering', 'Web Dev'], office: 'C-108', hours: 'Mon-Wed 9-11AM', rating: 4.8, leaves: 0, status: 'Active' },
     ];
     const ANNOUNCEMENTS_DATA = [
-      { id: 1, title: 'End Semester Exams â€” May 5-20', body: 'ESE schedule released. Hall tickets 1 week prior.', target: 'All', urgency: 'High', date: 'Mar 10', author: 'Exam Cell', reads: 1240 },
-      { id: 2, title: 'Ideathon 2026 â€” Register Now', body: 'Cash prizes Rs 1,50,000. Deadline March 20.', target: 'UG', urgency: 'Medium', date: 'Mar 9', author: 'Innovation Cell', reads: 890 },
+      { id: 1, title: 'End Semester Exams — May 5-20', body: 'ESE schedule released. Hall tickets 1 week prior.', target: 'All', urgency: 'High', date: 'Mar 10', author: 'Exam Cell', reads: 1240 },
+      { id: 2, title: 'Ideathon 2026 — Register Now', body: 'Cash prizes Rs 1,50,000. Deadline March 20.', target: 'UG', urgency: 'Medium', date: 'Mar 9', author: 'Innovation Cell', reads: 890 },
       { id: 3, title: 'Network Maintenance Mar 16', body: 'Campus network down 12AM-4AM.', target: 'All', urgency: 'Low', date: 'Mar 7', author: 'IT Dept.', reads: 450 },
     ];
     const EVENTS_DATA = [
@@ -1118,13 +1118,13 @@
       { date: 'Mar 25', event: 'Mid-Sem Exams Begin', type: 'Exam' },
       { date: 'Apr 1', event: 'Mid-Sem Results', type: 'Result' },
       { date: 'Apr 14', event: 'Dr. Ambedkar Jayanti Holiday', type: 'Holiday' },
-      { date: 'Apr 22', event: 'Earth Day â€” Campus Drive', type: 'Event' },
+      { date: 'Apr 22', event: 'Earth Day — Campus Drive', type: 'Event' },
       { date: 'May 5', event: 'End-Sem Exams Begin', type: 'Exam' },
       { date: 'May 20', event: 'End-Sem Exams End', type: 'Exam' },
       { date: 'Jun 1', event: 'Summer Vacation Begins', type: 'Holiday' },
     ];
 
-    /* â”€â”€ UTILS â”€â”€ */
+    /* ── UTILS ── */
     function showToast(msg, type = 'success') {
       const t = document.getElementById('toast');
       const clr = type === 'error' ? '#fb7185' : type === 'warn' ? 'var(--gold)' : '#34d399';
@@ -1184,7 +1184,7 @@
       </div></div>`);
     }
 
-    /* â”€â”€ BADGE MANAGEMENT SYSTEM FOR ADMIN â”€â”€ */
+    /* ── BADGE MANAGEMENT SYSTEM FOR ADMIN ── */
     const BADGE_STATE = {
       students: 3,
       announce: 2,
@@ -1259,9 +1259,9 @@
       }
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
        PAGE: DASHBOARD
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
     function pageDashboard() {
       const totalStu = DEPTS.reduce((a, d) => a + d.students, 0);
       const totalFac = DEPTS.reduce((a, d) => a + d.faculty, 0);
@@ -1280,11 +1280,11 @@
       <div class="sh"><div class="sh-t"><i class="fa-solid fa-building-columns" style="margin-right:6px;color:var(--admin)"></i>Department Overview</div><button class="btn btn-glass btn-xs" onclick="nav(document.querySelector('[onclick*=students]'),\'students\')">Details</button></div>
       ${DEPTS.map(d => `<div style="margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:5px">
-          <span style="font-weight:600">${d.code} <span style="color:var(--muted);font-weight:400">Â· ${d.hod}</span></span>
+          <span style="font-weight:600">${d.code} <span style="color:var(--muted);font-weight:400">· ${d.hod}</span></span>
           <span style="color:${d.att >= 75 ? '#2dd4bf' : '#fb7185'};font-weight:700">${d.att}%</span>
         </div>
         <div class="pb"><div class="pf" style="width:${d.att}%;background:${d.att >= 75 ? '#0d9488' : 'var(--rose)'}"></div></div>
-        <div style="font-size:.62rem;color:var(--muted);margin-top:2px">${d.students} students Â· ${d.faculty} faculty</div>
+        <div style="font-size:.62rem;color:var(--muted);margin-top:2px">${d.students} students · ${d.faculty} faculty</div>
       </div>`).join('')}
     </div>
     <div style="display:flex;flex-direction:column;gap:12px">
@@ -1295,7 +1295,7 @@
           <div style="width:32px;height:32px;border-radius:8px;background:rgba(232,160,32,.1);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:.8rem;flex-shrink:0"><i class="fa-solid fa-clock"></i></div>
           <div style="flex:1">
             <div style="font-size:.76rem;font-weight:600">Leave: ${l.faculty}</div>
-            <div style="font-size:.64rem;color:var(--muted)">${l.from} â†’ ${l.to} Â· ${l.reason}</div>
+            <div style="font-size:.64rem;color:var(--muted)">${l.from} → ${l.to} · ${l.reason}</div>
           </div>
           <div style="display:flex;gap:4px">
             <button class="btn btn-teal btn-xs" onclick="showToast('Leave approved')"><i class="fa-solid fa-check"></i></button>
@@ -1305,7 +1305,7 @@
         ${ANNOUNCEMENTS_DATA.filter(a => a.urgency === 'High').slice(0, 1).map(a => `
         <div class="li">
           <div style="width:32px;height:32px;border-radius:8px;background:rgba(225,29,72,.1);display:flex;align-items:center;justify-content:center;color:#fb7185;font-size:.8rem;flex-shrink:0"><i class="fa-solid fa-bullhorn"></i></div>
-          <div style="flex:1"><div style="font-size:.76rem;font-weight:600">${a.title}</div><div style="font-size:.64rem;color:var(--muted)">${a.reads} reads Â· ${a.date}</div></div>
+          <div style="flex:1"><div style="font-size:.76rem;font-weight:600">${a.title}</div><div style="font-size:.64rem;color:var(--muted)">${a.reads} reads · ${a.date}</div></div>
         </div>`).join('')}
       </div>
       <div class="gcard">
@@ -1313,14 +1313,14 @@
         ${EVENTS_DATA.slice(0, 3).map(e => `
         <div class="li">
           <div style="width:28px;height:28px;border-radius:7px;background:rgba(99,102,241,.12);display:flex;align-items:center;justify-content:center;color:#a5b4fc;font-size:.75rem"><i class="fa-solid fa-calendar-check"></i></div>
-          <div style="flex:1"><div style="font-size:.76rem;font-weight:600">${e.name}</div><div style="font-size:.64rem;color:var(--muted)">${e.date} Â· ${e.reg}/${e.limit} registered</div></div>
+          <div style="flex:1"><div style="font-size:.76rem;font-weight:600">${e.name}</div><div style="font-size:.64rem;color:var(--muted)">${e.date} · ${e.reg}/${e.limit} registered</div></div>
           ${tagHtml(e.status, e.status === 'Closing' ? 'rose' : 'teal')}
         </div>`).join('')}
       </div>
     </div>
   </div>
   <div class="gcard">
-    <div class="sh"><div class="sh-t"><i class="fa-solid fa-users" style="margin-right:6px;color:#2dd4bf"></i>Active Users Today</div><span style="font-size:.68rem;color:var(--muted)">Simulated â€” live data via WebSocket in production</span></div>
+    <div class="sh"><div class="sh-t"><i class="fa-solid fa-users" style="margin-right:6px;color:#2dd4bf"></i>Active Users Today</div><span style="font-size:.68rem;color:var(--muted)">Simulated — live data via WebSocket in production</span></div>
     <div class="g4">
       ${[{ l: 'Students Online', v: 218, c: '#a5b4fc', ic: 'fa-user-graduate' }, { l: 'Faculty Active', v: 34, c: '#2dd4bf', ic: 'fa-chalkboard-user' }, { l: 'Portal Logins Today', v: 612, c: 'var(--gold)', ic: 'fa-right-to-bracket' }, { l: 'Reports Generated', v: 47, c: '#34d399', ic: 'fa-file-chart-column' }].map(s => `
       <div class="stat"><div class="stat-ico" style="background:rgba(255,255,255,.05);color:${s.c}"><i class="fa-solid ${s.ic}"></i></div><div><div class="stat-n" style="color:${s.c}">${s.v}</div><div class="stat-l">${s.l}</div></div></div>`).join('')}
@@ -1329,9 +1329,9 @@
 </div>`;
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
        PAGE: STUDENTS
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
     let stuFilter = { dept: 'all', year: 'all', q: '' };
     function pageStudents() {
       return `<div class="panel">
@@ -1351,7 +1351,7 @@
         <option value="all">All Years</option><option value="1">Year 1</option><option value="2">Year 2</option><option value="3">Year 3</option><option value="4">Year 4</option>
       </select>
       <button class="btn btn-admin btn-sm" onclick="showAddStudent()"><i class="fa-solid fa-user-plus" style="margin-right:4px"></i>Add Student</button>
-      <button class="btn btn-glass btn-sm" onclick="showToast('CSV import ready â€” drag & drop supported in production')"><i class="fa-solid fa-file-import" style="margin-right:4px"></i>Import CSV</button>
+      <button class="btn btn-glass btn-sm" onclick="showToast('CSV import ready — drag & drop supported in production')"><i class="fa-solid fa-file-import" style="margin-right:4px"></i>Import CSV</button>
     </div>
     <div style="overflow-x:auto">
       <table class="tbl" id="stu-table">
@@ -1368,7 +1368,7 @@
         <td><div style="font-weight:600;font-size:.8rem">${s.name}</div><div style="font-size:.64rem;color:var(--muted)">${s.email}</div></td>
         <td style="color:var(--muted);font-size:.72rem">${s.id}</td>
         <td>${tagHtml(s.dept, 'admin')}</td>
-        <td style="font-size:.74rem">Y${s.year} Â· Sec ${s.sec}</td>
+        <td style="font-size:.74rem">Y${s.year} · Sec ${s.sec}</td>
         <td><div style="display:flex;align-items:center;gap:8px"><div class="pb" style="width:70px"><div class="pf" style="width:${s.att}%;background:${s.att >= 75 ? '#0d9488' : 'var(--rose)'}"></div></div><span style="font-size:.72rem;color:${s.att >= 75 ? '#2dd4bf' : '#fb7185'};font-weight:700">${s.att}%</span></div></td>
         <td>${tagHtml(s.status, s.status === 'Active' ? 'teal' : 'rose')}</td>
         <td><div style="display:flex;gap:4px">
@@ -1381,7 +1381,7 @@
       const s = STUDENTS.find(x => x.id === id);
       if (!s) return;
       modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
-        <div class="modal-t"><i class="fa-solid fa-pen" style="color:var(--admin);margin-right:8px"></i>Edit Student â€” ${s.name}</div>
+        <div class="modal-t"><i class="fa-solid fa-pen" style="color:var(--admin);margin-right:8px"></i>Edit Student — ${s.name}</div>
         <div class="g2">
           <div class="frow"><div class="flbl">Full Name</div><input class="inp" id="ed-name" value="${s.name}"></div>
           <div class="frow"><div class="flbl">Department</div><select class="inp" id="ed-dept">${DEPTS.map(d => `<option value="${d.code}" ${d.code === s.dept ? 'selected' : ''}>${d.code}</option>`).join('')}</select></div>
@@ -1472,7 +1472,7 @@
     <div class="stat"><div class="stat-ico" style="background:rgba(13,148,136,.15);color:#2dd4bf"><i class="fa-solid fa-chalkboard-user"></i></div><div><div class="stat-n" style="color:#2dd4bf">${FACULTY.length}</div><div class="stat-l">Faculty (DB)</div></div></div>
     <div class="stat"><div class="stat-ico" style="background:rgba(16,185,129,.15);color:#34d399"><i class="fa-solid fa-circle-check"></i></div><div><div class="stat-n" style="color:#34d399">${FACULTY.filter(f => f.status === 'Active').length}</div><div class="stat-l">Active</div></div></div>
     <div class="stat"><div class="stat-ico" style="background:rgba(232,160,32,.15);color:var(--gold)"><i class="fa-solid fa-clock"></i></div><div><div class="stat-n" style="color:var(--gold)">${LEAVES.filter(l => l.status === 'Pending').length}</div><div class="stat-l">Pending Leaves</div></div></div>
-    <div class="stat"><div class="stat-ico" style="background:rgba(124,58,237,.15);color:#a78bfa"><i class="fa-solid fa-star"></i></div><div><div class="stat-n" style="color:#a78bfa">${FACULTY.length ? ((FACULTY.reduce((a, f) => a + f.rating, 0) / FACULTY.length).toFixed(1)) : 'â€”'}</div><div class="stat-l">Avg Rating</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(124,58,237,.15);color:#a78bfa"><i class="fa-solid fa-star"></i></div><div><div class="stat-n" style="color:#a78bfa">${FACULTY.length ? ((FACULTY.reduce((a, f) => a + f.rating, 0) / FACULTY.length).toFixed(1)) : '—'}</div><div class="stat-l">Avg Rating</div></div></div>
   </div>
   <div class="g2">
     <div class="gcard">
@@ -1484,9 +1484,9 @@
             <div style="display:flex;justify-content:space-between;align-items:center">
               <span style="font-weight:700;font-size:.84rem">${f.name}</span>${tagHtml(f.status, f.status === 'Active' ? 'teal' : 'rose')}
             </div>
-            <div style="font-size:.67rem;color:var(--muted);margin-top:1px">${f.dept} Â· <i class="fa-solid fa-star" style="color:var(--gold)"></i> ${f.rating}</div>
+            <div style="font-size:.67rem;color:var(--muted);margin-top:1px">${f.dept} · <i class="fa-solid fa-star" style="color:var(--gold)"></i> ${f.rating}</div>
             <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:5px">${f.subjects.map(s => tagHtml(s, 'white')).join('')}</div>
-            <div style="font-size:.65rem;color:var(--muted);margin-top:5px"><i class="fa-solid fa-building" style="margin-right:4px"></i>${f.office} &nbsp;Â·&nbsp; <i class="fa-solid fa-clock" style="margin-right:4px"></i>${f.hours}</div>
+            <div style="font-size:.65rem;color:var(--muted);margin-top:5px"><i class="fa-solid fa-building" style="margin-right:4px"></i>${f.office} &nbsp;·&nbsp; <i class="fa-solid fa-clock" style="margin-right:4px"></i>${f.hours}</div>
           </div>
         </div>
         <div style="display:flex;gap:6px;margin-top:10px">
@@ -1502,7 +1502,7 @@
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
           <span style="font-weight:600;font-size:.82rem">${l.faculty}</span>${tagHtml(l.status, l.status === 'Pending' ? 'gold' : l.status === 'Approved' ? 'teal' : 'rose')}
         </div>
-        <div style="font-size:.68rem;color:var(--muted);margin-bottom:3px"><i class="fa-solid fa-calendar" style="margin-right:4px"></i>${l.from} â†’ ${l.to} &nbsp;Â·&nbsp; ${l.reason}</div>
+        <div style="font-size:.68rem;color:var(--muted);margin-bottom:3px"><i class="fa-solid fa-calendar" style="margin-right:4px"></i>${l.from} → ${l.to} &nbsp;·&nbsp; ${l.reason}</div>
         <div style="font-size:.66rem;color:rgba(255,255,255,.3)">Substitute: ${l.sub}</div>
         ${l.status === 'Pending' ? `<div style="display:flex;gap:6px;margin-top:8px">
           <button class="btn btn-teal btn-sm" style="flex:1;justify-content:center" onclick="showToast('Leave approved for ${l.faculty}')"><i class="fa-solid fa-check" style="margin-right:4px"></i>Approve</button>
@@ -1531,7 +1531,7 @@
     </div>
   </div>
   <div class="gcard" style="overflow-x:auto">
-    <div class="sh"><div class="sh-t">Weekly Schedule â€” CSE Year 3 Section A</div></div>
+    <div class="sh"><div class="sh-t">Weekly Schedule — CSE Year 3 Section A</div></div>
     <table style="width:100%;border-collapse:collapse;font-size:.68rem;min-width:560px">
       <thead><tr><th style="padding:8px;width:55px"></th>${days.map(d => `<th style="padding:8px;text-align:center;background:rgba(255,255,255,.06);border-radius:4px;color:rgba(255,255,255,.7);font-size:.62rem">${d}</th>`).join('')}</tr></thead>
       <tbody>${times.map((t, ti) => `<tr>
@@ -1551,8 +1551,8 @@
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <button class="btn btn-admin btn-sm" onclick="showAddExam()"><i class="fa-solid fa-plus" style="margin-right:4px"></i>Add Exam</button>
       <button class="btn btn-white btn-sm" onclick="showToast('Hall tickets generated & emailed to all students!')"><i class="fa-solid fa-id-card" style="margin-right:4px"></i>Generate Hall Tickets</button>
-      <button class="btn btn-glass btn-sm" onclick="showToast('Schedule published â€” students notified!')"><i class="fa-solid fa-paper-plane" style="margin-right:4px"></i>Publish Schedule</button>
-      <select class="inp" style="width:130px;margin-left:auto"><option>CSE Â· Semester 6</option><option>IT Â· Semester 4</option></select>
+      <button class="btn btn-glass btn-sm" onclick="showToast('Schedule published — students notified!')"><i class="fa-solid fa-paper-plane" style="margin-right:4px"></i>Publish Schedule</button>
+      <select class="inp" style="width:130px;margin-left:auto"><option>CSE · Semester 6</option><option>IT · Semester 4</option></select>
     </div>
   </div>
   <div class="gcard">
@@ -1561,7 +1561,7 @@
       <thead><tr><th>Subject</th><th>Code</th><th>Date</th><th>Time</th><th>Venue</th><th>Dept</th><th>Actions</th></tr></thead>
       <tbody>${exams.map(e => `<tr>
         <td style="font-weight:600">${e.subject}</td>
-        <td>${tagHtml(e.subject_code || 'â€”', 'admin')}</td>
+        <td>${tagHtml(e.subject_code || '—', 'admin')}</td>
         <td style="color:#2dd4bf;font-weight:600">${e.date}</td>
         <td style="color:var(--muted)">${e.time}</td>
         <td style="color:var(--muted)">${e.venue}</td>
@@ -1619,7 +1619,7 @@
           window.DB_EXAMS.push({ id: d.id, subject, subject_code: code, date, time, venue, department: dept });
           closeModal();
           document.getElementById('page-content').innerHTML = pageExams();
-          showToast('âœ… Exam added & students notified!');
+          showToast('✅ Exam added & students notified!');
         } else {
           if (errEl) errEl.textContent = d.message || 'Error adding exam';
         }
@@ -1652,7 +1652,7 @@
     </div>
   </div>
   <div class="gcard">
-    <div class="sh"><div class="sh-t">Academic Calendar 2025â€“26</div></div>
+    <div class="sh"><div class="sh-t">Academic Calendar 2025–26</div></div>
     ${events.length ? events.map(e => `<div class="li">
       <div style="width:50px;height:42px;border-radius:10px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
         <div style="font-size:.58rem;color:var(--muted2);text-transform:uppercase">${e.date.split(' ')[0]}</div>
@@ -1706,7 +1706,7 @@
           window.DB_CAL_EVENTS.push({ id: d.id, event, date, type });
           closeModal();
           document.getElementById('page-content').innerHTML = pageCalendar();
-          showToast('âœ… Event added to calendar!');
+          showToast('✅ Event added to calendar!');
         } else {
           if (errEl) errEl.textContent = d.message || 'Error adding event';
         }
@@ -1733,14 +1733,14 @@
       return `<div class="panel">
   <div class="gcard" style="margin-bottom:14px">
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <select class="inp" style="width:160px"><option>CSE Â· Year 3 Â· Sec A</option><option>IT Â· Year 2 Â· Sec B</option></select>
+      <select class="inp" style="width:160px"><option>CSE · Year 3 · Sec A</option><option>IT · Year 2 · Sec B</option></select>
       <select class="inp" style="width:180px"><option>Data Structures (CSE301)</option><option>Computer Networks (CSE302)</option></select>
       <select class="inp" style="width:130px"><option>Internal Assessment 3</option><option>Internal Assessment 2</option><option>Internal Assessment 1</option></select>
       <button class="btn btn-admin btn-sm" onclick="showToast('Marks saved & sent for approval')"><i class="fa-solid fa-floppy-disk" style="margin-right:4px"></i>Save Marks</button>
     </div>
   </div>
   <div class="gcard">
-    <div class="sh"><div class="sh-t"><i class="fa-solid fa-pen-ruler" style="margin-right:6px;color:#a5b4fc"></i>Enter Marks â€” IA-3 Â· DSA Â· CSE Year 3 A</div><span style="font-size:.68rem;color:var(--muted)">Max: 20 marks</span></div>
+    <div class="sh"><div class="sh-t"><i class="fa-solid fa-pen-ruler" style="margin-right:6px;color:#a5b4fc"></i>Enter Marks — IA-3 · DSA · CSE Year 3 A</div><span style="font-size:.68rem;color:var(--muted)">Max: 20 marks</span></div>
     <table class="tbl">
       <thead><tr><th>Student</th><th>ID</th><th>Marks (/20)</th><th>Grade</th></tr></thead>
       <tbody>${STUDENTS.filter(s => s.dept === 'CSE').map(s => { const m = Math.floor(12 + Math.random() * 8); const g = m >= 18 ? 'A+' : m >= 16 ? 'A' : m >= 14 ? 'B+' : 'B'; return `<tr><td style="font-weight:600">${s.name}</td><td style="color:var(--muted);font-size:.72rem">${s.id}</td><td><input class="inp" style="width:80px;padding:5px 8px" value="${m}" type="number" min="0" max="20"></td><td>${tagHtml(g, m >= 16 ? 'teal' : m >= 14 ? 'gold' : 'rose')}</td></tr>` }).join('')}</tbody>
@@ -1782,7 +1782,7 @@
         <div style="font-size:.72rem;color:var(--muted);line-height:1.5">${a.body.substring(0, 150)}${a.body.length > 150 ? '...' : ''}</div>
         <div class="div"></div>
         <div style="display:flex;justify-content:space-between;align-items:center;font-size:.66rem;color:var(--muted)">
-          <span><i class="fa-solid fa-eye" style="margin-right:4px"></i>${a.reads || 0} reads Â· ${a.author}</span>
+          <span><i class="fa-solid fa-eye" style="margin-right:4px"></i>${a.reads || 0} reads · ${a.author}</span>
           <button class="btn btn-rose btn-xs" onclick="deleteAnnouncementAPI(${a.id})"><i class="fa-solid fa-trash"></i></button>
         </div>
       </div>`).join('') : `<div style="text-align:center;padding:20px;color:var(--muted);font-size:.75rem">No announcements yet</div>`}
@@ -1824,7 +1824,7 @@
           titleEl.value = '';
           bodyEl.value = '';
           document.getElementById('page-content').innerHTML = pageAnnounce();
-          showToast('âœ… Announcement posted & notifications sent!');
+          showToast('✅ Announcement posted & notifications sent!');
         } else {
           if (errEl) errEl.textContent = d.message || 'Error posting announcement';
         }
@@ -1848,7 +1848,7 @@
 
     /* NOTIFICATIONS */
     function pageNotifications() {
-      const groups = ['All Students', 'All Faculty', 'CSE Students', 'IT Students', 'Year 3 â€“ All Depts', 'Any custom group'];
+      const groups = ['All Students', 'All Faculty', 'CSE Students', 'IT Students', 'Year 3 – All Depts', 'Any custom group'];
       return `<div class="panel">
   <div class="g2">
     <div class="gcard">
@@ -1862,9 +1862,9 @@
     </div>
     <div class="gcard">
       <div class="sh"><div class="sh-t">Recent Notifications</div></div>
-      ${[{ msg: 'ESE schedule released on portal.', group: 'All', sent: 'Mar 10', reach: 1240 }, { msg: 'Library closed today for maintenance.', group: 'All', sent: 'Mar 9', reach: 980 }, { msg: 'CSE placements â€” TCS shortlist out.', group: 'CSE Students', sent: 'Mar 8', reach: 312 }].map(n => `<div class="li">
+      ${[{ msg: 'ESE schedule released on portal.', group: 'All', sent: 'Mar 10', reach: 1240 }, { msg: 'Library closed today for maintenance.', group: 'All', sent: 'Mar 9', reach: 980 }, { msg: 'CSE placements — TCS shortlist out.', group: 'CSE Students', sent: 'Mar 8', reach: 312 }].map(n => `<div class="li">
         <div style="width:32px;height:32px;border-radius:8px;background:rgba(99,102,241,.1);display:flex;align-items:center;justify-content:center;color:#a5b4fc;font-size:.8rem;flex-shrink:0"><i class="fa-solid fa-bell"></i></div>
-        <div style="flex:1"><div style="font-size:.78rem;font-weight:500">${n.msg}</div><div style="font-size:.63rem;color:var(--muted);margin-top:2px"><i class="fa-solid fa-users" style="margin-right:3px"></i>${n.group} &nbsp;Â·&nbsp; <i class="fa-solid fa-calendar" style="margin-right:3px"></i>${n.sent} &nbsp;Â·&nbsp; <i class="fa-solid fa-eye" style="margin-right:3px"></i>${n.reach}</div></div>
+        <div style="flex:1"><div style="font-size:.78rem;font-weight:500">${n.msg}</div><div style="font-size:.63rem;color:var(--muted);margin-top:2px"><i class="fa-solid fa-users" style="margin-right:3px"></i>${n.group} &nbsp;·&nbsp; <i class="fa-solid fa-calendar" style="margin-right:3px"></i>${n.sent} &nbsp;·&nbsp; <i class="fa-solid fa-eye" style="margin-right:3px"></i>${n.reach}</div></div>
       </div>`).join('')}
     </div>
   </div>
@@ -1883,7 +1883,7 @@
   <div class="g2">${EVENTS_DATA.map((e, i) => `<div class="gcard">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
       <div><div style="font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700"><i class="fa-solid fa-calendar-check" style="margin-right:6px;color:var(--admin)"></i>${e.name}</div>
-      <div style="font-size:.68rem;color:var(--muted);margin-top:2px"><i class="fa-solid fa-calendar" style="margin-right:4px"></i>${e.date} &nbsp;Â·&nbsp; <i class="fa-solid fa-location-dot" style="margin-right:4px"></i>${e.venue}</div></div>
+      <div style="font-size:.68rem;color:var(--muted);margin-top:2px"><i class="fa-solid fa-calendar" style="margin-right:4px"></i>${e.date} &nbsp;·&nbsp; <i class="fa-solid fa-location-dot" style="margin-right:4px"></i>${e.venue}</div></div>
       ${tagHtml(e.status, e.status === 'Closing' ? 'rose' : e.status === 'Open' ? 'teal' : 'white')}
     </div>
     <div style="margin-bottom:10px">
@@ -1930,7 +1930,7 @@
       <div class="sh"><div class="sh-t">Defaulters Report (&lt;75%)</div></div>
       ${STUDENTS.filter(s => s.att < 75).map(s => `<div class="li">
         <div style="width:30px;height:30px;border-radius:8px;background:rgba(225,29,72,.1);display:flex;align-items:center;justify-content:center;color:#fb7185;font-size:.78rem"><i class="fa-solid fa-triangle-exclamation"></i></div>
-        <div style="flex:1"><div style="font-size:.78rem;font-weight:600">${s.name}</div><div style="font-size:.64rem;color:var(--muted)">${s.dept} Â· Y${s.year} Â· ${s.id}</div></div>
+        <div style="flex:1"><div style="font-size:.78rem;font-weight:600">${s.name}</div><div style="font-size:.64rem;color:var(--muted)">${s.dept} · Y${s.year} · ${s.id}</div></div>
         <span style="font-weight:700;color:#fb7185;font-size:.82rem">${s.att}%</span>
       </div>`).join('')}
     </div>
@@ -1957,7 +1957,7 @@
       </div>
       <div class="gcard">
         <div class="sh"><div class="sh-t"><i class="fa-solid fa-sliders" style="margin-right:6px;color:var(--admin)"></i>App Config</div></div>
-        ${[['Min. Attendance Threshold', '75%'], ['Current Semester', 'Semester 6 Â· 2025-26'], ['Academic Year Start', 'August 1, 2025'], ['Exam Season', 'May 5 â€“ May 20, 2026']].map(([k, v]) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+        ${[['Min. Attendance Threshold', '75%'], ['Current Semester', 'Semester 6 · 2025-26'], ['Academic Year Start', 'August 1, 2025'], ['Exam Season', 'May 5 – May 20, 2026']].map(([k, v]) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)">
           <span style="font-size:.78rem;color:var(--muted)">${k}</span>
           <div style="display:flex;gap:6px;align-items:center"><span style="font-size:.78rem;font-weight:600">${v}</span><button class="btn btn-glass btn-xs" onclick="showToast('Updated ${k}')"><i class="fa-solid fa-pen"></i></button></div>
         </div>`).join('')}
@@ -1974,7 +1974,7 @@
         <div class="sh"><div class="sh-t"><i class="fa-solid fa-scroll" style="margin-right:6px;color:var(--admin)"></i>Audit Log (Recent)</div></div>
         ${[{ who: 'Dr. V. Patil', action: 'Posted ESE schedule announcement', when: 'Today 9:12 AM' }, { who: 'Prof. R. Sharma', action: 'Entered IA-3 marks for CSE301', when: 'Today 8:48 AM' }, { who: 'Admin', action: 'Approved leave for Prof. Gupta', when: 'Yesterday 4:30 PM' }, { who: 'Admin', action: 'Added 12 students to CSE Year 1', when: 'Mar 20, 11:00 AM' }].map(lg => `<div class="li">
           <div style="width:30px;height:30px;border-radius:8px;background:rgba(99,102,241,.08);display:flex;align-items:center;justify-content:center;color:#a5b4fc;font-size:.75rem"><i class="fa-solid fa-scroll"></i></div>
-          <div style="flex:1"><div style="font-size:.76rem;font-weight:500">${lg.action}</div><div style="font-size:.63rem;color:var(--muted);margin-top:2px"><i class="fa-solid fa-user" style="margin-right:3px"></i>${lg.who} &nbsp;Â·&nbsp; ${lg.when}</div></div>
+          <div style="flex:1"><div style="font-size:.76rem;font-weight:500">${lg.action}</div><div style="font-size:.63rem;color:var(--muted);margin-top:2px"><i class="fa-solid fa-user" style="margin-right:3px"></i>${lg.who} &nbsp;·&nbsp; ${lg.when}</div></div>
         </div>`).join('')}
       </div>
     </div>
@@ -1982,7 +1982,7 @@
 </div>`;
     }
 
-    /* â”€â”€ ADD / EDIT FACULTY â”€â”€ */
+    /* ── ADD / EDIT FACULTY ── */
     window.showAddFaculty = function () {
       modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
         <div class="modal-t"><i class="fa-solid fa-chalkboard-user" style="color:var(--admin);margin-right:8px"></i>Add Faculty</div>
@@ -2014,7 +2014,7 @@
         const r = await fetch(`${API_BASE}/admin/add-teacher`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, name, department: dept, designation: desg, email, phone }) });
         const d = await r.json();
         if (d.ok) {
-          FACULTY.push({ id, name, dept, subjects: [desg], office: 'â€”', hours: 'â€”', rating: 4.8, leaves: 0, status: 'Active', email });
+          FACULTY.push({ id, name, dept, subjects: [desg], office: '—', hours: '—', rating: 4.8, leaves: 0, status: 'Active', email });
           closeModal();
           document.getElementById('page-content').innerHTML = pageFaculty();
           showToast(`${name} added to faculty!`);
@@ -2025,7 +2025,7 @@
       const f = FACULTY.find(x => x.id === id);
       if (!f) return;
       modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
-        <div class="modal-t"><i class="fa-solid fa-pen" style="color:var(--admin);margin-right:8px"></i>Edit Faculty â€” ${f.name}</div>
+        <div class="modal-t"><i class="fa-solid fa-pen" style="color:var(--admin);margin-right:8px"></i>Edit Faculty — ${f.name}</div>
         <div class="frow"><div class="flbl">Full Name</div><input class="inp" id="ef-name" value="${f.name}"></div>
         <div class="g2"><div class="frow"><div class="flbl">Department</div><select class="inp" id="ef-dept">${DEPTS.map(d => `<option value="${d.code}" ${d.code === f.dept ? 'selected' : ''}>${d.code}</option>`).join('')}</select></div>
         <div class="frow"><div class="flbl">Designation</div><select class="inp" id="ef-desg"><option ${f.subjects[0] === 'Assistant Professor' ? 'selected' : ''}>Assistant Professor</option><option ${f.subjects[0] === 'Associate Professor' ? 'selected' : ''}>Associate Professor</option><option ${f.subjects[0] === 'Professor' ? 'selected' : ''}>Professor</option></select></div></div>
@@ -2069,7 +2069,7 @@
       } catch (e) { showToast('Server error', 'error'); }
     };
 
-    /* â”€â”€ ADMIN CHAT PAGE â”€â”€ */
+    /* ── ADMIN CHAT PAGE ── */
     let adminChatContacts = [], adminActiveRoom = null, adminSocket = null;
     function pageChats() {
       // Trigger contact loading when the page is rendered
@@ -2102,7 +2102,7 @@
             const isActive = adminActiveRoom === roomId;
             return `<div class="li" style="padding:10px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);${isActive ? 'background:rgba(99,102,241,.12)' : ''}" onclick="loadAdminChat('${roomId}','${c.id}','${c.name}','${c.role}')">
               <div style="width:30px;height:30px;border-radius:50%;background:rgba(99,102,241,.12);display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#a5b4fc;flex-shrink:0"><i class="fa-solid ${c.role === 'Teacher' ? 'fa-chalkboard-user' : 'fa-user-graduate'}"></i></div>
-              <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.name}</div><div style="font-size:.63rem;color:var(--muted)">${c.role} Â· ${c.role_label || 'Staff'}</div></div>
+              <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.name}</div><div style="font-size:.63rem;color:var(--muted)">${c.role} · ${c.role_label || 'Staff'}</div></div>
             </div>`;
           }).join('');
         } else {
@@ -2185,11 +2185,11 @@
         adminSocket.emit('send_message', { room_id: roomId, sender_id: u.id, sender_name: u.name, sender_role: 'Admin', text });
         inp.value = '';
       } else {
-        showToast('Chat server offline â€” message not sent', 'error');
+        showToast('Chat server offline — message not sent', 'error');
       }
     };
 
-    /* â”€â”€ PAGES MAP â”€â”€ */
+    /* ── PAGES MAP ── */
     const PAGES = {
       dashboard: pageDashboard, students: pageStudents, faculty: pageFaculty,
       timetable: pageTimetable, exams: pageExams, calendar: pageCalendar, marks: pageMarks,
@@ -2198,7 +2198,7 @@
       reports: pageReports, settings: pageSettings,
     };
 
-    /* â”€â”€ CHALK BG (login style) â”€â”€ */
+    /* ── CHALK BG (login style) ── */
     const board = document.getElementById('chalkboard');
     const glow = document.getElementById('mouse-glow');
     const icons = [];
@@ -2239,10 +2239,10 @@
     }
     animateChalk();
 
-    /* â”€â”€ BACKEND CONFIG â”€â”€ */
+    /* ── BACKEND CONFIG ── */
     const API_BASE = 'http://localhost:3001/api';
 
-    /* â”€â”€ AUTH GUARD & NAME INJECTION â”€â”€ */
+    /* ── AUTH GUARD & NAME INJECTION ── */
     (async function () {
       const u = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
       if (!u || u.role !== 'Admin') { window.location.href = 'index.html'; return; }
@@ -2285,7 +2285,7 @@
           tchrData.teachers.forEach(t => {
             FACULTY.push({
               id: t.id, name: t.name, dept: t.department,
-              subjects: [t.designation], office: 'â€”', hours: 'â€”',
+              subjects: [t.designation], office: '—', hours: '—',
               rating: 4.8, leaves: 0, status: 'Active',
               email: t.email || `${t.id.toLowerCase()}@uni.edu`
             });
@@ -2304,7 +2304,7 @@
         console.warn('Backend unavailable, using sample data:', e.message);
       }
 
-      /* â”€â”€ Wire Add Student modal to API â”€â”€ */
+      /* ── Wire Add Student modal to API ── */
       window.addStudentToAPI = async function (id, name, dept, year, sec, email) {
         try {
           const r = await fetch(`${API_BASE}/admin/add-student`, {
@@ -2321,12 +2321,12 @@
             showToast(d.message || 'Error adding student', 'error');
           }
         } catch (e) {
-          showToast('Server offline â€“ student not saved permanently', 'warn');
+          showToast('Server offline – student not saved permanently', 'warn');
           closeModal();
         }
       };
 
-      /* â”€â”€ Wire Delete Student to API â”€â”€ */
+      /* ── Wire Delete Student to API ── */
       window.deleteStudentAPI = async function (id, name) {
         if (!confirm(`Delete student ${name}?`)) return;
         try {
@@ -2340,7 +2340,7 @@
         }
       };
 
-      /* â”€â”€ Wire Add Student modal to API â”€â”€ */
+      /* ── Wire Add Student modal to API ── */
       window.addStudentToAPI = async function (id, name, dept, year, sec, email, batch = '') {
         const errEl = document.getElementById('add-err');
         try {
@@ -2360,12 +2360,12 @@
             else showToast(d.message || 'Error adding student', 'error');
           }
         } catch (e) {
-          if (errEl) errEl.textContent = 'Server offline â€“ student not saved permanently';
+          if (errEl) errEl.textContent = 'Server offline – student not saved permanently';
           else showToast('Server offline', 'warn');
         }
       };
 
-      /* â”€â”€ Wire Delete Student to API â”€â”€ */
+      /* ── Wire Delete Student to API ── */
       window.deleteStudentAPI = async function (id, name) {
         if (!confirm(`Delete student ${name}?`)) return;
         try {
@@ -2379,7 +2379,7 @@
         }
       };
 
-      /* â”€â”€ Admin Chat via Socket.IO â”€â”€ */
+      /* ── Admin Chat via Socket.IO ── */
       window.openChatWith = async function (contactId, contactName, contactRole) {
         // Navigate to chat page first
         const chatNavEl = document.querySelector('[onclick*="chats"]');
@@ -2407,7 +2407,7 @@
                 const roomId = [u.id, c.id].sort().join('_');
                 return `<div class="li" style="padding:10px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04)" onclick="loadAdminChat('${roomId}','${c.id}','${c.name}','${c.role}')">
                   <div style="width:30px;height:30px;border-radius:50%;background:rgba(99,102,241,.12);display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#a5b4fc;flex-shrink:0"><i class="fa-solid ${c.role === 'Teacher' ? 'fa-chalkboard-user' : 'fa-user-graduate'}"></i></div>
-                  <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.name}</div><div style="font-size:.63rem;color:var(--muted)">${c.role} Â· ${c.role_label}</div></div>
+                  <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.name}</div><div style="font-size:.63rem;color:var(--muted)">${c.role} · ${c.role_label}</div></div>
                 </div>`;
               }).join('');
             }
@@ -2423,7 +2423,7 @@
         chatMain.innerHTML = `
           <div style="padding:12px 16px;border-bottom:1px solid var(--glass-border);display:flex;align-items:center;gap:10px">
             <div style="width:32px;height:32px;border-radius:50%;background:rgba(99,102,241,.12);display:flex;align-items:center;justify-content:center;color:#a5b4fc;font-size:.8rem"><i class="fa-solid ${contactRole === 'Teacher' ? 'fa-chalkboard-user' : 'fa-user-graduate'}"></i></div>
-            <div><div style="font-weight:700;font-size:.84rem">${contactName}</div><div style="font-size:.62rem;color:var(--muted)">${contactRole} Â· ${roomId}</div></div>
+            <div><div style="font-weight:700;font-size:.84rem">${contactName}</div><div style="font-size:.62rem;color:var(--muted)">${contactRole} · ${roomId}</div></div>
           </div>
           <div style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px" id="admin-msgs"><div style="text-align:center;color:var(--muted);font-size:.75rem"><i class="fa-solid fa-spinner fa-spin"></i></div></div>
           <div style="padding:10px 12px;border-top:1px solid var(--glass-border);display:flex;gap:8px">
@@ -2465,12 +2465,12 @@
         inp.value = '';
       };
 
-      /* â”€â”€ Live stats refresh every 30s â”€â”€ */
+      /* ── Live stats refresh every 30s ── */
       setInterval(async () => {
         try {
           const r = await fetch(`${API_BASE}/admin/stats`);
           const d = await r.json();
-          if (d.ok && d.stats) {/* stats updated â€” re-render if on dashboard would cause flicker, just store */ }
+          if (d.ok && d.stats) {/* stats updated — re-render if on dashboard would cause flicker, just store */ }
         } catch (e) { }
       }, 30000);
 
@@ -2480,7 +2480,7 @@
 
     function doLogout() { sessionStorage.removeItem('Uni_user'); window.location.href = 'index.html'; }
 
-    /* â”€â”€ GLOBAL SEARCH â”€â”€ */
+    /* ── GLOBAL SEARCH ── */
     function globalSearch(q) {
       q = q.toLowerCase().trim();
       if (!q) {
@@ -2495,7 +2495,7 @@
       });
     }
 
-    /* â”€â”€ INIT â€“ handled by async auth guard above â”€â”€ */
+    /* ── INIT – handled by async auth guard above ── */
 
   </script>
 </body>
