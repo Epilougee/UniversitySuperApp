@@ -2,20 +2,29 @@
 node_modules/
 package-lock.json
 
-# Database (auto-generated on first run)
-backend/Uni.db
+# Next.js Build Output
+.next/
+out/
+build/
+dist/
 
-# OS files
+# Database
+*.db
+backend/Uni.db
+Uni.db
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# OS & Editor
 .DS_Store
 Thumbs.db
 desktop.ini
-
-# IDE / Editor
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
 # Logs
 *.log
@@ -25,7 +34,3 @@ npm-debug.log*
 .env
 .env.local
 .env.*.local
-
-# Build output
-dist/
-build/

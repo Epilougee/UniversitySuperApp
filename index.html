@@ -121,6 +121,93 @@
             box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
         }
 
+        .demo-section {
+            margin-bottom: 18px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            text-align: left;
+        }
+
+        .demo-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .demo-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #c7d2fe;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .quick-fill-btn {
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            color: #e0e7ff;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 10.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-fill-btn:hover {
+            background: rgba(99, 102, 241, 0.35);
+        }
+
+        .demo-chips {
+            display: flex;
+            gap: 6px;
+            justifyContent: space-between;
+        }
+
+        .demo-chip {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.75);
+            padding: 7px 4px;
+            border-radius: 9px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .demo-chip:hover {
+            background: rgba(99, 102, 241, 0.25);
+            border-color: rgba(99, 102, 241, 0.4);
+            color: #fff;
+        }
+
+        .demo-chip.active {
+            background: rgba(99, 102, 241, 0.35);
+            border-color: #818cf8;
+            color: #fff;
+        }
+
+        .feedback-banner {
+            margin-bottom: 14px;
+            font-size: 11.5px;
+            color: #86efac;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            padding: 7px 12px;
+            border-radius: 10px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
         .input-box {
             text-align: left;
             margin-bottom: 20px;
@@ -235,6 +322,35 @@
             </button>
         </div>
 
+        <!-- Demo auto-fill option -->
+        <div class="demo-section">
+            <div class="demo-header">
+                <span class="demo-title">
+                    <i class="fa-solid fa-wand-magic-sparkles" style="margin-right: 6px; color: #a5b4fc;"></i>
+                    Click to Auto-Fill Demo:
+                </span>
+                <button type="button" class="quick-fill-btn" onclick="fillDemo(currentRole)">
+                    <i class="fa-solid fa-bolt" style="margin-right: 4px;"></i>Fill Current
+                </button>
+            </div>
+            <div class="demo-chips">
+                <button type="button" class="demo-chip active" id="demo-chip-Student" onclick="fillDemo('Student')">
+                    <i class="fa-solid fa-user-graduate" style="margin-right: 4px;"></i>Demo Student
+                </button>
+                <button type="button" class="demo-chip" id="demo-chip-Teacher" onclick="fillDemo('Teacher')">
+                    <i class="fa-solid fa-chalkboard-user" style="margin-right: 4px;"></i>Demo Teacher
+                </button>
+                <button type="button" class="demo-chip" id="demo-chip-Admin" onclick="fillDemo('Admin')">
+                    <i class="fa-solid fa-shield-halved" style="margin-right: 4px;"></i>Demo Admin
+                </button>
+            </div>
+        </div>
+
+        <div id="feedback-banner" class="feedback-banner">
+            <i class="fa-solid fa-circle-check" style="margin-right: 6px;"></i>
+            <span id="feedback-text">Auto-filled demo credentials</span>
+        </div>
+
         <div class="input-box">
             <label id="id-label">University ID (URN)</label>
             <div class="input-wrapper">
@@ -324,13 +440,47 @@
         }
         animate();
 
-        /* â”€â”€â”€â”€â”€ ROLE TOGGLE â”€â”€â”€â”€â”€ */
+        /* Demo Auto-Fill */
+        const DEMO_MAP = {
+            Student: { id: 'E25B022087', pass: 'E25B022087', name: 'John Doe (Student)' },
+            Teacher: { id: 'T25S022090', pass: 'T25S022090', name: 'Dr. Indu Kumari (Teacher)' },
+            Admin:   { id: 'Admin@404', pass: 'Admin@123',   name: 'System Admin' }
+        };
+
+        function fillDemo(role) {
+            currentRole = role;
+            document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+            const roleBtn = document.getElementById(`role-${role.toLowerCase()}`);
+            if (roleBtn) roleBtn.classList.add('active');
+
+            document.querySelectorAll('.demo-chip').forEach(c => c.classList.remove('active'));
+            const chip = document.getElementById(`demo-chip-${role}`);
+            if (chip) chip.classList.add('active');
+
+            const labels = { Student: 'University ID (URN)', Teacher: 'Teacher ID', Admin: 'Admin ID' };
+            const lbl = document.getElementById('id-label');
+            if (lbl) lbl.innerText = labels[role];
+
+            const cred = DEMO_MAP[role];
+            document.getElementById('mainInput').value = cred.id;
+            document.getElementById('pwInput').value = cred.pass;
+
+            const banner = document.getElementById('feedback-banner');
+            const text = document.getElementById('feedback-text');
+            if (banner && text) {
+                text.textContent = `Auto-filled ${role} demo credentials (${cred.name})`;
+                banner.style.display = 'flex';
+                setTimeout(() => { banner.style.display = 'none'; }, 2800);
+            }
+        }
+
         function setRole(role, btn) {
             currentRole = role;
             document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             const labels = { Student: 'University ID (URN)', Teacher: 'Teacher ID', Admin: 'Admin ID' };
             document.getElementById('id-label').innerText = labels[role];
+            fillDemo(role);
         }
 
         /* â”€â”€â”€â”€â”€ LOGIN â”€â”€â”€â”€â”€ */

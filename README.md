@@ -1,8 +1,8 @@
-# 🎓 Uni Super App — Complete ERP System
+# 🎓 Uni Super App — Next.js ERP System
 
-> A comprehensive Educational Resource Planning (ERP) platform for academic institutions
+> A comprehensive Educational Resource Planning (ERP) platform for academic institutions converted to Next.js with TypeScript, App Router, and real-time Socket.IO.
 
-**Built with:** Node.js • Express • Socket.IO • SQLite
+**Built with:** Next.js (App Router) • React • TypeScript • Socket.IO • SQLite (sql.js)
 
 ---
 
@@ -10,14 +10,12 @@
 
 1. [Overview](#-project-overview)
 2. [Features](#key-features)
-3. [Prerequisites](#-prerequisites)
-4. [Installation](#️-installation--setup)
-5. [Running the Project](#-running-the-project)
-6. [Login Credentials](#-default-login-credentials)
-7. [How to Use](#-how-to-use)
-8. [Project Structure](#-project-structure)
-9. [API Endpoints](#-api-endpoints-overview)
-10. [Database Schema](#-database-schema)
+3. [Quick Start](#-quick-start)
+4. [Going Live / Deployment](#-going-live--deployment)
+5. [Login Credentials](#-default-login-credentials)
+6. [Project Structure](#-project-structure)
+7. [API Endpoints](#-api-endpoints-overview)
+8. [Database Schema](#-database-schema)
 11. [Frontend Details](#-frontend-details)
 12. [Troubleshooting](#-troubleshooting)
 13. [Technology Stack](#-technology-stack)
@@ -81,54 +79,51 @@ npm --version
 
 ---
 
-## ⚙️ Installation & Setup
+## ⚡ Quick Start
 
-### Step 1: Clone the Repository
-
+### 1. Install Dependencies
 ```bash
-git clone https://github.com/YOUR_USERNAME/uni-super-app.git
-cd uni-super-app
-```
-
-### Step 2: Install Backend Dependencies
-
-```bash
-cd backend
 npm install
 ```
 
-**This will install:**
-- `express` — Web server framework
-- `cors` — Cross-Origin Resource Sharing middleware
-- `socket.io` — Real-time communication library
-- `bcryptjs` — Password hashing library
-- `sql.js` — SQLite database for Node.js
-
-### Step 3: Verify Dependencies
-
+### 2. Run Development Server
 ```bash
-npm list
+npm run dev
 ```
+Open [http://localhost:3000](http://localhost:3000) in your browser. Both Next.js and real-time Socket.IO run concurrently on the same port!
 
-All packages should be listed with their versions.
-
----
-
-## 🚀 Running the Project
-
-### Start the Backend Server
-
-From the `backend` directory:
-
+### 3. Production Build & Start
 ```bash
+npm run build
 npm start
 ```
 
-**Alternative method:**
+---
 
-```bash
-node server.js
-```
+## 🌐 Going Live / Deployment
+
+This Next.js app is production-ready for any cloud host.
+
+### Option A: Railway / Render / DigitalOcean / VPS (Recommended for WebSockets)
+1. Push this repository to GitHub.
+2. In Railway or Render, create a new **Web Service** connected to your repo.
+3. Set the build command:
+   ```bash
+   npm install && npm run build
+   ```
+4. Set the start command:
+   ```bash
+   npm start
+   ```
+5. Port is automatically bound to `process.env.PORT`.
+
+### Option B: Vercel
+1. Import repo into Vercel.
+2. Framework preset will automatically detect **Next.js**.
+3. All Next.js pages and API route handlers (`/api/...`) work serverlessly out of the box!
+4. For persistent database across serverless redeployments, connect a hosted DB or set `DATABASE_PATH` on persistent storage.
+
+---
 
 ### ✅ Expected Output
 

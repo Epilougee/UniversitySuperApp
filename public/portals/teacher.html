@@ -1,0 +1,2267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uni | Teacher Portal</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+  <style>
+    :root {
+      --bg-dark: #020408;
+      --glass: rgba(255, 255, 255, .04);
+      --glass-border: rgba(255, 255, 255, .1);
+      --glass-hover: rgba(255, 255, 255, .1);
+      --muted: rgba(255, 255, 255, .45);
+      --muted2: rgba(255, 255, 255, .25);
+      --gold: #e8a020;
+      --gold2: #f5c842;
+      --teal: #0d9488;
+      --rose: #e11d48;
+      --green: #10b981;
+      --violet: #7c3aed;
+      --admin: #6366f1;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    body,
+    html {
+      width: 100%;
+      height: 100%;
+      background: #020408;
+      font-family: 'Inter', -apple-system, sans-serif;
+      color: #fff;
+      overflow: hidden
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, .02);
+      border-radius: 99px
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(255, 255, 255, .25), rgba(255, 255, 255, .08));
+      border-radius: 99px
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, rgba(255, 255, 255, .45), rgba(255, 255, 255, .18))
+    }
+
+    #chalkboard {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden
+    }
+
+    #mouse-glow {
+      position: fixed;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(99, 102, 241, .1) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: screen;
+      transition: left .05s, top .05s
+    }
+
+    .chalk-icon {
+      position: absolute;
+      color: rgba(255, 255, 255, .35);
+      pointer-events: none;
+      filter: drop-shadow(0 0 5px rgba(255, 255, 255, .1));
+      will-change: transform, color, opacity;
+      transition: color .3s, opacity .3s
+    }
+
+    .app {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      height: 100vh;
+      width: 100%
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 230px;
+      flex-shrink: 0;
+      background: var(--glass);
+      border-right: 1px solid var(--glass-border);
+      backdrop-filter: blur(30px);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      overflow-x: hidden;
+      position: relative
+    }
+
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 200px;
+      background: radial-gradient(ellipse at 50% 0%, rgba(99, 102, 241, .08), transparent);
+      pointer-events: none
+    }
+
+    .sb-head {
+      padding: 20px 18px 14px;
+      border-bottom: 1px solid var(--glass-border);
+      flex-shrink: 0
+    }
+
+    .sb-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: -.5px;
+      color: #fff
+    }
+
+    .sb-logo span {
+      color: #a5b4fc
+    }
+
+    .sb-uni {
+      font-size: .56rem;
+      color: var(--muted2);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-top: 2px
+    }
+
+    .sb-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(13, 148, 136, .15);
+      border: 1px solid rgba(13, 148, 136, .25);
+      color: #2dd4bf;
+      font-size: .55rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 99px;
+      margin-top: 6px;
+      letter-spacing: .5px
+    }
+
+    .sb-profile {
+      margin: 12px 10px;
+      padding: 10px 12px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .sb-av {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #0d9488, #2dd4bf);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .75rem;
+      font-weight: 800;
+      color: #fff
+    }
+
+    .sb-name {
+      font-size: .76rem;
+      font-weight: 600
+    }
+
+    .sb-role {
+      font-size: .6rem;
+      color: var(--muted)
+    }
+
+    .sb-section {
+      font-size: .54rem;
+      color: var(--muted2);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 10px 18px 4px
+    }
+
+    .sb-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 18px;
+      cursor: pointer;
+      transition: all .15s;
+      border-left: 2px solid transparent;
+      font-size: .76rem;
+      font-weight: 500;
+      color: var(--muted);
+      position: relative
+    }
+
+    .sb-item:hover {
+      background: rgba(255, 255, 255, .04);
+      color: rgba(255, 255, 255, .85)
+    }
+
+    .sb-item.active {
+      background: rgba(99, 102, 241, .1);
+      color: #a5b4fc;
+      border-left-color: #6366f1
+    }
+
+    .sb-ico {
+      font-size: .82rem;
+      width: 16px;
+      text-align: center;
+      flex-shrink: 0
+    }
+
+    .sb-bdg {
+      margin-left: auto;
+      background: var(--rose);
+      color: #fff;
+      font-size: .52rem;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 99px;
+      min-width: 15px;
+      text-align: center
+    }
+
+    .sb-foot {
+      margin-top: auto;
+      padding: 12px 18px;
+      border-top: 1px solid var(--glass-border)
+    }
+
+    /* MAIN */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden
+    }
+
+    .main::-webkit-scrollbar {
+      width: 5px
+    }
+
+    .main::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(255, 255, 255, .25), rgba(255, 255, 255, .08));
+      border-radius: 99px
+    }
+
+    /* TOPBAR */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(2, 4, 8, .85);
+      backdrop-filter: blur(30px);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 12px 22px;
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .tb-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      flex: 1
+    }
+
+    .tb-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 99px;
+      padding: 6px 14px
+    }
+
+    .tb-search input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      font-size: .76rem;
+      color: #fff;
+      width: 140px
+    }
+
+    .tb-search input::placeholder {
+      color: var(--muted2)
+    }
+
+    .nb {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: var(--glass);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: .82rem;
+      position: relative;
+      transition: .2s
+    }
+
+    .nb:hover {
+      border-color: rgba(255, 255, 255, .3)
+    }
+
+    .ndot {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      min-width: 16px;
+      height: 16px;
+      background: var(--rose);
+      border-radius: 99px;
+      border: 1.5px solid #020408;
+      font-size: .58rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 3px;
+      color: #fff;
+      transition: transform .2s
+    }
+
+    /* â”€â”€ NOTIFICATION DROPDOWN â”€â”€ */
+    .notif-panel {
+      position: fixed;
+      top: 58px;
+      right: 16px;
+      width: 320px;
+      max-height: 480px;
+      background: rgba(10, 12, 24, .96);
+      backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 18px;
+      z-index: 999;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .6);
+      animation: panelIn .2s ease both;
+      display: none
+    }
+
+    .notif-panel.open {
+      display: flex;
+      flex-direction: column
+    }
+
+    .notif-hdr {
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, .07);
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .notif-title {
+      font-size: .82rem;
+      font-weight: 700
+    }
+
+    .notif-list {
+      overflow-y: auto;
+      flex: 1
+    }
+
+    .notif-list::-webkit-scrollbar {
+      width: 2px
+    }
+
+    .notif-item {
+      padding: 11px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, .04);
+      cursor: pointer;
+      transition: background .15s;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start
+    }
+
+    .notif-item:hover {
+      background: rgba(255, 255, 255, .04)
+    }
+
+    .notif-item.unread {
+      background: rgba(99, 102, 241, .06)
+    }
+
+    .notif-ico {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .8rem;
+      flex-shrink: 0;
+      margin-top: 1px
+    }
+
+    .notif-body {
+      flex: 1;
+      min-width: 0
+    }
+
+    .notif-body-t {
+      font-size: .76rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+      line-height: 1.35
+    }
+
+    .notif-body-s {
+      font-size: .66rem;
+      color: var(--muted)
+    }
+
+    .notif-unread-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--rose);
+      flex-shrink: 0;
+      margin-top: 6px
+    }
+
+    .notif-empty {
+      padding: 30px 16px;
+      text-align: center;
+      color: var(--muted);
+      font-size: .78rem
+    }
+
+    .notif-foot {
+      padding: 10px 16px;
+      border-top: 1px solid rgba(255, 255, 255, .06);
+      text-align: center
+    }
+
+    @keyframes panelIn {
+      from {
+        opacity: 0;
+        transform: translateY(-8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .page {
+      padding: 18px 22px 40px
+    }
+
+    /* CARDS */
+    .gcard {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      backdrop-filter: blur(30px);
+      padding: 16px 18px;
+      transition: border-color .2s;
+      position: relative;
+      overflow: hidden
+    }
+
+    .gcard:hover {
+      border-color: rgba(255, 255, 255, .18)
+    }
+
+    .stat {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      backdrop-filter: blur(30px);
+      transition: .2s
+    }
+
+    .stat:hover {
+      border-color: rgba(255, 255, 255, .2);
+      transform: translateY(-1px)
+    }
+
+    .stat-ico {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0
+    }
+
+    .stat-n {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      line-height: 1
+    }
+
+    .stat-l {
+      font-size: .65rem;
+      color: var(--muted);
+      margin-top: 2px
+    }
+
+    /* GRIDS */
+    .g2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px
+    }
+
+    .g3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px
+    }
+
+    .g4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px
+    }
+
+    /* UI */
+    .sh {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px
+    }
+
+    .sh-t {
+      font-family: 'Playfair Display', serif;
+      font-size: .95rem;
+      font-weight: 700
+    }
+
+    .div {
+      height: 1px;
+      background: rgba(255, 255, 255, .07);
+      margin: .7rem 0
+    }
+
+    .pb {
+      height: 4px;
+      background: rgba(255, 255, 255, .08);
+      border-radius: 99px;
+      overflow: hidden
+    }
+
+    .pf {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 1s cubic-bezier(.4, 0, .2, 1)
+    }
+
+    .li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 6px;
+      border-radius: 10px;
+      transition: .15s;
+      cursor: pointer
+    }
+
+    .li:hover {
+      background: rgba(255, 255, 255, .04)
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 7px;
+      border-radius: 99px;
+      font-size: .6rem;
+      font-weight: 600
+    }
+
+    .t-gold {
+      background: rgba(232, 160, 32, .15);
+      color: var(--gold);
+      border: 1px solid rgba(232, 160, 32, .25)
+    }
+
+    .t-teal {
+      background: rgba(13, 148, 136, .15);
+      color: #2dd4bf;
+      border: 1px solid rgba(13, 148, 136, .25)
+    }
+
+    .t-rose {
+      background: rgba(225, 29, 72, .15);
+      color: #fb7185;
+      border: 1px solid rgba(225, 29, 72, .25)
+    }
+
+    .t-green {
+      background: rgba(16, 185, 129, .15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, .25)
+    }
+
+    .t-violet {
+      background: rgba(124, 58, 237, .15);
+      color: #a78bfa;
+      border: 1px solid rgba(124, 58, 237, .25)
+    }
+
+    .t-white {
+      background: rgba(255, 255, 255, .1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, .15)
+    }
+
+    .t-admin {
+      background: rgba(99, 102, 241, .15);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, .25)
+    }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 13px;
+      border-radius: 9px;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      font-size: .73rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .2s
+    }
+
+    .btn-teal {
+      background: var(--teal);
+      color: #fff
+    }
+
+    .btn-teal:hover {
+      background: #0f766e
+    }
+
+    .btn-admin {
+      background: var(--admin);
+      color: #fff
+    }
+
+    .btn-admin:hover {
+      background: #4f46e5
+    }
+
+    .btn-glass {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      color: #fff
+    }
+
+    .btn-glass:hover {
+      background: var(--glass-hover)
+    }
+
+    .btn-white {
+      background: #fff;
+      color: #000
+    }
+
+    .btn-white:hover {
+      background: rgba(255, 255, 255, .9)
+    }
+
+    .btn-rose {
+      background: var(--rose);
+      color: #fff
+    }
+
+    .btn-rose:hover {
+      background: #be123c
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: #000
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: .68rem
+    }
+
+    .btn-xs {
+      padding: 3px 8px;
+      font-size: .62rem
+    }
+
+    /* INPUTS */
+    .inp {
+      width: 100%;
+      padding: 9px 12px;
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 9px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: .8rem;
+      outline: none;
+      transition: .2s
+    }
+
+    .inp:focus {
+      background: rgba(255, 255, 255, .07);
+      border-color: rgba(99, 102, 241, .5);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, .1)
+    }
+
+    .inp::placeholder {
+      color: var(--muted2)
+    }
+
+    .inp.error {
+      border-color: #fb7185;
+      background: rgba(251, 113, 133, .08)
+    }
+
+    .inp.success {
+      border-color: #34d399;
+      background: rgba(52, 211, 153, .08)
+    }
+
+    select.inp option {
+      background: #0d1117;
+      color: #fff
+    }
+
+    /* TABLE */
+    .tbl {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .76rem
+    }
+
+    .tbl th {
+      padding: 9px 12px;
+      text-align: left;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: .62rem;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      border-bottom: 1px solid rgba(255, 255, 255, .08)
+    }
+
+    .tbl td {
+      padding: 9px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, .04);
+      vertical-align: middle
+    }
+
+    .tbl tr:hover td {
+      background: rgba(255, 255, 255, .025)
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 999;
+      background: rgba(255, 255, 255, .12);
+      backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, .2);
+      color: #fff;
+      padding: 11px 16px;
+      border-radius: 11px;
+      font-size: .78rem;
+      font-weight: 500;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .5);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: fadeUp .3s ease
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    /* GLOBAL LOADER */
+    .global-loader {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .4);
+      backdrop-filter: blur(30px);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn .2s ease
+    }
+
+    .global-loader.hidden {
+      display: none
+    }
+
+    .loader-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 255, 255, .15);
+      border-top-color: rgba(255, 255, 255, .8);
+      border-radius: 50%;
+      animation: spin 1s linear infinite
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .panel {
+      animation: fadeUp .3s ease both
+    }
+
+    /* MODAL */
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .6);
+      backdrop-filter: blur(30px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .modal {
+      background: #0d1117;
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 24px;
+      width: 480px;
+      max-width: 95vw;
+      max-height: 85vh;
+      overflow-y: auto
+    }
+
+    .modal-t {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 16px
+    }
+
+    .frow {
+      margin-bottom: 12px
+    }
+
+    .flbl {
+      font-size: .65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      margin-bottom: 4px;
+      font-weight: 600
+    }
+
+    /* ATT GRID */
+    .att-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 8px
+    }
+
+    .att-stu {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      padding: 10px;
+      cursor: pointer;
+      transition: .15s;
+      text-align: center
+    }
+
+    .att-stu:hover {
+      background: rgba(255, 255, 255, .1)
+    }
+
+    .att-stu.present {
+      border-color: rgba(13, 148, 136, .5);
+      background: rgba(13, 148, 136, .1)
+    }
+
+    .att-stu.absent {
+      border-color: rgba(225, 29, 72, .5);
+      background: rgba(225, 29, 72, .1)
+    }
+  </style>
+</head>
+
+<body>
+  <div id="mouse-glow"></div>
+  <div id="chalkboard"></div>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sb-head">
+        <div class="sb-logo">Un<span>i</span></div>
+        <div class="sb-uni">Teacher Portal Â· 2025â€“26</div>
+        <div class="sb-badge"><i class="fa-solid fa-chalkboard-user"></i> Faculty</div>
+      </div>
+      <div class="sb-profile">
+        <div class="sb-av" id="sb-av">IK</div>
+        <div>
+          <div class="sb-name" id="sb-name">Indu Kumari</div>
+          <div class="sb-role">Faculty</div>
+        </div>
+      </div>
+      <div id="sb-nav">
+        <div class="sb-section"><i class="fa-solid fa-star" style="margin-right:6px"></i>Overview</div>
+        <div class="sb-item active" onclick="nav(this,'dashboard')"><span class="sb-ico"><i
+              class="fa-solid fa-gauge-high"></i></span>Dashboard</div>
+
+        <div class="sb-section"><i class="fa-solid fa-chalkboard-user" style="margin-right:6px"></i>Teaching</div>
+        <div class="sb-item" onclick="nav(this,'attendance')"><span class="sb-ico"><i
+              class="fa-solid fa-clipboard-check"></i></span>Attendance<span class="sb-bdg">2</span></div>
+        <div class="sb-item" onclick="nav(this,'students')"><span class="sb-ico"><i
+              class="fa-solid fa-user-graduate"></i></span>My Students</div>
+        <div class="sb-item" onclick="nav(this,'timetable')"><span class="sb-ico"><i
+              class="fa-solid fa-calendar-days"></i></span>Timetable</div>
+
+        <div class="sb-section"><i class="fa-solid fa-graduation-cap" style="margin-right:6px"></i>Academics</div>
+        <div class="sb-item" onclick="nav(this,'materials')"><span class="sb-ico"><i
+              class="fa-solid fa-folder-open"></i></span>Materials</div>
+        <div class="sb-item" onclick="nav(this,'assignments')"><span class="sb-ico"><i
+              class="fa-solid fa-pen-ruler"></i></span>Assignments<span class="sb-bdg">4</span></div>
+        <div class="sb-item" onclick="nav(this,'marks')"><span class="sb-ico"><i
+              class="fa-solid fa-pen-ruler"></i></span>Marks &amp; Gradebook</div>
+
+        <div class="sb-section"><i class="fa-solid fa-message" style="margin-right:6px"></i>Communication</div>
+        <div class="sb-item" onclick="nav(this,'announce')"><span class="sb-ico"><i
+              class="fa-solid fa-bullhorn"></i></span>Announcements</div>
+        <div class="sb-item" onclick="nav(this,'messages')"><span class="sb-ico"><i
+              class="fa-solid fa-comments"></i></span>Messages<span class="sb-bdg">3</span></div>
+
+        <div class="sb-section"><i class="fa-solid fa-briefcase" style="margin-right:6px"></i>Work</div>
+        <div class="sb-item" onclick="nav(this,'leave')"><span class="sb-ico"><i
+              class="fa-solid fa-plane-departure"></i></span>Leave</div>
+        <div class="sb-item" onclick="nav(this,'performance')"><span class="sb-ico"><i
+              class="fa-solid fa-chart-line"></i></span>Performance</div>
+        <div class="sb-item" onclick="nav(this,'profile')"><span class="sb-ico"><i
+              class="fa-solid fa-circle-user"></i></span>Profile &amp; Settings</div>
+      </div>
+      <div class="sb-foot">
+        <div class="sb-item" style="color:rgba(220,80,80,.8);padding:0" onclick="doLogout()">
+          <span class="sb-ico"><i class="fa-solid fa-right-from-bracket"></i></span>Log Out
+        </div>
+      </div>
+    </aside>
+    <div class="main" id="main">
+      <div class="topbar">
+        <div class="tb-title" id="tb-title">Dashboard</div>
+        <div class="tb-search">
+          <i class="fa-solid fa-magnifying-glass" style="color:var(--muted2);font-size:.73rem"></i>
+          <input id="global-search" placeholder="Search students, subjects..." oninput="globalSearch(this.value)">
+        </div>
+        <div class="nb" id="notif-btn" onclick="toggleNotifications(event)"><i class="fa-solid fa-bell"
+            style="font-size:.78rem"></i>
+          <div class="ndot" id="notif-count" style="display:none">0</div>
+        </div>
+        <div class="nb" onclick="showTeacherHelp()"><i class="fa-solid fa-circle-question" style="font-size:.78rem"></i>
+        </div>
+        <div style="font-size:.73rem;font-weight:600;color:var(--muted);cursor:pointer" id="tb-name"
+          onclick="nav(document.querySelector('[onclick*=\'profile\']'),'profile')">Indu Kumari</div>
+      </div>
+      <div class="page" id="page-content"></div>
+    </div>
+
+    <!-- â”€â”€â”€ NOTIFICATION PANEL â”€â”€â”€ -->
+    <div class="notif-panel" id="notif-panel" onclick="event.stopPropagation()">
+      <div class="notif-hdr">
+        <span class="notif-title"><i class="fa-solid fa-bell"
+            style="margin-right:6px;color:var(--admin)"></i>Notifications</span>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-glass btn-xs" onclick="markAllRead()">Read all</button>
+          <button class="btn btn-glass btn-xs" onclick="toggleNotifications()"><i
+              class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+      <div class="notif-list" id="notif-list"></div>
+      <div class="notif-foot">
+        <button class="btn btn-glass btn-xs" onclick="clearAllNotifications()"><i class="fa-solid fa-trash"
+            style="margin-right:4px"></i>Clear all</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="toast" id="toast" style="display:none"></div>
+  <div class="global-loader hidden" id="global-loader">
+    <div class="loader-spinner"></div>
+  </div>
+  <div id="modal-root"></div>
+  <script>
+    /* DATA */
+    const SUBJECTS = [{ code: 'CSE301', name: 'Data Structures & Algorithms', sections: ['3A', '3B'], students: 62 }, { code: 'CSE302', name: 'Algorithm Design', sections: ['3A'], students: 31 }, { code: 'CSE401', name: 'Advanced Algorithms', sections: ['4A'], students: 28 }];
+    const MY_STUDENTS = [
+      { id: 'Uni2022CS001', name: 'Aryan Deshmukh', sec: '3A', att: 81, marks: { ia1: 16, ia2: 18, ia3: 0 }, cgpa: 8.7, status: 'Active' },
+      { id: 'Uni2022CS002', name: 'Priya Sharma', sec: '3A', att: 62, marks: { ia1: 14, ia2: 12, ia3: 0 }, cgpa: 6.5, status: 'Active' },
+      { id: 'Uni2022CS003', name: 'Rahul Patil', sec: '3A', att: 91, marks: { ia1: 19, ia2: 20, ia3: 0 }, cgpa: 9.5, status: 'Active' },
+      { id: 'Uni2022CS004', name: 'Sneha Kulkarni', sec: '3A', att: 55, marks: { ia1: 11, ia2: 13, ia3: 0 }, cgpa: 5.5, status: 'Active' },
+      { id: 'Uni2022CS005', name: 'Karan Mehta', sec: '3A', att: 74, marks: { ia1: 15, ia2: 17, ia3: 0 }, cgpa: 8.0, status: 'Active' },
+      { id: 'Uni2022CS006', name: 'Kavya Nair', sec: '3A', att: 88, marks: { ia1: 18, ia2: 19, ia3: 0 }, cgpa: 9.0, status: 'Active' },
+      { id: 'Uni2022CS007', name: 'Nikhil Aher', sec: '3B', att: 69, marks: { ia1: 13, ia2: 14, ia3: 0 }, cgpa: 6.8, status: 'Active' },
+      { id: 'Uni2022CS008', name: 'Pooja Singh', sec: '3B', att: 95, marks: { ia1: 20, ia2: 19, ia3: 0 }, cgpa: 9.8, status: 'Active' },
+      { id: 'Uni2022CS009', name: 'Amit Jawade', sec: '3B', att: 78, marks: { ia1: 16, ia2: 16, ia3: 0 }, cgpa: 8.0, status: 'Active' },
+      { id: 'Uni2022CS010', name: 'Riya Bhosale', sec: '3B', att: 58, marks: { ia1: 10, ia2: 12, ia3: 0 }, cgpa: 5.5, status: 'Active' },
+    ];
+    const SCHEDULE = [
+      { time: '9:00 AM', sub: 'Data Structures', code: 'CSE301', sec: '3A', room: 'B-204', type: 'Lecture', done: true },
+      { time: '10:00 AM', sub: 'Algorithm Design', code: 'CSE302', sec: '3A', room: 'B-204', type: 'Lecture', done: true },
+      { time: '11:00 AM', sub: '', code: '', sec: '', room: '', type: 'Free', done: false },
+      { time: '12:00 PM', sub: 'Data Structures Lab', code: 'CSE301L', sec: '3B', room: 'Lab-2', type: 'Lab', done: false },
+      { time: '2:00 PM', sub: 'Data Structures', code: 'CSE301', sec: '3B', room: 'B-204', type: 'Lecture', done: false },
+      { time: '3:00 PM', sub: 'Advanced Algorithms', code: 'CSE401', sec: '4A', room: 'C-112', type: 'Lecture', done: false },
+    ];
+    const ASSIGNMENTS = [
+      { id: 1, title: 'Graph Traversal (BFS & DFS)', sub: 'DSA', sec: '3A', due: 'Mar 20', total: 31, submitted: 28, evaluated: 20, maxMarks: 20 },
+      { id: 2, title: 'Sorting Algorithm Analysis', sub: 'DSA', sec: '3B', due: 'Mar 22', total: 31, submitted: 15, evaluated: 0, maxMarks: 20 },
+      { id: 3, title: 'Greedy Algorithm Problems', sub: 'Algo', sec: '3A', due: 'Mar 25', total: 31, submitted: 10, evaluated: 0, maxMarks: 15 },
+      { id: 4, title: 'Dynamic Programming', sub: 'DSA', sec: '3A', due: 'Mar 30', total: 31, submitted: 3, evaluated: 0, maxMarks: 20 },
+    ];
+    const ANNOUNCEMENTS_T = [
+      { id: 1, title: 'IA-3 Syllabus Announced', body: 'Unit 4 & 5 â€” Graphs and Heaps. Reference CLRS Chapter 22-24.', target: '3A & 3B', date: 'Mar 10', reads: 58 },
+      { id: 2, title: 'Lab Session Rescheduled', body: 'Lab on Mar 14 shifted to Mar 16, 11AM. Same lab room.', target: '3B', date: 'Mar 9', reads: 30 },
+    ];
+    const LEAVES_T = [
+      { id: 1, from: 'Mar 22', to: 'Mar 22', reason: 'Academic Conference â€” NIT Pune', sub: 'Prof. S. Kulkarni', status: 'Pending' },
+      { id: 2, from: 'Mar 5', to: 'Mar 6', reason: 'Medical', sub: 'Prof. A. Joshi', status: 'Approved' },
+    ];
+    const CHATS_T = [
+      { id: 1, name: 'Aryan Deshmukh', role: 'Student Â· 3A', last: 'Sir, can I get an extension?', time: '10:14 AM', unread: 1, msgs: [{ me: false, text: "Sir, can I get an extension on the graph assignment?" }, { me: true, text: "I'll consider it. Submit by tomorrow evening." }, { me: false, text: "Thank you sir!" }] },
+      { id: 2, name: 'Pooja Singh', role: 'Student Â· 3B', last: 'Notes uploaded?', time: '9:48 AM', unread: 2, msgs: [{ me: false, text: "Sir, are the Unit 5 notes uploaded?" }, { me: true, text: "Will upload by 5 PM today." }, { me: false, text: "Ok sir, thanks!" }] },
+      { id: 3, name: 'Prof. S. Kulkarni', role: 'Faculty Â· CN', last: 'Substitution tomorrow?', time: '9:20 AM', unread: 0, msgs: [{ me: false, text: "Can you take my 11 AM class tomorrow?" }, { me: true, text: "Sure, no problem." }] },
+    ];
+
+    /* UTILS */
+    function showToast(msg, type = 'success') { const t = document.getElementById('toast'); const clr = type === 'error' ? '#fb7185' : type === 'warn' ? 'var(--gold)' : '#34d399'; const ic = type === 'error' ? 'fa-circle-xmark' : type === 'warn' ? 'fa-triangle-exclamation' : 'fa-circle-check'; t.innerHTML = `<i class="fa-solid ${ic}" style="color:${clr};font-size:.9rem"></i> ${msg}`; t.style.display = 'flex'; clearTimeout(t._t); t._t = setTimeout(() => t.style.display = 'none', 2800); }
+
+    /* â”€â”€ MODAL & CLOSE MODAL â”€â”€ */
+    window.modal = function (html) {
+      let container = document.getElementById('modal-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'modal-container';
+        container.style.cssText = 'position:fixed;inset:0;z-index:2000;';
+        document.body.appendChild(container);
+      }
+      container.innerHTML = html;
+    };
+    window.closeModal = function () {
+      const container = document.getElementById('modal-container');
+      if (container) container.innerHTML = '';
+    };
+    function tagHtml(txt, cls) { return `<span class="tag t-${cls}">${txt}</span>`; }
+    function modal(html) { document.getElementById('modal-root').innerHTML = html; }
+    function closeModal() { document.getElementById('modal-root').innerHTML = ''; }
+    function showLoader() { const l = document.getElementById('global-loader'); if (l) l.classList.remove('hidden'); }
+    function hideLoader() { const l = document.getElementById('global-loader'); if (l) l.classList.add('hidden'); }
+
+    /* â”€â”€ BADGE MANAGEMENT SYSTEM FOR TEACHER â”€â”€ */
+    const BADGE_STATE = {
+      attendance: 2,
+      assignments: 4,
+      messages: 3
+    };
+
+    function initBadges() {
+      Object.entries(BADGE_STATE).forEach(([section, count]) => {
+        updateBadge(section, count);
+      });
+    }
+
+    function updateBadge(section, count) {
+      BADGE_STATE[section] = count;
+      const items = document.querySelectorAll(`.sb-item[onclick*="'${section}'"]`);
+      items.forEach(item => {
+        let badge = item.querySelector('.sb-bdg');
+        if (count > 0) {
+          if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'sb-bdg';
+            item.appendChild(badge);
+          }
+          badge.textContent = count;
+          badge.style.display = 'inline-flex';
+        } else {
+          if (badge) {
+            badge.style.display = 'none';
+          }
+        }
+      });
+    }
+
+    async function clearSectionBadges(section, userId, userRole) {
+      const count = BADGE_STATE[section] || 0;
+      if (count === 0) return;
+
+      try {
+        const endpoint = section === 'messages' ? 'chat/read' : `${section}/read`;
+        if (userId && userRole) {
+          await fetch(`/api/${endpoint}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId, user_role: userRole })
+          }).catch(() => null);
+        }
+      } catch (e) {
+        console.warn('Could not clear badges via API:', e.message);
+      }
+
+      updateBadge(section, 0);
+    }
+
+    const TITLES = { dashboard: 'Dashboard', attendance: 'Attendance Management', students: 'My Students', timetable: 'Timetable & Classes', materials: 'Study Materials', assignments: 'Assignments', marks: 'Marks & Gradebook', announce: 'Announcements', messages: 'Messages', leave: 'Leave Management', performance: 'Performance & Insights', profile: 'Profile & Settings' };
+    let activeChat = null;
+
+    function nav(el, id) {
+      document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('tb-title').textContent = TITLES[id] || id;
+      document.getElementById('main').scrollTop = 0;
+      const fn = PAGES[id];
+      if (fn) document.getElementById('page-content').innerHTML = fn();
+
+      // Clear badges for this section
+      const u = JSON.parse(sessionStorage.getItem('Uni_user') || '{}');
+      if (u.id && u.role) {
+        clearSectionBadges(id, u.id, u.role);
+      }
+    }
+
+    /* DASHBOARD */
+    function pageDashboard() {
+      const totalStu = MY_STUDENTS.length;
+      const defaulters = MY_STUDENTS.filter(s => s.att < 75).length;
+      const classesToday = SCHEDULE.filter(s => s.sub).length;
+      const done = SCHEDULE.filter(s => s.done).length;
+      return `<div class="panel">
+  <div class="g4" style="margin-bottom:14px">
+    <div class="stat"><div class="stat-ico" style="background:rgba(13,148,136,.15);color:#2dd4bf"><i class="fa-solid fa-chalkboard"></i></div><div><div class="stat-n" style="color:#2dd4bf">${done}/${classesToday}</div><div class="stat-l">Classes Today</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(99,102,241,.15);color:#a5b4fc"><i class="fa-solid fa-user-graduate"></i></div><div><div class="stat-n" style="color:#a5b4fc">${totalStu}</div><div class="stat-l">My Students</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(225,29,72,.15);color:#fb7185"><i class="fa-solid fa-triangle-exclamation"></i></div><div><div class="stat-n" style="color:#fb7185">${defaulters}</div><div class="stat-l">Defaulters</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(232,160,32,.15);color:var(--gold)"><i class="fa-solid fa-pen-ruler"></i></div><div><div class="stat-n" style="color:var(--gold)">${ASSIGNMENTS.filter(a => a.evaluated < a.submitted).length}</div><div class="stat-l">Pending Tasks</div></div></div>
+  </div>
+  <div class="g2" style="margin-bottom:14px">
+    <div class="gcard">
+      <div class="sh"><div class="sh-t"><i class="fa-solid fa-calendar-day" style="margin-right:6px;color:var(--teal)"></i>Today's Schedule â€” Tue, Mar 25</div><span style="font-size:.68rem;color:var(--muted)">${done} done Â· ${classesToday - done} pending</span></div>
+      ${SCHEDULE.map(s => s.type === 'Free' ? `<div class="li" style="opacity:.4"><div style="width:50px;font-size:.68rem;color:var(--muted2);flex-shrink:0">${s.time}</div><div style="width:24px;height:24px;border-radius:7px;border:1px dashed rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--muted2)"><i class="fa-solid fa-coffee"></i></div><span style="font-size:.72rem;color:var(--muted2)">Free Slot</span></div>` :
+        `<div class="li"><div style="width:50px;font-size:.68rem;color:var(--muted2);flex-shrink:0">${s.time}</div><div style="width:24px;height:24px;border-radius:7px;background:${s.done ? 'rgba(13,148,136,.15)' : 'rgba(99,102,241,.12)'};display:flex;align-items:center;justify-content:center;font-size:.7rem;color:${s.done ? '#2dd4bf' : '#a5b4fc'}"><i class="fa-solid ${s.type === 'Lab' ? 'fa-flask' : 'fa-chalkboard'}"></i></div><div style="flex:1"><div style="font-size:.76rem;font-weight:600">${s.sub} <span style="font-size:.65rem;font-weight:400;color:var(--muted)">Â· Sec ${s.sec}</span></div><div style="font-size:.63rem;color:var(--muted)">${s.room}</div></div>${s.done ? tagHtml('Done', 'teal') : `<button class="btn btn-admin btn-xs" onclick="nav(document.querySelector('[onclick*=attendance]'),\'attendance\')">Mark Att.</button>`}</div>`).join('')}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="gcard">
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-list-check" style="margin-right:6px;color:var(--rose)"></i>Pending Tasks</div></div>
+        ${ASSIGNMENTS.filter(a => a.evaluated < a.submitted).map(a => `<div class="li"><div style="width:30px;height:30px;border-radius:8px;background:rgba(232,160,32,.1);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:.8rem;flex-shrink:0"><i class="fa-solid fa-pen-ruler"></i></div><div style="flex:1"><div style="font-size:.76rem;font-weight:600">${a.title}</div><div style="font-size:.63rem;color:var(--muted)">${a.submitted - a.evaluated} submissions to evaluate Â· ${a.sub} ${a.sec}</div></div><button class="btn btn-teal btn-xs" onclick="nav(document.querySelector('[onclick*=assignments]'),\'assignments\')">Evaluate</button></div>`).join('')}
+        ${defaulters > 0 ? `<div class="li"><div style="width:30px;height:30px;border-radius:8px;background:rgba(225,29,72,.1);display:flex;align-items:center;justify-content:center;color:#fb7185;font-size:.8rem;flex-shrink:0"><i class="fa-solid fa-triangle-exclamation"></i></div><div style="flex:1"><div style="font-size:.76rem;font-weight:600">${defaulters} Attendance Defaulters</div><div style="font-size:.63rem;color:var(--muted)">Students below 75% threshold</div></div></div>` : ''}
+      </div>
+      <div class="gcard">
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-bell" style="margin-right:6px;color:var(--admin)"></i>Recent Notifications</div></div>
+        ${[{ txt: 'IA-3 schedule released â€” May 11', ic: 'fa-calendar', c: '#a5b4fc' }, { txt: 'Submit marks by April 5th', ic: 'fa-clock', c: 'var(--gold)' }, { txt: 'Faculty meeting Friday 4 PM', ic: 'fa-users', c: '#2dd4bf' }].map(n => `<div class="li"><div style="width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;color:${n.c};font-size:.75rem"><i class="fa-solid ${n.ic}"></i></div><div style="font-size:.76rem">${n.txt}</div></div>`).join('')}
+      </div>
+    </div>
+  </div>
+</div>`;
+    }
+
+    /* ATTENDANCE */
+    let attSec = '3A', attSub = 'CSE301';
+    function pageAttendance() {
+      const stu = MY_STUDENTS.filter(s => s.sec === attSec);
+      const defaulters = MY_STUDENTS.filter(s => s.att < 75);
+      return `<div class="panel">
+  <div class="g4" style="margin-bottom:14px">
+    <div class="stat"><div class="stat-ico" style="background:rgba(13,148,136,.15);color:#2dd4bf"><i class="fa-solid fa-circle-check"></i></div><div><div class="stat-n" style="color:#2dd4bf">78%</div><div class="stat-l">Avg Attendance (3A)</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(225,29,72,.15);color:#fb7185"><i class="fa-solid fa-triangle-exclamation"></i></div><div><div class="stat-n" style="color:#fb7185">${defaulters.length}</div><div class="stat-l">Defaulters &lt;75%</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(99,102,241,.15);color:#a5b4fc"><i class="fa-solid fa-users"></i></div><div><div class="stat-n" style="color:#a5b4fc">${stu.length}</div><div class="stat-l">Students (Sec ${attSec})</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(232,160,32,.15);color:var(--gold)"><i class="fa-solid fa-calendar-check"></i></div><div><div class="stat-n" style="color:var(--gold)">36</div><div class="stat-l">Classes Held</div></div></div>
+  </div>
+  <div class="g2">
+    <div>
+      <div class="gcard" style="margin-bottom:12px">
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-calendar-check" style="margin-right:6px;color:var(--teal)"></i>Mark Attendance</div></div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+          <select class="inp" style="width:130px" onchange="attSub=this.value;document.getElementById('page-content').innerHTML=pageAttendance()">
+            ${SUBJECTS.map(s => `<option value="${s.code}">${s.code}</option>`).join('')}
+          </select>
+          <select class="inp" style="width:90px" onchange="attSec=this.value;document.getElementById('page-content').innerHTML=pageAttendance()">
+            <option value="3A">Sec 3A</option><option value="3B">Sec 3B</option>
+          </select>
+          <input class="inp" type="date" style="width:140px">
+          <button class="btn btn-admin btn-xs" onclick="showToast('All marked present')">All Present</button>
+        </div>
+        <div class="att-grid" id="att-grid">
+          ${stu.map(s => `<div class="att-stu" id="stu-${s.id}" onclick="toggleAtt('${s.id}')">
+            <div style="font-size:.75rem;font-weight:600;margin-bottom:2px">${s.name.split(' ')[0]}</div>
+            <div style="font-size:.6rem;color:var(--muted)">${s.id.slice(-5)}</div>
+            <div style="margin-top:5px"><i class="fa-solid fa-check" style="color:#2dd4bf;display:none" id="chk-${s.id}"></i></div>
+          </div>`).join('')}
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+          <button class="btn btn-glass btn-sm" onclick="showToast('Attendance draft saved')"><i class="fa-solid fa-floppy-disk" style="margin-right:4px"></i>Save Draft</button>
+          <button class="btn btn-teal btn-sm" onclick="showToast('Attendance submitted & recorded!')"><i class="fa-solid fa-paper-plane" style="margin-right:4px"></i>Submit Attendance</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="gcard" style="margin-bottom:12px">
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;color:#fb7185"></i>Defaulters â€” Below 75%</div></div>
+        ${defaulters.map(s => `<div class="li">
+          <div style="width:30px;height:30px;border-radius:8px;background:rgba(225,29,72,.1);display:flex;align-items:center;justify-content:center;color:#fb7185;font-size:.78rem;flex-shrink:0"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div style="flex:1"><div style="font-size:.78rem;font-weight:600">${s.name}</div><div style="font-size:.63rem;color:var(--muted)">${s.id} Â· Sec ${s.sec}</div></div>
+          <span style="font-weight:700;color:#fb7185">${s.att}%</span>
+        </div>`).join('')}
+      </div>
+      <div class="gcard">
+        <div class="sh"><div class="sh-t">Attendance History</div></div>
+        ${[{ date: 'Mar 24', sec: '3A', present: 28, total: 31, sub: 'DSA' }, { date: 'Mar 23', sec: '3B', present: 27, total: 31, sub: 'DSA' }, { date: 'Mar 22', sec: '3A', present: 30, total: 31, sub: 'DSA' }, { date: 'Mar 21', sec: '4A', present: 25, total: 28, sub: 'Adv Algo' }].map(h => `<div class="li">
+          <div style="width:42px;height:36px;border-radius:8px;background:rgba(99,102,241,.1);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+            <div style="font-size:.58rem;color:var(--muted2)">${h.date.split(' ')[0]}</div>
+            <div style="font-size:.78rem;font-weight:700;color:#a5b4fc">${h.date.split(' ')[1]}</div>
+          </div>
+          <div style="flex:1"><div style="font-size:.76rem;font-weight:600">${h.sub} Â· Sec ${h.sec}</div><div style="font-size:.64rem;color:var(--muted)">${h.present}/${h.total} present</div></div>
+          <button class="btn btn-glass btn-xs" onclick="showToast('Edit attendance for ${h.date}')"><i class="fa-solid fa-pen"></i></button>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>
+</div>`;
+    }
+    window.toggleAtt = function (id) { const el = document.getElementById('stu-' + id); const chk = document.getElementById('chk-' + id); if (el.classList.contains('present')) { el.classList.remove('present'); el.classList.add('absent'); chk.style.display = 'none'; } else if (el.classList.contains('absent')) { el.classList.remove('absent'); chk.style.display = 'none'; } else { el.classList.add('present'); chk.style.display = 'inline'; } };
+
+    /* MY STUDENTS */
+    function pageStudents() {
+      return `<div class="panel">
+  <div class="g4" style="margin-bottom:14px">
+    <div class="stat"><div class="stat-ico" style="background:rgba(99,102,241,.15);color:#a5b4fc"><i class="fa-solid fa-users"></i></div><div><div class="stat-n" style="color:#a5b4fc">${MY_STUDENTS.length}</div><div class="stat-l">Total Students</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(13,148,136,.15);color:#2dd4bf"><i class="fa-solid fa-chart-bar"></i></div><div><div class="stat-n" style="color:#2dd4bf">${Math.round(MY_STUDENTS.reduce((a, s) => a + s.att, 0) / MY_STUDENTS.length)}%</div><div class="stat-l">Avg Attendance</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(225,29,72,.15);color:#fb7185"><i class="fa-solid fa-triangle-exclamation"></i></div><div><div class="stat-n" style="color:#fb7185">${MY_STUDENTS.filter(s => s.att < 75).length}</div><div class="stat-l">Defaulters</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(16,185,129,.15);color:#34d399"><i class="fa-solid fa-star"></i></div><div><div class="stat-n" style="color:#34d399">${MY_STUDENTS.filter(s => s.att >= 85).length}</div><div class="stat-l">Excellent â‰¥85%</div></div></div>
+  </div>
+  <div class="g2" style="margin-bottom:14px">
+    <div class="gcard">
+      <div class="sh"><div class="sh-t">Add New Student</div></div>
+      <div class="frow"><div class="flbl">Student ID</div><input class="inp" id="new-stu-id" placeholder="e.g., E25B022101"></div>
+      <div class="frow" style="margin-top:8px"><div class="flbl">Name</div><input class="inp" id="new-stu-name" placeholder="Full Name"></div>
+      <div class="g2" style="margin-top:8px">
+        <div class="frow"><div class="flbl">Email</div><input class="inp" id="new-stu-email" type="email" placeholder="student@uni.edu"></div>
+        <div class="frow"><div class="flbl">Phone</div><input class="inp" id="new-stu-phone" placeholder="+91 98765..."></div>
+      </div>
+      <div class="g2" style="margin-top:8px">
+        <div class="frow"><div class="flbl">Section</div><select class="inp" id="new-stu-sec"><option>A</option><option>B</option><option>C</option></select></div>
+        <div class="frow"><div class="flbl">Year</div><select class="inp" id="new-stu-year"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+        <button class="btn btn-glass btn-sm" onclick="clearStudentForm()"><i class="fa-solid fa-x" style="margin-right:4px"></i>Clear</button>
+        <button class="btn btn-teal btn-sm" onclick="addNewStudent()"><i class="fa-solid fa-plus" style="margin-right:4px"></i>Add Student</button>
+      </div>
+    </div>
+    <div class="gcard">
+      <div class="sh"><div class="sh-t">Marks Entry</div></div>
+      <div style="margin-bottom:10px">
+        <div class="flbl">Select Class</div>
+        <select class="inp" id="marks-class-sel" style="width:100%" onchange="loadClassStudents()">
+          <option value="">â€” Choose a class â€”</option>
+          ${SUBJECTS.map((s, i) => `<option value="${i}">${s.code} â€” ${s.name}</option>`).join('')}
+        </select>
+      </div>
+      <div style="margin-bottom:10px">
+        <div class="flbl">Assessment Type</div>
+        <select class="inp" id="marks-type-sel" style="width:100%">
+          <option value="IA-1">Internal Assessment 1</option>
+          <option value="IA-2">Internal Assessment 2</option>
+          <option value="IA-3">Internal Assessment 3</option>
+          <option value="Assignment">Assignment</option>
+        </select>
+      </div>
+      <button class="btn btn-teal btn-sm" style="width:100%" onclick="showMarksEntry()"><i class="fa-solid fa-pen" style="margin-right:4px"></i>Enter Marks</button>
+    </div>
+  </div>
+  <div class="gcard">
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <div style="position:relative;flex:1;min-width:160px"><i class="fa-solid fa-magnifying-glass" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted2);font-size:.72rem;pointer-events:none"></i><input class="inp" placeholder="Search student..." style="padding-left:30px" id="stu-q" oninput="filterMyStudents()"></div>
+      <select class="inp" style="width:110px" id="stu-sec" onchange="filterMyStudents()"><option value="all">All Sections</option><option value="3A">Sec 3A</option><option value="3B">Sec 3B</option></select>
+      <select class="inp" style="width:140px" id="stu-filter" onchange="filterMyStudents()"><option value="all">All Students</option><option value="def">Defaulters (&lt;75%)</option><option value="exc">Excellent (â‰¥85%)</option></select>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="tbl"><thead><tr><th>Student</th><th>Section</th><th>Attendance</th><th>IA-1</th><th>IA-2</th><th>CGPA</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="stu-body">${renderMyStudents(MY_STUDENTS)}</tbody></table>
+    </div>
+  </div>
+</div>`;
+    }
+    function renderMyStudents(list) {
+      if (!list.length) return `<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">No students found</td></tr>`;
+      return list.map(s => `<tr>
+        <td><div style="font-weight:600;font-size:.8rem">${s.name}</div><div style="font-size:.63rem;color:var(--muted)">${s.id}</div></td>
+        <td>${tagHtml('Sec ' + s.sec, 'admin')}</td>
+        <td><div style="display:flex;align-items:center;gap:8px"><div style="width:60px;height:4px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden"><div style="width:${s.att}%;height:100%;background:${s.att >= 75 ? '#0d9488' : 'var(--rose)'};border-radius:99px"></div></div><span style="font-size:.72rem;color:${s.att >= 75 ? '#2dd4bf' : '#fb7185'};font-weight:700">${s.att}%</span></div></td>
+        <td style="font-weight:600;color:${s.marks.ia1 >= 14 ? '#2dd4bf' : '#fb7185'}">${s.marks.ia1}/20</td>
+        <td style="font-weight:600;color:${s.marks.ia2 >= 14 ? '#2dd4bf' : '#fb7185'}">${s.marks.ia2}/20</td>
+        <td style="font-weight:700;color:${s.cgpa >= 8 ? '#2dd4bf' : s.cgpa >= 7 ? 'var(--gold)' : '#fb7185'}">${(s.cgpa || 7.5).toFixed(1)}</td>
+        <td>${tagHtml(s.att >= 75 ? 'Regular' : 'Defaulter', s.att >= 75 ? 'teal' : 'rose')}</td>
+        <td><div style="display:flex;gap:4px"><button class="btn btn-glass btn-xs" onclick="showStudentProfile('${s.id}')"><i class="fa-solid fa-eye"></i></button><button class="btn btn-glass btn-xs" onclick="showStudentMarks('${s.id}')"><i class="fa-solid fa-chart-bar"></i></button></div></td>
+      </tr>`).join('');
+    }
+    window.filterMyStudents = function () { const q = (document.getElementById('stu-q')?.value || '').toLowerCase(); const sec = document.getElementById('stu-sec')?.value || 'all'; const f2 = document.getElementById('stu-filter')?.value || 'all'; let list = MY_STUDENTS.filter(s => (sec === 'all' || s.sec === sec) && s.name.toLowerCase().includes(q)); if (f2 === 'def') list = list.filter(s => s.att < 75); if (f2 === 'exc') list = list.filter(s => s.att >= 85); const b = document.getElementById('stu-body'); if (b) b.innerHTML = renderMyStudents(list); };
+    window.clearStudentForm = function () {
+      document.getElementById('new-stu-id').value = '';
+      document.getElementById('new-stu-name').value = '';
+      document.getElementById('new-stu-email').value = '';
+      document.getElementById('new-stu-phone').value = '';
+      document.getElementById('new-stu-sec').value = 'A';
+      document.getElementById('new-stu-year').value = '1';
+      showToast('Form cleared', 'info');
+    };
+    window.addNewStudent = async function () {
+      try {
+        const u = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+        const idEl = document.getElementById('new-stu-id');
+        const nameEl = document.getElementById('new-stu-name');
+        const emailEl = document.getElementById('new-stu-email');
+
+        const id = idEl?.value?.trim();
+        const name = nameEl?.value?.trim();
+        const email = emailEl?.value?.trim();
+        const phone = document.getElementById('new-stu-phone')?.value?.trim();
+        const section = document.getElementById('new-stu-sec')?.value;
+        const year = parseInt(document.getElementById('new-stu-year')?.value || '1');
+
+        if (!id || !name || !email) {
+          if (!id && idEl) idEl.style.borderColor = '#fb7185';
+          if (!name && nameEl) nameEl.style.borderColor = '#fb7185';
+          if (!email && emailEl) emailEl.style.borderColor = '#fb7185';
+          showToast('âŒ ID, Name, and Email required', 'error');
+          return;
+        }
+
+        if (!email.includes('@')) {
+          emailEl.style.borderColor = '#fb7185';
+          showToast('âŒ Invalid email address', 'error');
+          return;
+        }
+
+        const btn = document.querySelector('[onclick*="addNewStudent"]');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:4px"></i>Adding...'; }
+
+        const r = await fetch(`${API_BASE}/admin/add-student`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, name, department: u.department, year, section, email, phone, cgpa: 0, attendance: 0, batch: '' })
+        });
+        const d = await r.json();
+        if (d.ok) {
+          MY_STUDENTS.push({ id, name, sec: section, att: 0, marks: { ia1: 0, ia2: 0, ia3: 0 }, cgpa: 0, status: 'Active', email, phone });
+          showToast(`âœ… ${name} added successfully!`);
+          clearStudentForm();
+          document.getElementById('page-content').innerHTML = pageStudents();
+        } else {
+          showToast('âŒ ' + (d.message || 'Error adding student'), 'error');
+        }
+      } catch (e) { showToast('âŒ Server error: ' + e.message, 'error'); } finally {
+        const btn = document.querySelector('[onclick*="addNewStudent"]');
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-user-plus" style="margin-right:4px"></i>Add Student'; }
+      }
+    };
+    window.loadClassStudents = function () { showToast('Class students loaded'); };
+    window.showMarksEntry = function () {
+      const classIdx = document.getElementById('marks-class-sel').value;
+      if (!classIdx) { showToast('Please select a class', 'error'); return; }
+      const subj = SUBJECTS[classIdx];
+      const type = document.getElementById('marks-type-sel').value;
+      const html = `<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-pen" style="color:var(--admin);margin-right:8px"></i>Enter Marks â€” ${subj.name} / ${type}</div><table class="tbl" style="margin-bottom:12px"><thead><tr><th>Student</th><th>Marks (max 20)</th></tr></thead><tbody>${MY_STUDENTS.map(s => `<tr><td style="font-weight:600;font-size:.8rem">${s.name}</td><td><input class="inp" style="width:80px;padding:5px 8px" type="number" min="0" max="20" placeholder="â€”" data-sid="${s.id}"></td></tr>`).join('')}</tbody></table><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Cancel</button><button class="btn btn-teal" onclick="window.saveMarks('${classIdx}','${type}')">Save Marks</button></div></div></div>`;
+      modal(html);
+    };
+
+    window.saveMarks = async function (classIdx, assessmentType) {
+      try {
+        const u = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+        const inputs = document.querySelectorAll('input[data-sid]');
+        const entries = [];
+        inputs.forEach(inp => {
+          const val = parseInt(inp.value) || 0;
+          if (val > 0) entries.push({ student_id: inp.dataset.sid, obtained: val });
+        });
+        if (entries.length === 0) { showToast('âš ï¸ Enter at least one mark', 'error'); return; }
+
+        const btn = document.querySelector('.modal .btn-teal');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:4px"></i>Saving...'; }
+
+        const r = await fetch(`${API_BASE}/teacher/marks`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            teacher_id: u.id,
+            class_id: parseInt(classIdx),
+            assessment_type: assessmentType,
+            max_marks: 20,
+            entries,
+            semester: 'Current'
+          })
+        });
+        const d = await r.json();
+        if (d.ok) {
+          closeModal();
+          showToast('âœ… Marks saved & students notified!');
+        } else {
+          showToast('âŒ ' + (d.message || 'Error saving marks'), 'error');
+        }
+      } catch (e) { showToast('âŒ Server error: ' + e.message, 'error'); } finally {
+        const btn = document.querySelector('.modal .btn-teal');
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-check" style="margin-right:4px"></i>Save Marks'; }
+      }
+    };
+
+    window.showStudentProfile = function (id) { const s = MY_STUDENTS.find(x => x.id === id); if (!s) return; modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-user-graduate" style="color:var(--admin);margin-right:8px"></i>${s.name}</div><div style="display:flex;gap:16px;margin-bottom:14px"><div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--admin),#818cf8);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800">${s.name.split(' ').map(x => x[0]).join('')}</div><div><div style="font-weight:700">${s.name}</div><div style="font-size:.72rem;color:var(--muted)">${s.id} Â· Section ${s.sec}</div></div></div><div class="g2" style="margin-bottom:12px"><div class="gcard"><div style="font-size:.65rem;color:var(--muted);margin-bottom:4px">Attendance</div><div style="font-size:1.5rem;font-weight:800;color:${s.att >= 75 ? '#2dd4bf' : '#fb7185'}">${s.att}%</div></div><div class="gcard"><div style="font-size:.65rem;color:var(--muted);margin-bottom:4px">IA Avg</div><div style="font-size:1.5rem;font-weight:800;color:#a5b4fc">${((s.marks.ia1 + s.marks.ia2) / 2).toFixed(1)}/20</div></div><div class="gcard"><div style="font-size:.65rem;color:var(--muted);margin-bottom:4px">CGPA</div><div style="font-size:1.5rem;font-weight:800;color:#2dd4bf">${(s.cgpa || 7.5).toFixed(1)}</div></div></div><div style="margin-bottom:12px"><div class="sh-t" style="font-size:.78rem;margin-bottom:8px">Contact Info</div><div style="display:flex;flex-direction:column;gap:6px;font-size:.76rem;color:var(--muted)"><div><i class="fa-solid fa-envelope" style="margin-right:6px;color:#a5b4fc"></i>${s.email || 'â€”'}</div><div><i class="fa-solid fa-phone" style="margin-right:6px;color:#2dd4bf"></i>${s.phone || 'â€”'}</div></div></div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Close</button><button class="btn btn-teal" onclick="closeModal();showToast('Message sent to ${s.name}')"><i class="fa-solid fa-comment" style="margin-right:4px"></i>Message</button></div></div></div>`); };
+    window.showStudentMarks = function (id) { const s = MY_STUDENTS.find(x => x.id === id); if (!s) return; const avgIA = ((s.marks.ia1 || 0) + (s.marks.ia2 || 0)) / 2; modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-chart-bar" style="color:var(--admin);margin-right:8px"></i>Marks â€” ${s.name}</div><div class="g2" style="margin-bottom:12px"><div class="gcard"><div style="font-size:.65rem;color:var(--muted);margin-bottom:4px">IA-1</div><div style="font-size:1.4rem;font-weight:800;color:#a5b4fc">${s.marks.ia1 || 'â€”'}/20</div></div><div class="gcard"><div style="font-size:.65rem;color:var(--muted);margin-bottom:4px">IA-2</div><div style="font-size:1.4rem;font-weight:800;color:#2dd4bf">${s.marks.ia2 || 'â€”'}/20</div></div><div class="gcard"><div style="font-size:.65rem;color:var(--muted);margin-bottom:4px">Average</div><div style="font-size:1.4rem;font-weight:800;color:var(--gold)">${isNaN(avgIA) ? 'â€”' : avgIA.toFixed(1)}/20</div></div></div><div style="margin-bottom:12px"><div class="sh-t" style="font-size:.78rem;margin-bottom:8px;display:flex;justify-content:space-between"><span>Update Marks</span></div><div class="g2"><div class="frow"><div class="flbl">IA-1 (max 20)</div><input class="inp" type="number" min="0" max="20" id="mark-ia1" value="${s.marks.ia1 || 0}"></div><div class="frow"><div class="flbl">IA-2 (max 20)</div><input class="inp" type="number" min="0" max="20" id="mark-ia2" value="${s.marks.ia2 || 0}"></div></div></div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Cancel</button><button class="btn btn-teal" onclick="updateStudentMarks('${s.id}');closeModal();showToast('Marks updated!')">Save</button></div></div></div>`); };
+    window.updateStudentMarks = function (id) { const s = MY_STUDENTS.find(x => x.id === id); if (!s) return; s.marks.ia1 = parseInt(document.getElementById('mark-ia1').value) || 0; s.marks.ia2 = parseInt(document.getElementById('mark-ia2').value) || 0; const total = s.marks.ia1 + s.marks.ia2; s.cgpa = total >= 36 ? 9.5 : total >= 32 ? 8.5 : total >= 28 ? 7.5 : total >= 24 ? 6.5 : 5.5; };
+
+    /* TIMETABLE */
+    function pageTimetable() {
+      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+      const slots = [['DSA 3A', '#6366f1'], ['Algo 3A', '#0d9488'], ['Free', ''], ['DSA 3B', '#6366f1'], ['Adv Algo 4A', '#7c3aed'], ['DSA 3B', '#6366f1']];
+      const times = ['9:00', '10:00', '11:00', '12:00', '2:00', '3:00'];
+      return `<div class="panel">
+  <div class="gcard" style="margin-bottom:14px">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div class="sh-t" style="flex:1">Personal Timetable â€” Prof. R. Sharma</div>
+      <button class="btn btn-glass btn-sm" onclick="showToast('Timetable exported as PDF')"><i class="fa-solid fa-file-pdf" style="margin-right:4px"></i>Export</button>
+      <button class="btn btn-glass btn-sm" onclick="showChangReq()"><i class="fa-solid fa-rotate" style="margin-right:4px"></i>Request Change</button>
+    </div>
+  </div>
+  <div class="gcard" style="overflow-x:auto;margin-bottom:14px">
+    <table style="width:100%;border-collapse:collapse;font-size:.68rem;min-width:520px">
+      <thead><tr><th style="padding:8px;width:55px"></th>${days.map(d => `<th style="padding:8px;text-align:center;background:rgba(255,255,255,.06);border-radius:4px;color:rgba(255,255,255,.7);font-size:.62rem">${d}</th>`).join('')}</tr></thead>
+      <tbody>${times.map((t, ti) => `<tr><td style="padding:6px 4px;color:var(--muted);font-size:.6rem;text-align:right">${t}</td>${days.map((d, di) => { const idx = (ti + di) % slots.length; const [lbl, c] = slots[idx]; return lbl === 'Free' ? `<td style="padding:3px"><div style="border:1px dashed rgba(255,255,255,.07);border-radius:5px;min-height:38px;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--muted2)">Free</div></td>` : `<td style="padding:3px"><div style="background:${c}44;border:1px solid ${c}66;border-radius:5px;padding:5px;min-height:38px;font-weight:600;cursor:pointer" onclick="showToast('${lbl} class details')">${lbl}</div></td>`; }).join('')}</tr>`).join('')}</tbody>
+    </table>
+  </div>
+  <div class="gcard">
+    <div class="sh"><div class="sh-t">Upcoming Classes (Next 3 Days)</div></div>
+    ${SCHEDULE.filter(s => s.sub).map(s => `<div class="li"><div style="width:32px;height:32px;border-radius:8px;background:rgba(99,102,241,.1);display:flex;align-items:center;justify-content:center;color:#a5b4fc;font-size:.8rem;flex-shrink:0"><i class="fa-solid ${s.type === 'Lab' ? 'fa-flask' : 'fa-chalkboard'}"></i></div><div style="flex:1"><div style="font-size:.78rem;font-weight:600">${s.sub} <span style="font-size:.65rem;font-weight:400;color:var(--muted)">Â· Sec ${s.sec}</span></div><div style="font-size:.63rem;color:var(--muted)">${s.time} Â· ${s.room}</div></div>${tagHtml(s.type, s.type === 'Lab' ? 'violet' : 'admin')}</div>`).join('')}
+  </div>
+</div>`;
+    }
+    window.showChangReq = function () { modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-rotate" style="color:var(--admin);margin-right:8px"></i>Request Timetable Change</div><div class="frow"><div class="flbl">Current Slot</div><input class="inp" placeholder="e.g. Mon 9AM â€” DSA 3A"></div><div class="frow"><div class="flbl">Reason</div><textarea class="inp" placeholder="Reason for change..." style="min-height:60px;resize:none"></textarea></div><div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Cancel</button><button class="btn btn-admin" onclick="closeModal();showToast('Timetable change request submitted!')">Submit Request</button></div></div></div>`); };
+
+    /* MATERIALS */
+    const MATERIALS = [
+      { title: 'Unit 4 â€” Graph Algorithms', sub: 'DSA', type: 'PDF', size: '5.1 MB', date: 'Mar 8', downloads: 42, icon: 'fa-file-pdf', c: '#fb7185' },
+      { title: 'Unit 3 â€” Heaps & Priority Queues', sub: 'DSA', type: 'PDF', size: '3.8 MB', date: 'Mar 2', downloads: 58, icon: 'fa-file-pdf', c: '#fb7185' },
+      { title: 'Greedy Algorithms Lecture Recording', sub: 'Algo', type: 'Video', size: '420 MB', date: 'Feb 28', downloads: 34, icon: 'fa-file-video', c: '#a5b4fc' },
+      { title: 'Practice Problems â€” Sorting', sub: 'DSA', type: 'PDF', size: '1.2 MB', date: 'Feb 25', downloads: 71, icon: 'fa-file-pdf', c: '#fb7185' },
+    ];
+    function pageMaterials() {
+      return `<div class="panel">
+  <div class="gcard" style="margin-bottom:14px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <div class="sh-t" style="flex:1"><i class="fa-solid fa-folder-open" style="margin-right:6px;color:var(--teal)"></i>Upload Material</div>
+      <select class="inp" style="width:160px">${SUBJECTS.map(s => `<option>${s.code} â€” ${s.name.slice(0, 18)}</option>`).join('')}</select>
+      <button class="btn btn-teal btn-sm" onclick="showUploadMat()"><i class="fa-solid fa-upload" style="margin-right:4px"></i>Upload File</button>
+      <button class="btn btn-glass btn-sm" onclick="showUploadMat()"><i class="fa-solid fa-link" style="margin-right:4px"></i>Add Link</button>
+    </div>
+  </div>
+  <div class="g2">${MATERIALS.map(m => `<div class="gcard"><div style="display:flex;gap:12px;align-items:center;margin-bottom:10px"><div style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:${m.c}"><i class="fa-solid ${m.icon}"></i></div><div style="flex:1"><div style="font-weight:700;font-size:.84rem">${m.title}</div><div style="font-size:.65rem;color:var(--muted);margin-top:2px">${m.sub} Â· ${m.type} Â· ${m.size}</div></div></div><div style="display:flex;justify-content:space-between;align-items:center;font-size:.68rem;color:var(--muted)"><span><i class="fa-solid fa-download" style="margin-right:3px"></i>${m.downloads} downloads Â· ${m.date}</span><div style="display:flex;gap:4px"><button class="btn btn-glass btn-xs" onclick="showToast('Link copied!')"><i class="fa-solid fa-share"></i></button><button class="btn btn-rose btn-xs" onclick="showToast('Material removed')"><i class="fa-solid fa-trash"></i></button></div></span></div></div>`).join('')}</div>
+</div>`;
+    }
+    window.showUploadMat = function () { modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-upload" style="color:var(--admin);margin-right:8px"></i>Upload Study Material</div><div class="frow"><div class="flbl">Title</div><input class="inp" placeholder="e.g. Unit 5 â€” Dynamic Programming"></div><div class="g2"><div class="frow"><div class="flbl">Subject</div><select class="inp">${SUBJECTS.map(s => `<option>${s.code}</option>`).join('')}</select></div><div class="frow"><div class="flbl">Type</div><select class="inp"><option>PDF</option><option>Video</option><option>Link</option><option>Image</option></select></div></div><div class="frow"><div class="flbl">File / URL</div><input class="inp" placeholder="Drag & drop or paste link..."></div><div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Cancel</button><button class="btn btn-teal" onclick="closeModal();showToast('Material uploaded & shared!')"><i class="fa-solid fa-upload" style="margin-right:4px"></i>Upload</button></div></div></div>`); };
+
+    /* ASSIGNMENTS */
+    function pageAssignments() {
+      return `<div class="panel">
+  <div class="gcard" style="margin-bottom:14px">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <div class="sh-t" style="flex:1"><i class="fa-solid fa-pen-ruler" style="margin-right:6px;color:var(--teal)"></i>Assignments</div>
+      <button class="btn btn-teal btn-sm" onclick="showCreateAssign()"><i class="fa-solid fa-plus" style="margin-right:4px"></i>New Assignment</button>
+    </div>
+  </div>
+  <div class="g2">${ASSIGNMENTS.map(a => `<div class="gcard"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div><div style="font-weight:700;font-size:.9rem">${a.title}</div><div style="font-size:.66rem;color:var(--muted);margin-top:2px">${a.sub} Â· Sec ${a.sec} Â· Due ${a.due}</div></div>${tagHtml(a.evaluated === a.submitted ? 'Evaluated' : a.submitted > 0 ? 'In Review' : 'Waiting', a.evaluated === a.submitted && a.submitted > 0 ? 'teal' : 'gold')}</div><div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:.68rem;margin-bottom:4px"><span style="color:var(--muted)">Submissions</span><span style="font-weight:700;color:${a.submitted / a.total < 0.5 ? '#fb7185' : '#2dd4bf'}">${a.submitted}/${a.total}</span></div><div class="pb"><div class="pf" style="width:${Math.round(a.submitted / a.total * 100)}%;background:${a.submitted / a.total < 0.5 ? 'var(--rose)' : '#0d9488'}"></div></div></div><div style="display:flex;gap:6px"><button class="btn btn-glass btn-xs" onclick="showEvaluate(${a.id})"><i class="fa-solid fa-pen" style="margin-right:3px"></i>Evaluate</button><button class="btn btn-glass btn-xs" onclick="showToast('${a.submitted} submissions downloaded')"><i class="fa-solid fa-download" style="margin-right:3px"></i>Download All</button></div></div>`).join('')}</div>
+</div>`;
+    }
+    window.showCreateAssign = function () { modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-plus" style="color:var(--admin);margin-right:8px"></i>Create Assignment</div><div class="frow"><div class="flbl">Title</div><input class="inp" placeholder="Assignment title..."></div><div class="g2"><div class="frow"><div class="flbl">Subject</div><select class="inp">${SUBJECTS.map(s => `<option>${s.code}</option>`).join('')}</select></div><div class="frow"><div class="flbl">Section</div><select class="inp"><option>3A</option><option>3B</option><option>4A</option></select></div></div><div class="g2"><div class="frow"><div class="flbl">Due Date</div><input class="inp" type="date"></div><div class="frow"><div class="flbl">Max Marks</div><input class="inp" type="number" placeholder="20"></div></div><div class="frow"><div class="flbl">Instructions</div><textarea class="inp" placeholder="Assignment instructions..." style="min-height:60px;resize:none"></textarea></div><div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Cancel</button><button class="btn btn-teal" onclick="closeModal();showToast('Assignment created & notified to students!')"><i class="fa-solid fa-paper-plane" style="margin-right:4px"></i>Publish</button></div></div></div>`); };
+    window.showEvaluate = function (id) { const a = ASSIGNMENTS.find(x => x.id === id); modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-t"><i class="fa-solid fa-pen" style="color:var(--admin);margin-right:8px"></i>Evaluate â€” ${a.title}</div><table class="tbl"><thead><tr><th>Student</th><th>Marks (/20)</th><th>Feedback</th></tr></thead><tbody>${MY_STUDENTS.filter(s => s.sec === a.sec).slice(0, 5).map(s => `<tr><td style="font-weight:600">${s.name}</td><td><input class="inp" style="width:70px;padding:5px 8px" type="number" min="0" max="${a.maxMarks}" placeholder="â€”"></td><td><input class="inp" placeholder="Quick feedback..."></td></tr>`).join('')}</tbody></table><div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end"><button class="btn btn-glass" onclick="closeModal()">Cancel</button><button class="btn btn-teal" onclick="closeModal();showToast('Marks saved & students notified!')">Save Marks</button></div></div></div>`); };
+
+    /* MARKS */
+    function pageMarks() {
+      const avg = s => (s.marks.ia1 + s.marks.ia2) / 2;
+      return `<div class="panel">
+  <div class="gcard" style="margin-bottom:14px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <select class="inp" style="width:180px"><option>DSA (CSE301)</option><option>Algorithm Design (CSE302)</option></select>
+      <select class="inp" style="width:110px"><option>Sec 3A</option><option>Sec 3B</option></select>
+      <select class="inp" style="width:140px"><option>Internal Assessment 3</option><option>Internal Assessment 2</option><option>Internal Assessment 1</option></select>
+      <button class="btn btn-teal btn-sm" onclick="showToast('Marks submitted for approval!')"><i class="fa-solid fa-paper-plane" style="margin-right:4px"></i>Submit Marks</button>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="gcard">
+      <div class="sh"><div class="sh-t"><i class="fa-solid fa-pen-ruler" style="margin-right:6px;color:#a5b4fc"></i>Marks Entry â€” IA-3</div><span style="font-size:.68rem;color:var(--muted)">Max: 20</span></div>
+      <table class="tbl"><thead><tr><th>Student</th><th>IA-1</th><th>IA-2</th><th>IA-3</th></tr></thead>
+      <tbody>${MY_STUDENTS.filter(s => s.sec === '3A').map(s => `<tr><td style="font-weight:600;font-size:.8rem">${s.name}</td><td style="color:var(--muted)">${s.marks.ia1}</td><td style="color:var(--muted)">${s.marks.ia2}</td><td><input class="inp" style="width:70px;padding:5px 8px" type="number" min="0" max="20" placeholder="â€”"></td></tr>`).join('')}</tbody></table>
+    </div>
+    <div class="gcard">
+      <div class="sh"><div class="sh-t"><i class="fa-solid fa-book" style="margin-right:6px;color:#2dd4bf"></i>Gradebook Summary</div></div>
+      ${MY_STUDENTS.filter(s => s.sec === '3A').map(s => `<div class="li"><div style="flex:1"><div style="font-size:.78rem;font-weight:600">${s.name}</div><div style="font-size:.63rem;color:var(--muted)">Avg: ${avg(s).toFixed(1)}/20</div></div><div style="width:80px"><div class="pb"><div class="pf" style="width:${Math.round(avg(s) / 20 * 100)}%;background:${avg(s) >= 14 ? '#0d9488' : avg(s) >= 10 ? 'var(--gold)' : 'var(--rose)'}"></div></div></div>${tagHtml(avg(s) >= 16 ? 'A' : avg(s) >= 14 ? 'B+' : avg(s) >= 10 ? 'B' : 'C', avg(s) >= 14 ? 'teal' : 'gold')}</div>`).join('')}
+    </div>
+  </div>
+</div>`;
+    }
+
+    /* ANNOUNCEMENTS */
+    function pageAnnounce() {
+      return `<div class="panel"><div class="g2">
+  <div class="gcard">
+    <div class="sh"><div class="sh-t"><i class="fa-solid fa-bullhorn" style="margin-right:6px;color:#a78bfa"></i>Post Announcement</div></div>
+    <div class="frow"><div class="flbl">Title</div><input class="inp" id="ann-t" placeholder="Announcement title..."></div>
+    <div class="frow" style="margin-top:8px"><div class="flbl">Message</div><textarea class="inp" id="ann-b" placeholder="Full message..." style="min-height:80px;resize:vertical"></textarea></div>
+    <div class="g2" style="margin-top:8px"><div><div class="flbl">Target</div><select class="inp" id="ann-target"><option>All</option><option>Sec 3A</option><option>Sec 3B</option><option>Sec 4A</option></select></div><div><div class="flbl">Urgency</div><select class="inp" id="ann-urg"><option>Medium</option><option>High</option><option>Low</option></select></div></div>
+    <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end"><button class="btn btn-glass btn-sm" onclick="showToast('Draft saved')"><i class="fa-solid fa-floppy-disk" style="margin-right:4px"></i>Draft</button><button class="btn btn-teal btn-sm" onclick="window.postAnnouncement()"><i class="fa-solid fa-paper-plane" style="margin-right:4px"></i>Post</button></div>
+  </div>
+  <div>
+    <div class="sh"><div class="sh-t"><i class="fa-solid fa-clock-rotate-left" style="margin-right:6px;color:var(--teal)"></i>Posted Announcements</div></div>
+    ${ANNOUNCEMENTS_T.map(a => `<div class="gcard" style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-weight:700;font-size:.86rem">${a.title}</span><span style="font-size:.63rem;color:var(--muted)">${a.date}</span></div><div style="font-size:.72rem;color:var(--muted);line-height:1.5;margin-bottom:8px">${a.body}</div><div style="display:flex;justify-content:space-between;font-size:.66rem;color:var(--muted)"><span>${tagHtml(a.target, 'admin')} &nbsp; <i class="fa-solid fa-eye"></i> ${a.reads} reads</span><button class="btn btn-rose btn-xs" onclick="showToast('Announcement removed')"><i class="fa-solid fa-trash"></i></button></div></div>`).join('')}
+  </div>
+</div></div>`;
+    }
+
+    window.postAnnouncement = async function () {
+      try {
+        const u = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+        const tEl = document.getElementById('ann-t');
+        const bEl = document.getElementById('ann-b');
+        const t = tEl?.value?.trim();
+        const b = bEl?.value?.trim();
+        const target = document.getElementById('ann-target')?.value;
+        const urg = document.getElementById('ann-urg')?.value;
+
+        if (!t || !b) {
+          if (!t && tEl) tEl.style.borderColor = '#fb7185';
+          if (!b && bEl) bEl.style.borderColor = '#fb7185';
+          showToast('âŒ Title and message required', 'error');
+          return;
+        }
+
+        const btn = document.querySelector('[onclick*="postAnnouncement"]');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:4px"></i>Posting...'; }
+
+        const r = await fetch(`${API_BASE}/admin/announcements`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: t,
+            body: b,
+            target: target || 'All',
+            urgency: urg || 'Medium',
+            author: u.name || u.id
+          })
+        });
+        const d = await r.json();
+        if (d.ok) {
+          document.getElementById('ann-t').value = '';
+          document.getElementById('ann-b').value = '';
+          tEl.style.borderColor = '';
+          bEl.style.borderColor = '';
+          showToast('âœ… Announcement posted & all students notified!');
+          document.getElementById('page-content').innerHTML = pageAnnounce();
+        } else {
+          showToast('âŒ ' + (d.message || 'Error posting'), 'error');
+        }
+      } catch (e) { showToast('âŒ Server error: ' + e.message, 'error'); } finally {
+        const btn = document.querySelector('[onclick*="postAnnouncement"]');
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane" style="margin-right:4px"></i>Post'; }
+      }
+    };
+
+
+    /* MESSAGES */
+    function pageMessages() {
+      return `<div class="panel"><div class="g2" style="height:520px">
+  <div class="gcard" style="overflow-y:auto;padding:12px">
+    <div class="sh"><div class="sh-t">Chats</div><button class="btn btn-admin btn-xs" onclick="tchrCreateNewChat()" title="Start new conversation"><i class="fa-solid fa-plus" style="margin-right:3px"></i>New</button></div>
+    ${CHATS_T.map(c => `<div class="li" onclick="openChat(${c.id})" id="chat-li-${c.id}" style="${activeChat === c.id ? 'background:rgba(99,102,241,.1)' : ''};border-radius:10px">
+      <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--admin),#818cf8);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;flex-shrink:0">${c.name.split(' ').map(x => x[0]).slice(0, 2).join('')}</div>
+      <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:.8rem">${c.name}</div><div style="font-size:.65rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.last}</div></div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><div style="font-size:.6rem;color:var(--muted)">${c.time}</div>${c.unread > 0 ? `<div style="background:var(--rose);color:#fff;font-size:.55rem;font-weight:700;padding:1px 5px;border-radius:99px">${c.unread}</div>` : ''}</div>
+    </div>`).join('')}
+  </div>
+  <div class="gcard" style="display:flex;flex-direction:column;padding:0" id="chat-window">
+    <div style="padding:14px 16px;border-bottom:1px solid var(--glass-border);font-weight:700;font-size:.88rem">Select a conversation</div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted)"><i class="fa-solid fa-comments" style="font-size:2rem;opacity:.3"></i></div>
+  </div>
+</div></div>`;
+    }
+    window.openChat = function (id) {
+      activeChat = id; const c = CHATS_T.find(x => x.id === id);
+      document.getElementById('chat-window').innerHTML = `
+        <div style="padding:12px 16px;border-bottom:1px solid var(--glass-border);display:flex;align-items:center;gap:10px">
+          <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--admin),#818cf8);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700">${c.name.split(' ').map(x => x[0]).slice(0, 2).join('')}</div>
+          <div><div style="font-weight:700;font-size:.84rem">${c.name}</div><div style="font-size:.62rem;color:var(--muted)">${c.role}</div></div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px" id="msgs">
+          ${c.msgs.map(m => `<div style="display:flex;justify-content:${m.me ? 'flex-end' : 'flex-start'}"><div style="max-width:75%;background:${m.me ? 'rgba(99,102,241,.25)' : 'rgba(255,255,255,.07)'};border:1px solid ${m.me ? 'rgba(99,102,241,.3)' : 'rgba(255,255,255,.1)'};border-radius:12px;padding:8px 12px;font-size:.78rem;line-height:1.5">${m.text}</div></div>`).join('')}
+        </div>
+        <div style="padding:10px 12px;border-top:1px solid var(--glass-border);display:flex;gap:8px">
+          <input class="inp" id="msg-inp" placeholder="Type a message..." style="flex:1" onkeydown="if(event.key==='Enter')sendMsg(${id})">
+          <button class="btn btn-teal btn-sm" onclick="sendMsg(${id})"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>`;
+    };
+    window.sendMsg = function (id) {
+      const inp = document.getElementById('msg-inp');
+      const txt = inp?.value?.trim();
+      if (!txt) return;
+      // Send via socket if available
+      if (window._tchrSocket && window._tchrActiveRoom) {
+        window._tchrSocket.emit('send_message', {
+          room_id: window._tchrActiveRoom,
+          sender_id: window._tchrMyId,
+          sender_name: window._tchrMyName,
+          sender_role: 'Teacher',
+          text: txt
+        });
+      } else {
+        // Fallback to local
+        const c = CHATS_T.find(x => x.id === id);
+        if (c) c.msgs.push({ me: true, text: txt });
+        openChat(id);
+      }
+      inp.value = '';
+    };
+
+    /**
+     * Create a new chat by selecting a contact
+     * Shows a dialog with available contacts to start a conversation
+     */
+    window.tchrCreateNewChat = async function () {
+      const u = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+      const API_BASE = '/api';
+
+      try {
+        const resp = await fetch(`${API_BASE}/chat/contacts/${encodeURIComponent(u.id)}/Teacher`);
+        const data = await resp.json();
+        const contacts = data.ok && data.contacts ? data.contacts : [];
+
+        if (contacts.length === 0) {
+          alert('No contacts available to chat with');
+          return;
+        }
+
+        // Create contact selection dialog
+        const dialogHtml = `
+          <div class="modal-bg" id="new-chat-dialog" onclick="if(event.target.id==='new-chat-dialog') document.getElementById('new-chat-dialog').remove()">
+            <div class="modal" style="width:420px;max-width:95vw">
+              <div class="modal-t"><i class="fa-solid fa-pen-to-square" style="margin-right:8px;color:var(--teal)"></i>Start New Chat</div>
+              <div style="border-bottom:1px solid rgba(255,255,255,0.08);padding:12px 16px;font-size:.7rem;color:var(--muted)">Select a contact to message</div>
+              <div style="max-height:400px;overflow-y:auto;padding:8px 0">
+                ${contacts.map((c, idx) => `
+                  <div class="li" style="margin:0;padding:12px 16px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.04)" onclick="tchrSelectContactForChat(${idx})">
+                    <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;color:${c.role === 'Teacher' ? '#2dd4bf' : c.role === 'Student' ? '#a78bfa' : '#6366f1'};font-size:.9rem;flex-shrink:0">
+                      <i class="fa-solid ${c.role === 'Teacher' ? 'fa-chalkboard-user' : c.role === 'Student' ? 'fa-user-graduate' : 'fa-shield-halved'}"></i>
+                    </div>
+                    <div style="flex:1;">
+                      <div style="font-weight:600;font-size:.8rem">${c.name}</div>
+                      <div style="font-size:.68rem;color:var(--muted)">${c.role_label}</div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>`;
+
+        document.body.insertAdjacentHTML('beforeend', dialogHtml);
+      } catch (e) {
+        console.error('Failed to load contacts:', e);
+        alert('Error loading contacts');
+      }
+    };
+
+    /**
+     * Select a contact and create/open chat with them
+     */
+    window.tchrSelectContactForChat = async function (idx) {
+      const u = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+      const API_BASE = '/api';
+
+      try {
+        // Get contacts again
+        const resp = await fetch(`${API_BASE}/chat/contacts/${encodeURIComponent(u.id)}/Teacher`);
+        const data = await resp.json();
+        const contacts = data.ok && data.contacts ? data.contacts : [];
+        const contact = contacts[idx];
+
+        if (!contact) return;
+
+        // Remove dialog
+        const dialog = document.getElementById('new-chat-dialog');
+        if (dialog) dialog.remove();
+
+        // Call backend to create/get chat
+        const createResp = await fetch(`${API_BASE}/chat/create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user1_id: u.id,
+            user2_id: contact.id,
+            user1_name: u.name,
+            user2_name: contact.name,
+            user1_role: 'Teacher',
+            user2_role: contact.role
+          })
+        });
+        const createData = await createResp.json();
+        if (createData.ok) {
+          showToast('âœ“ Chat opened successfully');
+          // Add to CHATS_T if not already there
+          if (!CHATS_T.find(x => x.id === contact.id)) {
+            CHATS_T.unshift({
+              id: contact.id,
+              name: contact.name,
+              role: contact.role,
+              last: 'Just started...',
+              time: 'now',
+              unread: 0,
+              icon: contact.role === 'Teacher' ? 'fa-chalkboard-user' : 'fa-user-graduate',
+              msgs: []
+            });
+          }
+          // Reload the page to show new contact
+          nav(document.querySelector('[onclick*="messages"]'), 'messages');
+        }
+      } catch (e) {
+        console.error('Chat create error:', e);
+        showToast('Error creating chat', 'error');
+      }
+    };
+    function pageLeave() {
+      const lecturesPerWeek = SCHEDULE.filter(s => s.sub).length;
+      return `<div class="panel">
+  <div class="g2">
+    <div>
+      <div class="gcard" style="margin-bottom:12px">
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-paper-plane" style="margin-right:6px;color:var(--teal)"></i>Apply for Leave</div></div>
+        <div class="g2"><div class="frow"><div class="flbl">From Date</div><input class="inp" type="date"></div><div class="frow"><div class="flbl">To Date</div><input class="inp" type="date"></div></div>
+        <div class="frow" style="margin-top:8px"><div class="flbl">Reason</div><select class="inp"><option>Medical</option><option>Academic Conference</option><option>Personal</option><option>Family Emergency</option></select></div>
+        <div class="frow" style="margin-top:8px"><div class="flbl">Substitute (Optional)</div><input class="inp" placeholder="e.g. Prof. S. Kulkarni"></div>
+        <div class="frow" style="margin-top:8px"><div class="flbl">Additional Details</div><textarea class="inp" placeholder="Any additional info..." style="min-height:60px;resize:none"></textarea></div>
+        <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end"><button class="btn btn-teal btn-sm" onclick="showToast('Leave application submitted!')"><i class="fa-solid fa-paper-plane" style="margin-right:4px"></i>Submit</button></div>
+      </div>
+      <div class="gcard">
+        <div class="sh"><div class="sh-t"><i class="fa-solid fa-briefcase" style="margin-right:6px;color:var(--teal)"></i>Workload Summary</div></div>
+        ${[{ l: 'Lectures / Week', v: lecturesPerWeek, ic: 'fa-chalkboard', c: '#a5b4fc' }, { l: 'Total Students', v: `${MY_STUDENTS.length}`, ic: 'fa-users', c: '#2dd4bf' }, { l: 'Avg Class Size', v: '31', ic: 'fa-users-line', c: 'var(--gold)' }, { l: 'Subjects Teaching', v: SUBJECTS.length, ic: 'fa-book', c: '#34d399' }].map(s => `<div class="li"><div style="width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:.78rem;color:${s.c}"><i class="fa-solid ${s.ic}"></i></div><div style="flex:1;font-size:.78rem">${s.l}</div><span style="font-weight:700;color:${s.c}">${s.v}</span></div>`).join('')}
+      </div>
+    </div>
+    <div class="gcard">
+      <div class="sh"><div class="sh-t"><i class="fa-solid fa-clock-rotate-left" style="margin-right:6px;color:var(--teal)"></i>Leave History</div></div>
+      ${LEAVES_T.map(l => `<div class="gcard" style="margin-bottom:8px;padding:12px 14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-weight:600">${l.reason}</span>${tagHtml(l.status, l.status === 'Approved' ? 'teal' : l.status === 'Rejected' ? 'rose' : 'gold')}</div><div style="font-size:.68rem;color:var(--muted);margin-bottom:4px"><i class="fa-solid fa-calendar" style="margin-right:4px"></i>${l.from} â†’ ${l.to}</div><div style="font-size:.65rem;color:rgba(255,255,255,.3)">Substitute: ${l.sub}</div></div>`).join('')}
+    </div>
+  </div>
+</div>`;
+    }
+
+    /* PERFORMANCE */
+    function pagePerformance() {
+      const subjects_att = [{ sub: 'DSA Â· 3A', att: 81 }, { sub: 'DSA Â· 3B', att: 74 }, { sub: 'Algo Â· 3A', att: 86 }, { sub: 'Adv Algo Â· 4A', att: 79 }];
+      return `<div class="panel">
+  <div class="g3" style="margin-bottom:14px">
+    <div class="stat"><div class="stat-ico" style="background:rgba(99,102,241,.15);color:#a5b4fc"><i class="fa-solid fa-chart-bar"></i></div><div><div class="stat-n" style="color:#a5b4fc">${Math.round(MY_STUDENTS.reduce((a, s) => a + (s.marks.ia1 + s.marks.ia2) / 2, 0) / MY_STUDENTS.length).toFixed(1)}/20</div><div class="stat-l">Avg IA Marks</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(13,148,136,.15);color:#2dd4bf"><i class="fa-solid fa-circle-check"></i></div><div><div class="stat-n" style="color:#2dd4bf">${MY_STUDENTS.filter(s => (s.marks.ia1 + s.marks.ia2) / 2 >= 14).length}</div><div class="stat-l">Students â‰¥70%</div></div></div>
+    <div class="stat"><div class="stat-ico" style="background:rgba(124,58,237,.15);color:#a78bfa"><i class="fa-solid fa-star"></i></div><div><div class="stat-n" style="color:#a78bfa">4.8</div><div class="stat-l">Student Rating</div></div></div>
+  </div>
+  <div class="g2" style="margin-bottom:14px">
+    <div class="gcard">
+      <div class="sh"><div class="sh-t"><i class="fa-solid fa-chart-line" style="margin-right:6px;color:var(--teal)"></i>Attendance by Subject</div></div>
+      ${subjects_att.map(s => `<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:4px"><span style="font-weight:600">${s.sub}</span><span style="color:${s.att >= 75 ? '#2dd4bf' : '#fb7185'};font-weight:700">${s.att}%</span></div><div class="pb"><div class="pf" style="width:${s.att}%;background:${s.att >= 75 ? '#0d9488' : 'var(--rose)'}"></div></div></div>`).join('')}
+    </div>
+    <div class="gcard">
+      <div class="sh"><div class="sh-t"><i class="fa-solid fa-trophy" style="margin-right:6px;color:var(--gold)"></i>Top Performers â€” IA Average</div></div>
+      ${[...MY_STUDENTS].sort((a, b) => (b.marks.ia1 + b.marks.ia2) - (a.marks.ia1 + a.marks.ia2)).slice(0, 5).map((s, i) => `<div class="li"><div style="width:22px;height:22px;border-radius:50%;background:${i === 0 ? 'rgba(232,160,32,.2)' : i === 1 ? 'rgba(255,255,255,.1)' : i === 2 ? 'rgba(205,127,50,.15)' : 'rgba(255,255,255,.05)'};display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;color:${i === 0 ? 'var(--gold)' : i === 1 ? '#e2e8f0' : i === 2 ? '#cd7f32' : 'var(--muted)'}">${i + 1}</div><div style="flex:1;font-size:.78rem;font-weight:600">${s.name}</div><span style="font-weight:700;color:#2dd4bf">${((s.marks.ia1 + s.marks.ia2) / 2).toFixed(1)}/20</span></div>`).join('')}
+    </div>
+  </div>
+</div>`;
+    }
+
+    /* PROFILE */
+    function pageProfile() {
+      return `<div class="panel"><div class="g2">
+  <div>
+    <div class="gcard" style="margin-bottom:12px">
+      <div style="display:flex;gap:16px;align-items:center;margin-bottom:16px">
+        <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#0d9488,#2dd4bf);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:800">RS</div>
+        <div><div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700">Prof. R. Sharma</div><div style="font-size:.72rem;color:var(--muted)">Faculty Â· Computer Science & Engineering</div></div>
+      </div>
+      <div class="sh"><div class="sh-t"><i class="fa-solid fa-user-gear" style="margin-right:6px;color:var(--teal)"></i>Profile Details</div><button class="btn btn-glass btn-xs" onclick="showToast('Edit mode enabled')"><i class="fa-solid fa-pen"></i></button></div>
+      ${[['Employee ID', 'FAC001'], ['Department', 'CSE'], ['Designation', 'Assistant Professor'], ['Email', 'r.sharma@uni.edu'], ['Phone', '+91 98765 43210'], ['Office', 'Block B, Room 204']].map(([k, v]) => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.78rem"><span style="color:var(--muted)">${k}</span><span style="font-weight:600">${v}</span></div>`).join('')}
+    </div>
+    <div class="gcard">
+      <div class="sh"><div class="sh-t"><i class="fa-solid fa-book" style="margin-right:6px;color:var(--teal)"></i>Subjects Assigned</div></div>
+      ${SUBJECTS.map(s => `<div class="li"><div style="width:30px;height:30px;border-radius:8px;background:rgba(99,102,241,.1);display:flex;align-items:center;justify-content:center;color:#a5b4fc;font-size:.78rem"><i class="fa-solid fa-book"></i></div><div style="flex:1"><div style="font-size:.78rem;font-weight:600">${s.name}</div><div style="font-size:.63rem;color:var(--muted)">${s.code} Â· ${s.students} students</div></div></div>`).join('')}
+    </div>
+  </div>
+  <div>
+    <div class="gcard" style="margin-bottom:12px">
+      <div class="sh"><div class="sh-t"><i class="fa-solid fa-clock" style="margin-right:6px;color:var(--teal)"></i>Office Hours</div><button class="btn btn-glass btn-xs" onclick="showToast('Office hours updated')"><i class="fa-solid fa-pen"></i></button></div>
+      ${[['Monday', '3:00 PM â€“ 5:00 PM'], ['Wednesday', '3:00 PM â€“ 5:00 PM'], ['Friday', '10:00 AM â€“ 12:00 PM']].map(([d, h]) => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.78rem"><span style="color:var(--muted)">${d}</span><span style="font-weight:600;color:#2dd4bf">${h}</span></div>`).join('')}
+    </div>
+    <div class="gcard">
+      <div class="sh"><div class="sh-t"><i class="fa-solid fa-bell-concierge" style="margin-right:6px;color:var(--teal)"></i>Notification Preferences</div></div>
+      ${[['New Assignment Submission', 'on'], ['Attendance Defaulter Alert', 'on'], ['Admin Announcements', 'on'], ['Student Messages', 'on']].map(([l, v]) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span style="font-size:.78rem">${l}</span><div style="width:36px;height:20px;border-radius:99px;background:${v === 'on' ? '#0d9488' : 'rgba(255,255,255,.15)'};position:relative;cursor:pointer" onclick="showToast('Preference toggled')"><div style="position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:3px;${v === 'on' ? 'right:3px' : 'left:3px'};transition:.2s"></div></div></div>`).join('')}
+    </div>
+  </div>
+</div></div>`;
+    }
+
+    /* PAGES MAP */
+    const PAGES = { dashboard: pageDashboard, attendance: pageAttendance, students: pageStudents, timetable: pageTimetable, materials: pageMaterials, assignments: pageAssignments, marks: pageMarks, announce: pageAnnounce, messages: pageMessages, leave: pageLeave, performance: pagePerformance, profile: pageProfile };
+
+    /* CHALK BG */
+    const board = document.getElementById('chalkboard');
+    const glow = document.getElementById('mouse-glow');
+    const icons = [];
+    const iconTypes = ['fa-code', 'fa-terminal', 'fa-microchip', 'fa-book', 'fa-graduation-cap', 'fa-flask', 'fa-atom', 'fa-calculator', 'fa-database', 'fa-network-wired', 'fa-chart-line', 'fa-brain', 'fa-chalkboard', 'fa-pen-ruler', 'fa-compass', 'fa-shapes'];
+    const rows = 12, cols = 14;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const icon = document.createElement('i');
+        icon.className = `fa-solid ${iconTypes[Math.floor(Math.random() * iconTypes.length)]} chalk-icon`;
+        icon.style.left = `${(c * (100 / cols)) + (Math.random() * 5)}%`;
+        icon.style.top = `${(r * (100 / rows)) + (Math.random() * 5)}%`;
+        icon.style.fontSize = `${18 + Math.random() * 20}px`;
+        icon.style.opacity = '0.4';
+        board.appendChild(icon);
+        icons.push({ el: icon, x: 0, y: 0, vx: 0, vy: 0 });
+      }
+    }
+    let mX = window.innerWidth / 2, mY = window.innerHeight / 2;
+    document.addEventListener('mousemove', e => { mX = e.clientX; mY = e.clientY; glow.style.left = `${mX}px`; glow.style.top = `${mY}px`; });
+    function animateChalk() {
+      icons.forEach(icon => {
+        const rect = icon.el.getBoundingClientRect();
+        const iX = rect.left + rect.width / 2, iY = rect.top + rect.height / 2;
+        const dx = mX - iX, dy = mY - iY, dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 200) {
+          const angle = Math.atan2(dy, dx), force = (200 - dist) / 200;
+          icon.vx -= Math.cos(angle) * force * 5; icon.vy -= Math.sin(angle) * force * 5;
+          icon.el.style.color = 'rgba(180,180,255,.95)'; icon.el.style.opacity = '1';
+          icon.el.style.filter = 'drop-shadow(0 0 12px rgba(99,102,241,.9))';
+        } else {
+          icon.el.style.color = 'rgba(255,255,255,.35)'; icon.el.style.opacity = '0.4';
+          icon.el.style.filter = 'drop-shadow(0 0 5px rgba(255,255,255,.1))';
+        }
+        icon.vx *= 0.9; icon.vy *= 0.9; icon.x += icon.vx; icon.y += icon.vy; icon.x *= 0.95; icon.y *= 0.95;
+        icon.el.style.transform = `translate(${icon.x}px,${icon.y}px)`;
+      });
+      requestAnimationFrame(animateChalk);
+    }
+    animateChalk();
+
+    /* â”€â”€ BACKEND CONFIG â”€â”€ */
+    const API_BASE = '/api';
+
+    /* â”€â”€ NOTIFICATIONS SYSTEM â”€â”€ */
+    let NOTIFICATIONS = [];
+    let _tchrUser = null;
+
+    // Fetch notifications from backend
+    async function loadNotifications() {
+      try {
+        const user = JSON.parse(sessionStorage.getItem('Uni_user') || '{}');
+        if (!user.id || user.role !== 'Teacher') return;
+        _tchrUser = user;
+
+        const resp = await fetch(`${API_BASE}/notifications/${user.id}/Teacher`);
+        const data = await resp.json();
+        if (data.ok && data.notifications) {
+          NOTIFICATIONS = data.notifications.map(n => ({
+            id: n.id,
+            title: n.title,
+            sub: n.body || 'Notification',
+            icon: 'fa-bell',
+            color: 'rgba(13,148,136,0.15)',
+            iconColor: '#2dd4bf',
+            read: n.read_status === 1,
+            created_at: n.created_at,
+            category: n.category
+          }));
+        }
+        updateNotifBadge();
+        renderNotifList();
+      } catch (e) {
+        console.error('Failed to load notifications:', e);
+      }
+    }
+
+    function getUnreadCount() {
+      return NOTIFICATIONS.filter(n => !n.read).length;
+    }
+
+    function updateNotifBadge() {
+      const cnt = getUnreadCount();
+      const dot = document.getElementById('notif-count');
+      if (!dot) return;
+      if (cnt > 0) {
+        dot.style.display = 'flex';
+        dot.textContent = cnt;
+      } else {
+        dot.style.display = 'none';
+      }
+    }
+
+    function renderNotifList() {
+      const list = document.getElementById('notif-list');
+      if (!list) return;
+      if (NOTIFICATIONS.length === 0) {
+        list.innerHTML = '<div class="notif-empty"><i class="fa-solid fa-bell-slash" style="font-size:1.8rem;display:block;margin-bottom:8px;opacity:.3"></i>All caught up!</div>';
+        return;
+      }
+      const unreadCount = getUnreadCount();
+      list.innerHTML = `<div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.08);font-size:.7rem;color:var(--muted);display:flex;justify-content:space-between;align-items:center">
+        <span>${unreadCount} unread notification${unreadCount !== 1 ? 's' : ''}</span>
+        ${unreadCount > 0 ? `<button class="btn btn-glass btn-xs" onclick="markAllRead()" style="padding:3px 8px;font-size:.62rem"><i class="fa-solid fa-check-double" style="margin-right:3px"></i>Mark all read</button>` : ''}
+      </div>` + NOTIFICATIONS.map((n, i) => `
+        <div class="notif-item ${n.read ? '' : 'unread'}" onclick="readNotif(${i})" style="cursor:pointer;transition:.2s">
+          <div class="notif-ico" style="background:${n.color};color:${n.iconColor}">
+            <i class="fa-solid ${n.icon}"></i>
+          </div>
+          <div class="notif-body">
+            <div class="notif-body-t">${n.title}</div>
+            <div class="notif-body-s">${n.sub}</div>
+          </div>
+          ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
+        </div>`).join('');
+    }
+
+    // Close notifications when clicking outside
+    document.addEventListener('click', () => {
+      const p = document.getElementById('notif-panel');
+      if (p && p.classList.contains('open')) p.classList.remove('open');
+    });
+
+    window.toggleNotifications = function (e) {
+      if (e) e.stopPropagation();
+      const panel = document.getElementById('notif-panel');
+      const isOpen = panel.classList.contains('open');
+      if (isOpen) {
+        panel.classList.remove('open');
+      } else {
+        panel.classList.add('open');
+        renderNotifList();
+      }
+    };
+
+    window.showTeacherHelp = function () {
+      modal(`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
+        <div class="modal-t"><i class="fa-solid fa-circle-question" style="color:var(--teal);margin-right:8px"></i>Teacher Support & Help</div>
+        <p style="font-size:.8rem;color:var(--muted);line-height:1.6;margin-bottom:12px">Welcome to the Uni Faculty Portal. Here you can manage your classes, student attendance, assignments, and grades.</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="padding:10px;background:rgba(255,255,255,.04);border-radius:8px">
+            <div style="font-weight:600;font-size:.75rem;margin-bottom:2px">Technical Issues?</div>
+            <div style="font-size:.7rem;color:var(--muted)">For portal-related issues, contact IT helpdesk at helpdesk@uni.edu.</div>
+          </div>
+          <div style="padding:10px;background:rgba(255,255,255,.04);border-radius:8px">
+            <div style="font-weight:600;font-size:.75rem;margin-bottom:2px">Grading Policy</div>
+            <div style="font-size:.7rem;color:var(--muted)">Download the latest <a href="#" style="color:var(--teal)">Academic Grading Guidelines (2025)</a> for reference.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <button class="btn btn-teal" onclick="closeModal()">Understood</button>
+        </div>
+      </div></div>`);
+    };
+
+    /**
+     * Mark a single notification as read via API
+     */
+    window.readNotif = async function (i) {
+      const notif = NOTIFICATIONS[i];
+      if (notif.read) return; // Already read
+
+      try {
+        const resp = await fetch(`${API_BASE}/notifications/read/${notif.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await resp.json();
+        if (data.ok) {
+          notif.read = true;
+          updateNotifBadge();
+          renderNotifList();
+        }
+      } catch (e) {
+        console.error('Failed to mark notification as read:', e);
+      }
+    };
+
+    /**
+     * Mark all notifications as read via bulk API
+     */
+    window.markAllRead = async function () {
+      if (!_tchrUser) return;
+      try {
+        const resp = await fetch(`${API_BASE}/notifications/mark-read`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: _tchrUser.id, user_role: 'Teacher' })
+        });
+        const data = await resp.json();
+        if (data.ok) {
+          NOTIFICATIONS.forEach(n => n.read = true);
+          updateNotifBadge();
+          renderNotifList();
+        }
+      } catch (e) {
+        console.error('Failed to mark all as read:', e);
+      }
+    };
+
+    window.clearAllNotifications = function () {
+      if (confirm('Clear all notifications?')) {
+        NOTIFICATIONS = [];
+        updateNotifBadge();
+        renderNotifList();
+      }
+    };
+
+    // Close notification panel when clicking outside
+    document.addEventListener('click', function (e) {
+      const panel = document.getElementById('notif-panel');
+      const btn = document.getElementById('notif-btn');
+      if (panel && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
+        panel.classList.remove('open');
+      }
+    });
+    (async function () {
+      const u = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+      if (!u || u.role !== 'Teacher') { window.top.location.href = '/'; return; }
+
+      const initials = u.name.split(' ').map(x => x[0]).join('').slice(0, 2).toUpperCase();
+      document.getElementById('sb-av').textContent = initials;
+      document.getElementById('sb-name').textContent = u.name;
+      document.getElementById('tb-name').textContent = u.name.split(' ')[0];
+
+      /* Load notifications from API */
+      loadNotifications();
+
+      /* Initialize badges */
+      initBadges();
+
+      /* Fetch live teacher data from backend */
+      try {
+        const resp = await fetch(`${API_BASE}/teacher/${encodeURIComponent(u.id)}`);
+        const data = await resp.json();
+        if (data.ok) {
+          const t = data.teacher;
+          /* Update sidebar name + designation from DB */
+          document.getElementById('sb-name').textContent = t.name;
+          document.getElementById('tb-name').textContent = t.name.split(' ')[0];
+          const roleEl = document.querySelector('.sb-role');
+          if (roleEl) roleEl.textContent = t.designation;
+
+          /* Replace hardcoded SUBJECTS with DB classes */
+          if (data.classes && data.classes.length) {
+            SUBJECTS.length = 0;
+            data.classes.forEach(c => {
+              SUBJECTS.push({
+                code: c.subject_code,
+                name: c.name,
+                sections: [c.schedule ? c.schedule.split(' ')[0] : 'A'],
+                students: Number(c.student_count) || 0
+              });
+            });
+          }
+
+          /* Store full profile in session */
+          sessionStorage.setItem('Uni_user', JSON.stringify({
+            ...u, ...t, role: 'Teacher'
+          }));
+
+          /* Save teacher info for chat */
+          window._tchrMyId = t.id || u.id;
+          window._tchrMyName = t.name || u.name;
+        }
+      } catch (e) {
+        console.warn('Backend unavailable, using session data:', e.message);
+      }
+
+      /* Initialize Socket.IO for real-time chat */
+      try {
+        window._tchrSocket = io(window.location.origin);
+        window._tchrActiveRoom = null;
+        window._tchrSocket.on('receive_message', (data) => {
+          if (data.room_id !== window._tchrActiveRoom) return;
+          const msgsEl = document.getElementById('msgs');
+          if (msgsEl) {
+            const u2 = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+            msgsEl.innerHTML += `<div style="display:flex;justify-content:${data.sender_id === u2?.id ? 'flex-end' : 'flex-start'}"><div style="max-width:75%;background:${data.sender_id === u2?.id ? 'rgba(99,102,241,.25)' : 'rgba(255,255,255,.07)'};border:1px solid ${data.sender_id === u2?.id ? 'rgba(99,102,241,.3)' : 'rgba(255,255,255,.1)'};border-radius:12px;padding:8px 12px;font-size:.78rem;line-height:1.5">${data.text}</div></div>`;
+            msgsEl.scrollTop = msgsEl.scrollHeight;
+          }
+        });
+      } catch (e) {
+        console.warn('Socket.IO not available:', e.message);
+      }
+
+      /* Load real contacts for teacher chat */
+      const myId = window._tchrMyId || u.id;
+      try {
+        const cr = await fetch(`${API_BASE}/chat/contacts/${encodeURIComponent(myId)}/Teacher`);
+        const cd = await cr.json();
+        if (cd.ok && cd.contacts.length) {
+          // Prepend real contacts to CHATS_T
+          const realChats = cd.contacts.map((c, i) => ({
+            id: 900 + i,
+            contactId: c.id,
+            name: c.name,
+            role: `${c.role} Â· ${c.role_label}`,
+            last: 'Start chatting...',
+            time: '',
+            unread: 0,
+            msgs: [] // will be loaded on open
+          }));
+          // Merge with existing if not duplicate
+          realChats.forEach(rc => {
+            if (!CHATS_T.find(x => x.name === rc.name)) CHATS_T.unshift(rc);
+          });
+        }
+      } catch (e) { /* silently skip */ }
+
+      /* Override openChat to use Socket.IO */
+      window.openChat = async function (id) {
+        activeChat = id;
+        const c = CHATS_T.find(x => x.id === id);
+        if (!c) return;
+
+        const contactId = c.contactId || c.id;
+        const myId2 = window._tchrMyId || JSON.parse(sessionStorage.getItem('Uni_user') || '{}').id;
+        const roomId = [myId2, contactId].sort().join('_');
+        window._tchrActiveRoom = roomId;
+
+        if (window._tchrSocket) window._tchrSocket.emit('join_room', roomId);
+
+        // Render window
+        document.getElementById('chat-window').innerHTML = `
+          <div style="padding:12px 16px;border-bottom:1px solid var(--glass-border);display:flex;align-items:center;gap:10px">
+            <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--admin),#818cf8);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700">${c.name.split(' ').map(x => x[0]).slice(0, 2).join('')}</div>
+            <div><div style="font-weight:700;font-size:.84rem">${c.name}</div><div style="font-size:.62rem;color:var(--muted)">${c.role}</div></div>
+          </div>
+          <div style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px" id="msgs"><div style="text-align:center;color:var(--muted)"><i class="fa-solid fa-spinner fa-spin"></i></div></div>
+          <div style="padding:10px 12px;border-top:1px solid var(--glass-border);display:flex;gap:8px">
+            <input class="inp" id="msg-inp" placeholder="Type a message..." style="flex:1" onkeydown="if(event.key==='Enter')sendMsg(${id})">
+            <button class="btn btn-teal btn-sm" onclick="sendMsg(${id})"><i class="fa-solid fa-paper-plane"></i></button>
+          </div>`;
+
+        // Load history from API
+        try {
+          const hr = await fetch(`${API_BASE}/chat/messages/${encodeURIComponent(roomId)}`);
+          const hd = await hr.json();
+          const msgsEl = document.getElementById('msgs');
+          if (msgsEl && hd.ok) {
+            if (hd.messages.length === 0) {
+              msgsEl.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:.75rem;padding:20px">No messages yet. Start the conversation!</div>';
+            } else {
+              const u3 = JSON.parse(sessionStorage.getItem('Uni_user') || 'null');
+              msgsEl.innerHTML = hd.messages.map(m => `<div style="display:flex;justify-content:${m.sender_id === u3?.id ? 'flex-end' : 'flex-start'}"><div style="max-width:75%;background:${m.sender_id === u3?.id ? 'rgba(99,102,241,.25)' : 'rgba(255,255,255,.07)'};border:1px solid ${m.sender_id === u3?.id ? 'rgba(99,102,241,.3)' : 'rgba(255,255,255,.1)'};border-radius:12px;padding:8px 12px;font-size:.78rem;line-height:1.5">${m.text}<div style="font-size:.58rem;color:rgba(255,255,255,.3);margin-top:2px">${m.sender_name}</div></div></div>`).join('');
+              msgsEl.scrollTop = msgsEl.scrollHeight;
+            }
+          } else {
+            // Show fallback UI if API response not ok
+            const msgsEl = document.getElementById('msgs');
+            if (msgsEl && c.msgs?.length) {
+              msgsEl.innerHTML = c.msgs.map(m => `<div style="display:flex;justify-content:${m.me ? 'flex-end' : 'flex-start'}"><div style="max-width:75%;background:${m.me ? 'rgba(99,102,241,.25)' : 'rgba(255,255,255,.07)'};border:1px solid ${m.me ? 'rgba(99,102,241,.3)' : 'rgba(255,255,255,.1)'};border-radius:12px;padding:8px 12px;font-size:.78rem">${m.text}</div></div>`).join('');
+            }
+          }
+        } catch (e) {
+          console.error('Chat load error:', e);
+          // Show local messages as fallback
+          const msgsEl = document.getElementById('msgs');
+          if (msgsEl && c.msgs?.length) {
+            msgsEl.innerHTML = c.msgs.map(m => `<div style="display:flex;justify-content:${m.me ? 'flex-end' : 'flex-start'}"><div style="max-width:75%;background:${m.me ? 'rgba(99,102,241,.25)' : 'rgba(255,255,255,.07)'};border:1px solid ${m.me ? 'rgba(99,102,241,.3)' : 'rgba(255,255,255,.1)'};border-radius:12px;padding:8px 12px;font-size:.78rem">${m.text}</div></div>`).join('');
+            showToast('âŒ Could not load message history', 'error');
+          }
+        }
+      };
+
+      /* Render dashboard after data is ready */
+      document.getElementById('page-content').innerHTML = pageDashboard();
+    })();
+
+    function doLogout() { sessionStorage.removeItem('Uni_user'); window.top.location.href = '/'; }
+
+    /* â”€â”€ GLOBAL SEARCH â”€â”€ */
+    function globalSearch(q) {
+      q = q.toLowerCase().trim();
+      if (!q) {
+        document.querySelectorAll('.li, tbody tr').forEach(el => el.style.display = '');
+        return;
+      }
+      document.querySelectorAll('.li').forEach(el => {
+        el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+      document.querySelectorAll('tbody tr').forEach(el => {
+        el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    }
+
+    /* INIT â€“ dashboard rendered by async auth above */
+  </script>
+</body>
+
+</html>
