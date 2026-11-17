@@ -172,14 +172,14 @@ async function seedData() {
   db.run(`INSERT OR IGNORE INTO admins (id,password,name) VALUES (?,?,?)`,['Admin@404',bcrypt.hashSync('Admin@123',salt),'Admin']);
 
   const classes = [
-    {name:'Data Structures & Algorithms',code:'CSE301',dept:'CSE',tid:'T25S022090',sched:'Mon/Wed/Fri 9:00â€“10:00',room:'Lab A-201',cred:4},
-    {name:'Database Management Systems',code:'CSE302',dept:'CSE',tid:'T25S022090',sched:'Tue/Thu 10:00â€“11:30',room:'Room B-105',cred:3},
-    {name:'Operating Systems',code:'CSE303',dept:'CSE',tid:'T25S022090',sched:'Mon/Wed 11:00â€“12:00',room:'Room B-106',cred:3},
-    {name:'Computer Networks',code:'CSE304',dept:'CSE',tid:'T25S022090',sched:'Tue/Thu 2:00â€“3:30',room:'Room A-102',cred:3},
-    {name:'Digital Electronics',code:'ECE201',dept:'ECE',tid:'T25S022091',sched:'Mon/Wed/Fri 10:00â€“11:00',room:'Lab E-101',cred:4},
-    {name:'Signals & Systems',code:'ECE202',dept:'ECE',tid:'T25S022091',sched:'Tue/Thu 11:00â€“12:30',room:'Room E-102',cred:3},
-    {name:'Marketing Management',code:'BBA301',dept:'BBA',tid:'T25S022092',sched:'Mon/Wed 2:00â€“3:30',room:'Room M-201',cred:3},
-    {name:'Business Law',code:'BBA302',dept:'BBA',tid:'T25S022092',sched:'Tue/Thu 9:00â€“10:30',room:'Room M-202',cred:3},
+    {name:'Data Structures & Algorithms',code:'CSE301',dept:'CSE',tid:'T25S022090',sched:'Mon/Wed/Fri 9:00-10:00',room:'Lab A-201',cred:4},
+    {name:'Database Management Systems',code:'CSE302',dept:'CSE',tid:'T25S022090',sched:'Tue/Thu 10:00-11:30',room:'Room B-105',cred:3},
+    {name:'Operating Systems',code:'CSE303',dept:'CSE',tid:'T25S022090',sched:'Mon/Wed 11:00-12:00',room:'Room B-106',cred:3},
+    {name:'Computer Networks',code:'CSE304',dept:'CSE',tid:'T25S022090',sched:'Tue/Thu 2:00-3:30',room:'Room A-102',cred:3},
+    {name:'Digital Electronics',code:'ECE201',dept:'ECE',tid:'T25S022091',sched:'Mon/Wed/Fri 10:00-11:00',room:'Lab E-101',cred:4},
+    {name:'Signals & Systems',code:'ECE202',dept:'ECE',tid:'T25S022091',sched:'Tue/Thu 11:00-12:30',room:'Room E-102',cred:3},
+    {name:'Marketing Management',code:'BBA301',dept:'BBA',tid:'T25S022092',sched:'Mon/Wed 2:00-3:30',room:'Room M-201',cred:3},
+    {name:'Business Law',code:'BBA302',dept:'BBA',tid:'T25S022092',sched:'Tue/Thu 9:00-10:30',room:'Room M-202',cred:3},
   ];
   const cStmt = db.prepare(`INSERT OR IGNORE INTO classes (name,subject_code,department,teacher_id,schedule,room,credits) VALUES (?,?,?,?,?,?,?)`);
   classes.forEach(c => cStmt.run([c.name,c.code,c.dept,c.tid,c.sched,c.room,c.cred]));
@@ -268,11 +268,11 @@ async function seedNewTables(salt) {
   attStmt.free();
 
   const anns = [
-    {title:'End Semester Exams â€” May 5â€“20, 2026',body:'The End Semester Examination schedule for all departments has been released. Hall tickets will be issued one week prior to the exams. All students must ensure their attendance is above 75% to appear for the exams.',target:'All',urgency:'High',author:'Exam Cell',role:'Admin',ts:now-7*86400000},
-    {title:'Ideathon 2026 — Register by March 20',body:'Participate in Uni Ideathon 2026. Cash prizes worth Rs 1,50,000. Open to all UG students. Register at the portal before March 20, 2026.',target:'UG',urgency:'Medium',author:'Innovation Cell',role:'Admin',ts:now-5*86400000},
-    {title:'Network Maintenance â€” Mar 16 (12AMâ€“4AM)',body:'Campus network and all online portals will be unavailable from 12 AM to 4 AM on March 16. Please save your work before midnight.',target:'All',urgency:'Low',author:'IT Department',role:'Admin',ts:now-4*86400000},
-    {title:'Campus Placement Drive â€” TCS on Apr 3',body:'TCS will be visiting the campus on April 3, 2026 for placement drives for CSE and IT final year students. Eligible students must register on the placement portal before March 28.',target:'CSE',urgency:'High',author:'Placement Cell',role:'Admin',ts:now-2*86400000},
-    {title:'Library Extended Hours During Exams',body:'The central library will remain open 24Ã—7 from April 20 to May 20. Students can use reading rooms with their ID cards. Silent zone rules strictly enforced.',target:'All',urgency:'Low',author:'Library',role:'Admin',ts:now-86400000},
+    {title:'End Semester Exams - May 5-20, 2026',body:'The End Semester Examination schedule for all departments has been released. Hall tickets will be issued one week prior to the exams. All students must ensure their attendance is above 75% to appear for the exams.',target:'All',urgency:'High',author:'Exam Cell',role:'Admin',ts:now-7*86400000},
+    {title:'Ideathon 2026 - Register by March 20',body:'Participate in Uni Ideathon 2026. Cash prizes worth Rs 1,50,000. Open to all UG students. Register at the portal before March 20, 2026.',target:'UG',urgency:'Medium',author:'Innovation Cell',role:'Admin',ts:now-5*86400000},
+    {title:'Network Maintenance - Mar 16 (12AM-4AM)',body:'Campus network and all online portals will be unavailable from 12 AM to 4 AM on March 16. Please save your work before midnight.',target:'All',urgency:'Low',author:'IT Department',role:'Admin',ts:now-4*86400000},
+    {title:'Campus Placement Drive - TCS on Apr 3',body:'TCS will be visiting the campus on April 3, 2026 for placement drives for CSE and IT final year students. Eligible students must register on the placement portal before March 28.',target:'CSE',urgency:'High',author:'Placement Cell',role:'Admin',ts:now-2*86400000},
+    {title:'Library Extended Hours During Exams',body:'The central library will remain open 24x7 from April 20 to May 20. Students can use reading rooms with their ID cards. Silent zone rules strictly enforced.',target:'All',urgency:'Low',author:'Library',role:'Admin',ts:now-86400000},
   ];
   const annStmt = db.prepare(`INSERT OR IGNORE INTO announcements (title,body,target,urgency,author,author_role,created_at,reads) VALUES (?,?,?,?,?,?,?,?)`);
   anns.forEach((a,i) => annStmt.run([a.title,a.body,a.target,a.urgency,a.author,a.role,a.ts,Math.floor(Math.random()*500)+100]));
@@ -293,9 +293,9 @@ async function seedNewTables(salt) {
   exStmt.free();
 
   const events = [
-    {name:'TechXcelerate 2026',date:'Apr 22â€“24',venue:'Block F, Open Ground',cat:'Technical',limit:400,reg:312,status:'Open',desc:'Annual tech fest with hackathons, robotics, gaming tournaments.'},
+    {name:'TechXcelerate 2026',date:'Apr 22-24',venue:'Block F, Open Ground',cat:'Technical',limit:400,reg:312,status:'Open',desc:'Annual tech fest with hackathons, robotics, gaming tournaments.'},
     {name:'Rang Cultural Fest',date:'Mar 29',venue:'Main Amphitheatre',cat:'Cultural',limit:700,reg:680,status:'Closing',desc:'Celebrating diversity through dance, music, and drama.'},
-    {name:'Campus Placement Drive â€” TCS',date:'Apr 3',venue:'Seminar Hall A',cat:'Career',limit:200,reg:145,status:'Open',desc:'TCS MNC recruitment for CSE/IT branches.'},
+    {name:'Campus Placement Drive - TCS',date:'Apr 3',venue:'Seminar Hall A',cat:'Career',limit:200,reg:145,status:'Open',desc:'TCS MNC recruitment for CSE/IT branches.'},
     {name:'Research Symposium RISE',date:'Apr 8',venue:'Convention Centre',cat:'Academic',limit:150,reg:78,status:'Open',desc:'Research paper presentations and faculty talks.'},
   ];
   const evStmt = db.prepare(`INSERT OR IGNORE INTO events (name,date,venue,category,reg_limit,registered,status,description) VALUES (?,?,?,?,?,?,?,?)`);
@@ -327,7 +327,7 @@ async function seedNewTables(salt) {
     {date:'2026-04-01',event:'Mid-Semester Results Declared',type:'Result'},
     {date:'2026-04-03',event:'TCS Campus Placement Drive',type:'Event'},
     {date:'2026-04-08',event:'Research Symposium RISE',type:'Event'},
-    {date:'2026-04-14',event:'Dr. Ambedkar Jayanti â€” Holiday',type:'Holiday'},
+    {date:'2026-04-14',event:'Dr. Ambedkar Jayanti - Holiday',type:'Holiday'},
     {date:'2026-04-22',event:'Earth Day Campus Drive',type:'Event'},
     {date:'2026-04-22',event:'TechXcelerate 2026 Begins',type:'Event'},
     {date:'2026-05-05',event:'End Semester Exams Begin',type:'Exam'},
