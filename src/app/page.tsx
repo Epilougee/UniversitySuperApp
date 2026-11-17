@@ -5,65 +5,19 @@ import { useRouter } from 'next/navigation';
 import Chalkboard from '@/components/Chalkboard';
 import { UserRole } from '@/lib/types';
 
-interface DemoAccount {
-  id: string;
-  pass: string;
-  name: string;
-  role: UserRole;
-  desc: string;
-}
-
-const DEMO_ACCOUNTS: Record<UserRole, DemoAccount> = {
-  Student: {
-    id: 'E25B022087',
-    pass: 'E25B022087',
-    name: 'John Doe',
-    role: 'Student',
-    desc: 'Computer Science (Year 2)',
-  },
-  Teacher: {
-    id: 'T25S022090',
-    pass: 'T25S022090',
-    name: 'Dr. Indu Kumari',
-    role: 'Teacher',
-    desc: 'Associate Professor (CSE)',
-  },
-  Admin: {
-    id: 'Admin@404',
-    pass: 'Admin@123',
-    name: 'System Admin',
-    role: 'Admin',
-    desc: 'Full Access Administrator',
-  },
-};
-
 export default function LoginPage() {
   const router = useRouter();
   const [role, setRole] = useState<UserRole>('Student');
-  const [id, setId] = useState('E25B022087');
-  const [password, setPassword] = useState('E25B022087');
+  const [id, setId] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [demoFeedback, setDemoFeedback] = useState<string | null>(null);
-
-  const fillDemo = (targetRole: UserRole) => {
-    const account = DEMO_ACCOUNTS[targetRole];
-    setRole(targetRole);
-    setId(account.id);
-    setPassword(account.pass);
-    setError(null);
-    setDemoFeedback(`✓ Auto-filled ${targetRole} credentials (${account.name})`);
-    setTimeout(() => {
-      setDemoFeedback(null);
-    }, 3000);
-  };
 
   const handleRoleSelect = (newRole: UserRole) => {
     setRole(newRole);
     setError(null);
-    const account = DEMO_ACCOUNTS[newRole];
-    setId(account.id);
-    setPassword(account.pass);
+    setId('');
+    setPassword('');
   };
 
   const handleLogin = async (e?: React.FormEvent) => {
@@ -91,7 +45,6 @@ export default function LoginPage() {
         return;
       }
 
-      // Store in session storage
       sessionStorage.setItem(
         'Uni_user',
         JSON.stringify({
@@ -163,79 +116,10 @@ export default function LoginPage() {
           </button>
         </div>
 
-        {/* Demo auto-fill option section */}
-        <div style={styles.demoSection}>
-          <div style={styles.demoHeader}>
-            <span style={styles.demoTitle}>
-              <i className="fa-solid fa-wand-magic-sparkles" style={{ marginRight: 6, color: '#a5b4fc' }}></i>
-              Click to Auto-Fill Demo:
-            </span>
-            <button
-              type="button"
-              style={styles.quickFillCurrentBtn}
-              onClick={() => fillDemo(role)}
-              title={`Fill demo credentials for current role (${role})`}
-            >
-              <i className="fa-solid fa-bolt" style={{ marginRight: 4 }}></i>
-              Fill {role}
-            </button>
-          </div>
-
-          <div style={styles.demoChipsRow}>
-            <button
-              type="button"
-              style={{
-                ...styles.demoChip,
-                ...(role === 'Student' ? styles.demoChipSelected : {}),
-              }}
-              onClick={() => fillDemo('Student')}
-            >
-              <i className="fa-solid fa-user-graduate" style={{ marginRight: 5 }}></i>
-              Demo Student
-            </button>
-            <button
-              type="button"
-              style={{
-                ...styles.demoChip,
-                ...(role === 'Teacher' ? styles.demoChipSelected : {}),
-              }}
-              onClick={() => fillDemo('Teacher')}
-            >
-              <i className="fa-solid fa-chalkboard-user" style={{ marginRight: 5 }}></i>
-              Demo Teacher
-            </button>
-            <button
-              type="button"
-              style={{
-                ...styles.demoChip,
-                ...(role === 'Admin' ? styles.demoChipSelected : {}),
-              }}
-              onClick={() => fillDemo('Admin')}
-            >
-              <i className="fa-solid fa-shield-halved" style={{ marginRight: 5 }}></i>
-              Demo Admin
-            </button>
-          </div>
-        </div>
-
-        {demoFeedback && (
-          <div style={styles.feedbackBanner}>
-            <i className="fa-solid fa-circle-check" style={{ marginRight: 6 }}></i>
-            {demoFeedback}
-          </div>
-        )}
-
         <form onSubmit={handleLogin}>
           <div style={styles.inputBox}>
             <div style={styles.labelRow}>
               <label style={styles.label}>{roleLabels[role]}</label>
-              <button
-                type="button"
-                style={styles.labelAction}
-                onClick={() => fillDemo(role)}
-              >
-                Auto-fill
-              </button>
             </div>
             <div style={styles.inputWrapper}>
               <i className="fa-solid fa-id-card" style={styles.inputIcon}></i>
@@ -246,6 +130,7 @@ export default function LoginPage() {
                 onChange={(e) => setId(e.target.value)}
                 style={styles.input}
                 disabled={loading}
+                autoComplete="username"
               />
             </div>
           </div>
@@ -253,7 +138,6 @@ export default function LoginPage() {
           <div style={styles.inputBox}>
             <div style={styles.labelRow}>
               <label style={styles.label}>Password</label>
-              <span style={styles.labelHint}>Demo: default ID or Admin@123</span>
             </div>
             <div style={styles.inputWrapper}>
               <i className="fa-solid fa-lock" style={styles.inputIcon}></i>
@@ -264,6 +148,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 style={styles.input}
                 disabled={loading}
+                autoComplete="current-password"
               />
             </div>
           </div>
@@ -340,7 +225,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     justifyContent: 'space-between',
     gap: 8,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   roleBtn: {
     flex: 1,
@@ -360,75 +245,6 @@ const styles: Record<string, React.CSSProperties> = {
     borderColor: 'rgba(99, 102, 241, 0.5)',
     boxShadow: '0 8px 24px rgba(99, 102, 241, 0.4)',
   },
-  demoSection: {
-    marginBottom: 18,
-    padding: '10px 12px',
-    borderRadius: 14,
-    background: 'rgba(99, 102, 241, 0.08)',
-    border: '1px solid rgba(99, 102, 241, 0.2)',
-    textAlign: 'left',
-  },
-  demoHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  demoTitle: {
-    fontSize: 11,
-    fontWeight: 600,
-    color: '#c7d2fe',
-    letterSpacing: 0.5,
-    display: 'flex',
-    alignItems: 'center',
-  },
-  quickFillCurrentBtn: {
-    background: 'rgba(99, 102, 241, 0.2)',
-    border: '1px solid rgba(99, 102, 241, 0.4)',
-    color: '#e0e7ff',
-    padding: '3px 8px',
-    borderRadius: 8,
-    fontSize: 10.5,
-    fontWeight: 600,
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-  },
-  demoChipsRow: {
-    display: 'flex',
-    gap: 6,
-    justifyContent: 'space-between',
-  },
-  demoChip: {
-    flex: 1,
-    background: 'rgba(255, 255, 255, 0.05)',
-    border: '1px solid rgba(255, 255, 255, 0.12)',
-    color: 'rgba(255, 255, 255, 0.75)',
-    padding: '7px 4px',
-    borderRadius: 9,
-    fontSize: 11,
-    fontWeight: 600,
-    cursor: 'pointer',
-    textAlign: 'center',
-    transition: 'all 0.2s',
-  },
-  demoChipSelected: {
-    background: 'rgba(99, 102, 241, 0.3)',
-    borderColor: '#818cf8',
-    color: '#ffffff',
-    boxShadow: '0 2px 10px rgba(99, 102, 241, 0.25)',
-  },
-  feedbackBanner: {
-    marginBottom: 14,
-    fontSize: 11.5,
-    color: '#86efac',
-    background: 'rgba(34, 197, 94, 0.1)',
-    border: '1px solid rgba(34, 197, 94, 0.3)',
-    padding: '7px 12px',
-    borderRadius: 10,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   inputBox: {
     textAlign: 'left',
     marginBottom: 16,
@@ -446,20 +262,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: 'rgba(165, 180, 252, 0.75)',
     fontWeight: 700,
     marginLeft: 4,
-  },
-  labelAction: {
-    background: 'none',
-    border: 'none',
-    color: '#818cf8',
-    fontSize: 10,
-    fontWeight: 600,
-    cursor: 'pointer',
-    textDecoration: 'underline',
-    padding: 0,
-  },
-  labelHint: {
-    fontSize: 9.5,
-    color: 'rgba(255, 255, 255, 0.35)',
   },
   inputWrapper: {
     position: 'relative',
